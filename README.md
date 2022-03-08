@@ -1,5 +1,5 @@
 # NSMRWii
- A general New Super Mario Bros Wii Randomizer\
+ A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
  Currently the project is a work-in-progress.
 
 ## Features
