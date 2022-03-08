@@ -11,11 +11,18 @@
  1. Place the "Stage" folder at the root directory (Obtained in the game's file)
  2. Compile randomize_basic.py: Open the terminal and type \
    a. <code>python randomizer_basic.py</code> or\
-   b. <code>python3 randomizer_basic.py</code>
+   b. <code>python3 randomizer_basic.py</code> \
+   (Make sure python 3 is installed)
+ 3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.
 
 ## Planned Features
+Note: Planned features may be changed or removed at anytime
 - Full support for enemy randomization
-- 
+- Block randomization
+- Tileset randomizaion
+- Area / Entrance randomization
+- Support for level description for levels made by Reggie!
+- Seed system
 
 ## Notes
  Although this project was not based on the Reggie! NSMBW level editor,
