@@ -4,7 +4,7 @@
 
 ## Features
 - Shuffle levels
-- Shuffle enemies
+- Shuffle enemies (Partial)
 
 ## Usage
  A very temporary documentation about how to use this.
@@ -14,6 +14,11 @@
    b. <code>python3 randomizer_basic.py</code> \
    (Make sure python 3 is installed)
  3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.
+### Randomize enemies
+ Insert the Sprite ID in "Enemy Shuffle List.txt"
+ - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
+ - **New line for each Sprite ID entry**
+ - **Empty line will cause error. Remove empty lines in the file**
 
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
