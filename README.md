@@ -4,7 +4,7 @@
 
 ## Features
 - Shuffle levels
-- Shuffle enemies (Partial)
+- Shuffle enemies (Partial, may crash with some enemy)
 
 ## Usage
  A very temporary documentation about how to use this.
@@ -19,6 +19,7 @@
  - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
  - **New line for each Sprite ID entry**
  - **Empty line will cause error. Remove empty lines in the file**
+ - **Some sprite will cause crashes in the game. Testing is in progress for which (and how) sprite will crash the game**
 
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
