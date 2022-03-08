@@ -109,12 +109,12 @@ class NSMBWsprite:
     ################## RANDO ####################
     def randomEnemy(eData,lvName):
         reData = eData
-        print(erList)
+        #print(erList)
         for i in range(0,len(reData)):
-            print(reData[i][0])
+            #print(reData[i][0])
             if reData[i][0] in erList:
                 reData[i][0] = erList[randint(0,len(erList)-1)]
-                print(reData[i])
+                #print(reData[i])
             
         return reData
 

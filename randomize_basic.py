@@ -56,9 +56,9 @@ for istr in odir_c:
     u8n = u8_m.repackToBytes(u8list)
     u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
 
-    u8_m.saveByteData("01-01.arc",u8n)
+    u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
     
-    break #NOTE: break for debugging purpose
+    #break #NOTE: break for debugging purpose
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)
