@@ -1,0 +1,102 @@
+ARCHIVE STRUCTURE:
+
+--course
+----course1.bin(level info, entities?)
+----course1_bgdatL0.bin(Tiles info, layer 0)
+----course1_bgdatL1.bin(Tiles info, layer 1)
+----course1_bgdatL2.bin(Tiles info, layer 2)
+
+-area number is followed by "course". e.g. course1 = Area 1, course3 = Area 3, etc.
+-If no tiles were presented, 0xFFFF is stored for bgdat file
+
+-For the bytes after the string names, a bunch of 0x00 will appear
+    -The number of 0x00 are usually in the multple of 8, i.e.16,32,8
+    -Divide the number by 8, you will get the number of area(s) of that level.
+
+-Between file datas, an array of 0x00 will appear
+    -NEEDS INVESTIGATING
+
+FILE STRUCTUIRE
+1. course1.bin
+(Reference and further info: see reggie.py in Reggie Editor Source, search up self.block
+        -Line 1681 for level loading (@def loadLevel())
+        -Line 1807 and below fof each block loading (@def LoadMetabase())
+)
+
+HEAD:
+8 bytes for each section (referenced as blocks in Reggie Source), 14 Sections in total, 112 bytes total
+format:
+    -First 4 bytes: Unsigned Int for the offset to the setting
+    -Second 4 bytes: Unsigned Int for the size of that setting
+
+After Head:
+-OPTIONAL Level Description, added by the Reggie Editor
+-Size can be calculated by (First section's offset)-(0x70)
+    -0x70 = Size of head
+
+Sections:
+    SECTION 0: TILESET NAMES
+
+    SECTION 1: LEVEL PROPERTIES
+
+    SECTION 2: ZONES (GEOMETRIES(Pos, Size))
+
+    SECTION 4: TOP BACKGROUND
+
+    SECTION 5: BOTTOM BACKGROUND
+
+    SECTION 6: ENTRANCE
+    20 bytes for each entrance entry
+    Format: (All offset from the start of the entry)
+        Offset  DataType(C)  DataType(Py)  Description
+        0x00    UnsignShort  Integer       X Position of the entrance
+        0x02    UnsignShort  Integer       Y Position of the entrance
+        0x04    PaddingByte     /          -From 04 to 07
+        0x08    Unsign Char  Integer       Entrance ID
+        0x09    Unsign Char  Integer       Destination Area ID (0 for local(In-area) travel)
+        0x0A    Unsign Char  Integer       Destination Entrance ID
+        0x0B    Unsign Char  Integer       Entrance Type, see [1] below
+        0x0C    PaddingByte     /          -Only 1 byte
+        0x0D    Unsign Char  Integer       Zone ID(Which zone is the entrance located)???
+        0x0E    Unsign Char  Integer       
+        0x0F    Unsign Char  Integer       
+        0x10    UnsignShort  Integer       Entrance Enterable (128=True, 0=False)
+        0x12    PaddingByte     /          -From 12 to 13
+
+    [1]: Entrance type list
+    0: Normal
+    3: Upward Pipe
+    4: Downward Pipe
+    5: Leftward Pipe
+
+    SECTION 7: SPRITES
+    16 bytes for each sprites data entry
+    Format: (All offset from the start of the entry)
+        Offset  DataType(C)  DataType(Py)  Description
+        0x00    UnsignShort  Integer       Sprite ID {1}
+        0x02    UnsignShort  Integer       X Position
+        0x04    UnsignShort  Integer       Y Position
+        0x06    Char[8]      Bytes[8]      Raw Data (Properties) {2}
+        0x0D    PaddingByte     /          -from 0D to 0E
+
+    {1} Refer to the datas in Reggie Editor for ID list
+    {2} Most of the time is a flag(i.e. 0 or 1), but it is a hex value
+
+    SECTION 9: ZONE (DATA)
+
+    SECTION 10: LOCATIONS
+
+    SECTION 11: CAMERAS
+
+
+===========RANDO DEVELOPER NOTES============ (section written for reference in development of this program)
+
+entrance.txt
+--
+335: Start of entrance info
+343: Entrance ID
+
+
+enemy&entrance.txt
+365 enemy loc
+331 entrance loc
