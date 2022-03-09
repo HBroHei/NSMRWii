@@ -5,3 +5,4 @@ test1.arc
 *.arc
 Stage_Shuffled/
 __pycache__
+*.pyc

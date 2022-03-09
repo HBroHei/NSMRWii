@@ -55,7 +55,7 @@ for istr in odir_c:
     lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
     u8list["course1.bin"]["Data"] = nsmbw.writeDef(lvlSetting)
 
-    print(lvlSetting[8]["Data"])
+    #print(lvlSetting[8]["Data"])
     
     u8n = u8_m.repackToBytes(u8list)
     u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
