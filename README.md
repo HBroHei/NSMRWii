@@ -16,12 +16,12 @@
  1. Place the "Stage" folder at the root directory (Obtained in the game's file: DATA/files/)
  2. Open the file "Start.bat"
  3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.\
- **Some levels does not support randomized enemies. For a list of them, check "Level to be fixed" file**
  ### Randomize enemies
  Insert the Sprite ID in "Enemy Shuffle List.txt"
  - **New line for each Sprite ID entry**
  - **Empty line will cause error. Remove empty lines in the file**
  - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
+ - **Some levels does not support randomized enemies. For a list of them, check "Level to be fixed" file**
 
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
