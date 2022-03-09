@@ -1,6 +1,7 @@
 # New Super Mario Randomizer Wii
  A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
  Currently the project is a work-in-progress.
+***DISCLAMER: This program only received limited testing. The game may crash or get bugged at any time***
 
 ## Features
 - Shuffle levels
@@ -32,7 +33,6 @@ Note: Planned features may be changed or removed at anytime
 - Seed system
 
 ## Notes
-***DISCLAMER: This program only received limited testing. The game may crash or get bugged at any time***
  - Although this project was not based on the Reggie! NSMBW level editor,
  Some U8 / Level data phrasing procedure were written with the help from the source code of the Reggie! Editor. \
 Reggie! Editor: https://www.github.com/roadrunnerwmc/reggie-updated and https://www.github.com/clf78/reggie-next \
