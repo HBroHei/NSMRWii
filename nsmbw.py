@@ -65,6 +65,32 @@ def readRandoRule():
     erList = list(map(lambda l:int(l),_erList))
     rf.close()
 
+class NSMBWLoadSprite:
+    def __init__(self):
+        pass
+
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<=len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(int.from_bytes(byteData[0+i:2+i],"big"))
+            i+=4
+        return returnList
+
+    def toByteData(sprList,orgLen):
+        i = 0
+        returnByte = b""
+        for ID in sprList:
+            #print(ID)
+            returnByte += ID.to_bytes(2,"big") + b"\x00\x00"
+
+        #Fill in some padding data to match the orginal data length.
+        #while len(returnByte)<orgLen:
+        #    returnByte += b"\x00"
+        return returnByte
+
+
 
 class NSMBWsprite:
     def __init__(self,ID=None,x=None,y=None,prop=None):
@@ -107,14 +133,20 @@ class NSMBWsprite:
         return returnByte
 
     ################## RANDO ####################
-    def randomEnemy(eData,lvName):
+    def randomEnemy(eData,leData,lvName):
         reData = eData
+        relData = leData
         #print(erList)
         for i in range(0,len(reData)):
             #print(reData[i][0])
             if reData[i][0] in erList:
                 reData[i][0] = erList[randint(0,len(erList)-1)]
+                if reData[i][0] not in relData:
+                    relData.append(reData[i][0])
                 #print(reData[i])
             
-        return reData
+        return reData,relData
+
+
+
 

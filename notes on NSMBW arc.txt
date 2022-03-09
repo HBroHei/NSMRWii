@@ -82,6 +82,11 @@ Sections:
     {1} Refer to the datas in Reggie Editor for ID list
     {2} Most of the time is a flag(i.e. 0 or 1), but it is a hex value
 
+    SECTION 8: LOADED SPRITES
+    Used to identify the reources needed to load the sprites in the level
+    4 bytes for each entry
+    Format: 2 bytes for the ID, with 2 padding bytes
+
     SECTION 9: ZONE (DATA)
 
     SECTION 10: LOCATIONS
