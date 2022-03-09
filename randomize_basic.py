@@ -76,3 +76,4 @@ for istr in odir_c:
     del odir[rdm]
 shutil.rmtree(STG_OLD)
 
+input("Shuffle completed. Press Enter to continue...")
