@@ -3,7 +3,6 @@ import shutil
 import nsmbw
 from nsmbw import NSMBWLoadSprite, NSMBWsprite
 import u8_m
-import u8
 from sys import exit
 from random import randint
 
@@ -62,14 +61,14 @@ for istr in odir_c:
         spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
         sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
         spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+odir[rdm])
-    
+
         lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
         lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
         u8list["course1.bin"]["Data"] = nsmbw.writeDef(lvlSetting)
-    
+
         u8n = u8_m.repackToBytes(u8list)
         u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
-    
+
         u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
 
     #break #NOTE: break for debugging purpose
