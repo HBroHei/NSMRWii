@@ -1,10 +1,10 @@
-# NSMRWii
+# New Super Mario Randomizer Wii
  A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
  Currently the project is a work-in-progress.
 
 ## Features
 - Shuffle levels
-- Shuffle enemies (Partial, may crash with some enemy)
+- Shuffle enemies (Partial, works with most stages)
 
 ## Usage
  A very temporary documentation about how to use this.
@@ -13,8 +13,8 @@
    a. <code>python randomizer_basic.py</code> or\
    b. <code>python3 randomizer_basic.py</code> \
    (Make sure python 3 is installed)
- 3. ~~The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.~~
- **This does not work currently. This bug will be fixed ASAP**
+ 3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.\
+ **Some levels does not support randomized enemies. For a list of them, check "Level to be fixed" file**
  ### Randomize enemies
  Insert the Sprite ID in "Enemy Shuffle List.txt"
  - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
