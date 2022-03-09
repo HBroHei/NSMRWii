@@ -4,5 +4,7 @@ Stage_/
 test1.arc
 *.arc
 Stage_Shuffled/
-__pycache__
+__pycache__/
 *.pyc
+U8/
+.gitignore

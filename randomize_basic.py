@@ -26,10 +26,20 @@ shutil.rmtree(STG_NEW,True)
 print("Copying the Stage folder...")
 shutil.copytree("Stage",STG_OLD)
 # Move the files that needs to be in the orginal names
-# Texture Folder
-shutil.move(STG_OLD + "/" + "Texture",STG_NEW + "/" + "Texture")
-# 02-24.arc: 2-Castle, contains hard-coded stuff that will break the game if editted
-shutil.move(STG_OLD + "/" + "02-24.arc",STG_NEW + "/" + "02-24.arc")
+skipF = open("Skip List.txt","r")
+skipL = skipF.read().split("\n")
+
+for istr in skipL:
+    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+
+# Move the files that is bugged
+skipF = open("Level to be fixed","r")
+skipB = skipF.read().split("\n")
+
+for istr in skipB:
+    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
 
 odir = os.listdir(STG_OLD)
 odir_c = odir[:]
@@ -40,29 +50,28 @@ nsmbw.readRandoRule()
 #Loop through each levels
 for istr in odir_c:
     rdm = randint(0,len(odir)-1)
+    #rdm = odir.index(istr)
     print("Processing ",istr,": Renaming to ",odir[rdm])
     os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
 
     # U8 Archive Editting
-    u8list = u8_m.openFile(STG_NEW+"/"+odir[rdm],STG_OLD + "/" + istr)
-    u8FileList = u8list["File Name List"]
-    lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
-    spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-    sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
-    spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+odir[rdm])
-
-    lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
-    lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
-    u8list["course1.bin"]["Data"] = nsmbw.writeDef(lvlSetting)
-
-    #print(lvlSetting[8]["Data"])
+    if istr not in skipB:
+        u8list = u8_m.openFile(STG_NEW+"/"+odir[rdm],STG_OLD + "/" + istr)
+        u8FileList = u8list["File Name List"]
+        lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
+        spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
+        sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
+        spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+odir[rdm])
     
-    u8n = u8_m.repackToBytes(u8list)
-    u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
-
-    u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
+        lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
+        lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
+        u8list["course1.bin"]["Data"] = nsmbw.writeDef(lvlSetting)
     
-    #u8_m.saveByteData("01-01.arc",u8n)
+        u8n = u8_m.repackToBytes(u8list)
+        u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
+    
+        u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
+
     #break #NOTE: break for debugging purpose
 
     del odir[rdm]
