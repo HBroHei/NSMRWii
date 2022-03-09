@@ -7,20 +7,20 @@
 - Shuffle enemies (Partial, works with most stages)
 
 ## Usage
- A very temporary documentation about how to use this.
- 1. Place the "Stage" folder at the root directory (Obtained in the game's file)
- 2. Compile randomize_basic.py: Open the terminal and type \
-   a. <code>python randomizer_basic.py</code> or\
-   b. <code>python3 randomizer_basic.py</code> \
-   (Make sure python 3 is installed)
+ ### Prerequest
+ - Python 3.x (Only tested on 3.9 or above): https://www.python.org/downloads/ 
+   - Windows store version can be installed instead
+ - NSMBW Stage folder (The one that would be used for the Reggie! Editor)
+ ### Procedure
+ 1. Place the "Stage" folder at the root directory (Obtained in the game's file: DATA/files/)
+ 2. Open the file "Start.bat"
  3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.\
  **Some levels does not support randomized enemies. For a list of them, check "Level to be fixed" file**
  ### Randomize enemies
  Insert the Sprite ID in "Enemy Shuffle List.txt"
- - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
  - **New line for each Sprite ID entry**
  - **Empty line will cause error. Remove empty lines in the file**
- - **Some sprite will cause crashes in the game. Testing is in progress for which (and how) sprite will crash the game**
+ - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
 
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
@@ -32,6 +32,7 @@ Note: Planned features may be changed or removed at anytime
 - Seed system
 
 ## Notes
+***DISCLAMER: This program only received limited testing. The game may crash or get bugged at any time***
  - Although this project was not based on the Reggie! NSMBW level editor,
  Some U8 / Level data phrasing procedure were written with the help from the source code of the Reggie! Editor. \
 Reggie! Editor: https://www.github.com/roadrunnerwmc/reggie-updated and https://www.github.com/clf78/reggie-next \
