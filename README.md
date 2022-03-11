@@ -1,6 +1,6 @@
 # New Super Mario Randomizer Wii
  A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
- Currently the project is a work-in-progress.
+ Currently the project is a work-in-progress. \
 ***DISCLAMER: This program only received limited testing. The game may crash or get bugged at any time***
 
 ## Features
