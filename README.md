@@ -5,7 +5,7 @@
 
 ## Features
 - Shuffle levels
-- RAndomize enemies
+- Randomize enemies
 
 ## Usage
  ### Prerequest
