@@ -39,6 +39,6 @@ Note: Planned features may be changed or removed at anytime
 ## Notes
  - Although this project was not based on the Reggie! NSMBW level editor,
  Some U8 / Level data phrasing procedure were written with the help from the source code of the Reggie! Editor. \
-Reggie! Editor: https://www.github.com/roadrunnerwmc/reggie-updated and https://www.github.com/clf78/reggie-next \
+Reggie! Editor: https://www.github.com/RoadrunnerWMC/Reggie-Updated (Updated) / https://www.github.com/CLF78/Reggie-Next (Next) \
 Information about U8 archive is provided from https://wiki.tockdom.com/wiki/U8_(File_Format) and https://wiibrew.org/wiki/U8_archive \
  ***Due to an upcoming IRL event, updates to this project will be slowed down or paused at times until Late May***
