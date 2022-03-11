@@ -50,9 +50,9 @@ nsmbw.readRandoRule()
 #Loop through each levels
 for istr in odir_c:
     rdm = randint(0,len(odir)-1)
-    rdm = 0
-    istr = "05-21.arc"
-    odir[rdm] = istr
+    #rdm = 0
+    #istr = "05-21.arc"
+    #odir[rdm] = istr
     print("Processing ",istr,": Renaming to ",odir[rdm])
     os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
 
@@ -96,7 +96,7 @@ for istr in odir_c:
     #lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
     #print(u8list["Raw Data"][:520])
     #u8_m.saveTextData("u8r.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
-    break #NOTE: break for debugging purpose
+    #break #NOTE: break for debugging purpose
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)
