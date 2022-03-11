@@ -13,7 +13,8 @@
    - Windows store version can be installed instead
  - NSMBW Stage folder (The one that would be used for the Reggie! Editor)
  ### Procedure
- **This instruction is for Windows only. MacOS and Linux command will be crreatedd later\ Type python3 raandomize_basic.py directly into the terminal for now**
+ **This instruction is for Windows only. MacOS and Linux command will be created later.** \
+ **Type python3 randomize_basic.py directly into the terminal for now**
  1. Place the "Stage" folder at the root directory (Obtained in the game's file: DATA/files/)
  2. Open the file "Start.bat"
  3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.\
