@@ -29,7 +29,6 @@
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
 - Configuration file
-- Full support for enemy randomization
 - Unique enemies (Randomize properties)
 - Block randomization
 - Tileset randomizaion
