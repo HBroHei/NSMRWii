@@ -11,6 +11,7 @@ BinfileName = "Stage/Extract/course/course1.bin"
 
 erList = []
 
+
 ### OPEN FILE ###
 """bfile = open(BinfileName,"rb")
 byteFile = bfile.read()
@@ -65,6 +66,20 @@ def readRandoRule():
     erList = list(map(lambda l:int(l),_erList))
     rf.close()
 
+class NSMBWtileset:
+    #Only implemented this to fix problematic level
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<=len(byteData):
+            #print(byteData[0+i:2+i])
+            if byteData[0+i:2+i] != b"":
+                #print("".join(list(filter(lambda l: l!=b"\x00",byteData[0+i:32+i]))))
+                returnList.append(byteData[0+i:32+i].strip(b"\x00"))
+            i+=32
+        return returnList
+
+
 class NSMBWLoadSprite:
     def __init__(self):
         pass
@@ -74,8 +89,10 @@ class NSMBWLoadSprite:
         returnList = []
         while i<=len(byteData):
             #print(byteData[0+i:2+i])
-            returnList.append(int.from_bytes(byteData[0+i:2+i],"big"))
+            if byteData[0+i:2+i] != b"":
+                returnList.append(int.from_bytes(byteData[0+i:2+i],"big"))
             i+=4
+            #print(returnList[-1])
         return returnList
 
     def toByteData(sprList,orgLen):
@@ -123,7 +140,7 @@ class NSMBWsprite:
             if len(prop)==8:
                 returnByte += (ID).to_bytes(2,"big")+(x).to_bytes(2,"big")+(y).to_bytes(2,"big")+prop+b"\x00\x00"
             else:
-                print("Error: properties not in 8 bytes")
+                print("WARNING: properties not in 8 bytes")
         
         returnByte += b"\xff\xff\xff\xff"
 

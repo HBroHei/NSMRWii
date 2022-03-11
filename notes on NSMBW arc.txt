@@ -10,18 +10,16 @@ ARCHIVE STRUCTURE:
 -If no tiles were presented, 0xFFFF is stored for bgdat file
 
 -For the bytes after the string names, a bunch of 0x00 will appear
-    -The number of 0x00 are usually in the multple of 8, i.e.16,32,8
+    -The number of 0x00 are usually in the multple of 8, i.e.8,16,32
     -Divide the number by 8, you will get the number of area(s) of that level.
+    -Number can never exceed 32. Levels with 4 areas will not contains the 0x00 array.
 
 -Between file datas, an array of 0x00 will appear
     -NEEDS INVESTIGATING
 
 FILE STRUCTUIRE
 1. course1.bin
-(Reference and further info: see reggie.py in Reggie Editor Source, search up self.block
-        -Line 1681 for level loading (@def loadLevel())
-        -Line 1807 and below fof each block loading (@def LoadMetabase())
-)
+(Reference and further info: see reggie.py in Reggie Editor Source, search up self.block)
 
 HEAD:
 8 bytes for each section (referenced as blocks in Reggie Source), 14 Sections in total, 112 bytes total
@@ -36,6 +34,11 @@ After Head:
 
 Sections:
     SECTION 0: TILESET NAMES
+    32x4 = 128 bytes (No multiple entries)
+    Format:
+        32 bytes for each tileset name section.
+        First few bytes is the name in string.
+        (The rest of the strig is filled with 0x00)
 
     SECTION 1: LEVEL PROPERTIES
 

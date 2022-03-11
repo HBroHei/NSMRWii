@@ -133,11 +133,13 @@ def openFile(ARCfileName,orginalFileName):
     nodeTot = int.from_bytes(byteFile[offset+8:offset+12],"big")
     #print("Total number of files:",nodeTot)
 
+    # Get the number of areas
     # After byte name, a bunch of \x00 will appear
     # They are usually in the multple of 8, i.e.16,32,8
     # Divide the number by 8, you will get the number of area(s) of that level.
     x00Num = offsetFileData-(offsetFirstNode+sizeAllNodes)
     noAreas = x00Num//8
+    print(offsetFileData,(offsetFirstNode+sizeAllNodes))
 
     # For Root: loop through each dir/files
     # (Each nodes are placed next to each other, forming an array/list)
@@ -150,6 +152,7 @@ def openFile(ARCfileName,orginalFileName):
     strNameOffset = pointer
     startOfStr = strNameOffset+nodesList[0].fileNameIdx
     endOfStr = offsetFirstNode+sizeAllNodes
+    #print(byteFile[startOfStr:endOfStr])
     fNames_ = Util.binToUtf(byteFile[startOfStr:endOfStr])
     fNames = list(filter(None,"".join(list(map(Util.convertNULL,fNames_))).split(" ")))
     # Note: due to decode() does not return the NULL value, custom method is used
@@ -205,7 +208,7 @@ def splitWithEachEle(data):
 ###########################################################
 
 
-def repackToBytes(u8List):
+def repackToBytes(u8List,_1byte):
     #         FileMagic OffsetTo1stNode
     #                   -Always 0x20
     byteHead = b"U\xaa8-\x00\x00\x00 "
@@ -213,15 +216,17 @@ def repackToBytes(u8List):
     byteNames = b""
     fileDatas = b""
     returnARC = b""
-    #print(u8List)
-    #          isDtr    StrName        ParentDir           NextNode(number of nodes)
+    #          isDir    StrName        ParentDir           NextNode(number of nodes)
     nodes += b"\x01\x00\x00\x00\x00\x00\x00\x00" + (len(u8List["File Name List"])+1).to_bytes(4,"big") #Root Node
+   #print(len(u8List["File Name List"]))
+
+    #TODO SOMETHING IS WORNG WITH HEAD SIZE WHICH AFFECTS THE JUDGEMENT OF WHERE THE STRING TABLE ENDS. FIX IT
 
     # "Predict" the length of header
-    #           FileHeader                          Node Size   RootNodeSize                                                 String Name Section Size       Length of 0x00 Section
-    pHeadSize =         32 + len(u8List["File Name List"])*12 +           12 + (len("".join(u8List["File Name List"]))+len(u8List["File Name List"])) + u8List["Number of area"]*8
-    pFileDataOffset = pHeadSize
-
+    #                                    Node Size   RootNodeSize  Offset         String Name Section Size Offset   Length of 0x00 Section
+    pHeadSize = (len(u8List["File Name List"]))*12 +         12 + 1 + (len("0".join(u8List["File Name List"]))) + 1 #+u8List["Number of area"]*8
+    pFileDataOffset = 32 + pHeadSize + u8List["Number of area"]*8
+    print(u8List["Number of area"])
     for istr in u8List["File Name List"]:
         nodeDetails = [b"\x00",b"",b"",b""]
         
@@ -230,8 +235,12 @@ def repackToBytes(u8List):
             nodeDetails[2] = u8List[istr]["ParentDir"].to_bytes(4,"big")
             nodeDetails[3] = u8List[istr]["NextNode"].to_bytes(4,"big")
         else:
-            # Also offsetted by 0x01
-            nodeDetails[2] = (pFileDataOffset+1).to_bytes(4,"big")
+            
+            #if _1byte:# Also offsetted by 0x01
+            #    nodeDetails[2] = (pFileDataOffset+1).to_bytes(4,"big")
+            #else:
+            #    nodeDetails[2] = (pFileDataOffset).to_bytes(4,"big")
+            nodeDetails[2] = (pFileDataOffset).to_bytes(4,"big")
             nodeDetails[3] = len(u8List[istr]["Data"]).to_bytes(4,"big")
 
         #The string pool offsets are relative to the start of the string pool. (From wiki.tockdom.com)
@@ -245,17 +254,25 @@ def repackToBytes(u8List):
 
         fileDatas += u8List[istr]["Data"]
         pFileDataOffset += len(u8List[istr]["Data"])
+        #print(istr,len(nodeDetails[0]+nodeDetails[1]+nodeDetails[2]+nodeDetails[3]),len(istr)+1,len(nodeDetails[0]+nodeDetails[1]+nodeDetails[2]+nodeDetails[3])+len(istr)+1)
     
-    headSize = (len(nodes)+len(byteNames))
+    headSize = (len(nodes)+1+len(byteNames))# + 0 + u8List["Number of area"]*8
+    #print(headSize)
+    assert pHeadSize==headSize, "Head Size not match" 
     fileNodeOffset = (headSize + 32).to_bytes(4,"big") #32 = Offset to first node
-    byteHead += pHeadSize.to_bytes(4,"big") + pFileDataOffset.to_bytes(4,"big") + b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    byteHead += pHeadSize.to_bytes(4,"big") + pFileDataOffset.to_bytes(4,"big") + b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" #\x00 for 16
 
-    returnARC += byteHead + nodes + b"\x00" + byteNames + b"\x00"
+    returnARC += byteHead + nodes + b"\x00" + byteNames
+    #print("Before",byteNames)
     # Insert the \x00 for the number of areas
     returnARC += genx00(u8List["Number of area"]*8)
+    if u8List["Number of area"]*8!=0:
+        returnARC += b"\x00"
     # Insert File Data
     returnARC += fileDatas
 
+    #print(genx00(u8List["Number of area"]*8))
+    
     return returnARC
 
 #openFile("Stage/01-01.arc")
