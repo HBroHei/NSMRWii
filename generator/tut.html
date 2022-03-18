@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NSMRW Generator Guide</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: skyblue;
+        }
+        img{
+            width:45%
+        }
+    </style>
+    <body>
+        <div style="width:99%;text-align: center; border-style: dashed;">
+            <br>
+            <span style="font-size: 3.5em; font-weight: bold;">New Super Mario Randomizer Wii</span><br>
+            <span style="font-size: 2.5em;">How to use</span>
+            <br>
+        </div>
+        <h1>Notice</h1>
+        <ul>
+            <li>Currently there is no shell command for Linux/MacOS. Type "python3 randomize_basic.py" instead</li>
+            <li>RANDOMIZER NOT CONSOLE VERTIFIED. Play it at your own risk if you intended to play it on the actual hardware.</li>
+        </ul>
+        <h1>Prerequest</h1>
+        <h2>Python 3.x</h2>
+        <p>
+            <img class="img" src="img/pyDownload.jpg"><br>
+            This program require Python 3.x to run.
+            If you do not know what "Python" is or you do not have Python 3.x, download it <a href="https://www.python.org/downloads/">Here</a><br>
+            (Click on the button, it will download the most suitable version for your computer)<br>
+            <span style="font-weight: bold;">(Python 2.x is not supported and may not work)</span>
+        </p>
+        <h2>New Super Mario Bros Wii</h2>
+        <p>
+            Whether it is in physical form (CD) or digital form (ISO), as long as you have the game,
+            it's OK.<br>
+            <span style="font-weight: bold;">Pirated game is strongly discouraged. Please obtain the game legitiumately.</span>
+            <span style="font-weight: bold;">In the following guide, "the game" will be used to represent New Super Mario Bros Wii</span>
+        </p>
+        <h2>Dolphin Emulator</h2>
+        <p>
+            A Wii and Gamecube emulator available on Windows, MacOS and Linux.<br>
+            Download it <a href="https://dolphin-emu.org/download/">here</a>
+        </p>
+        <h1>1. Obtain the program</h1>
+        <p>
+            Go to <a href="https://www.github.com/HBroHei/NSMRWii">https://www.github.com/HBroHei/NSMRWii</a><br>
+            From there, click on the "Download Code" button, and save the program as a zip file.<br>
+            Unzip the folder after downloading it.
+            <span style="font-weight: bold;">In the following guide, "Root folder" will be used to represent where the program is<br>
+            i.e. the folder which contains "Start.bat", "Start" and "randomize_basic.py"</span>
+        </p>
+        <h1>2. Place the "Stage" folder into the Root folder</h1>
+        <p>
+            Extract the "Stage" folder from the game
+            If you have no idea on how to do this, follow this:
+            <ol>
+                <li>Follow the guide at <a href="https://horizon.miraheze.org/wiki/Obtain_Original_Game_Files">here</a>. Choose your method and extract the games file</li>
+                <li>Once the game file is obtained, go to DATA/files. Locate the "Stage" folder.</li>
+            </ol>
+            Once the "Stage" folder is obtained, place it at the Root folder.
+        </p>
+        <h1>3. Create a configuration file for the randomizer</h1>
+        <p>
+            Go to the <a href="index.html">Randomizer page</a>
+            From there, you can choose what to randomize.
+            <ul>
+                <li>The first table indicates which level will remain the same (in location)</li>
+                <li>The second table decides on which enemy is being thrown into the randomize list.<br>
+                For example, when Goomba, Koopa and Bob-omb is added, the randomizer will find any of those 3.<br>
+                Once found, they will be changed to either one of the three enemies.</li>
+            </ul>
+            Select the item in the dropdown menu, and click "Add" to add to the list.
+            Click "Remove" to remove the selected item from the rightside list.<br><br>
+       </p>
+       <h1>4. Move the config file</h1>
+       <p>
+            Once you are satisfied with the randomize ruleset, Click the "Generate" button at the bottom.<br>
+            A file named "Config.json" will be downloaded.<br>
+            Move the download file to the Root folder.
+       </p>
+       <h1>5. Run the program</h1>
+       <p>
+           You are all set to randomize your level.<br>
+           ON WINDOWS: Open "Start.bat".<br>
+           ON MAC/LINUX: Type "python3 randomize_basic.py" in the terminal at the root folder. (Available soon)
+       </p>
+       <h1>6. Play the game</h1>
+       <p>
+           Move the "Stage" folder to its orginal position (inside the game's file)<br>
+           (Replace the orginal files)<br>
+           Move back to the game's root folder (i.e. the folder that contains "DATA" and "UPDATE" folders) (Not the program's root folder)<br>
+           Navigate to DATA/sys/, and open main.dol with Dolphin Emulator
+       </p>
+        DISCLAMER: This project is not affiliated with Nintendo or any other projects.
+    </body>
+</html>

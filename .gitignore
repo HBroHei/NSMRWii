@@ -8,3 +8,5 @@ __pycache__/
 *.pyc
 U8/
 .gitignore
+U8N.txt
+U8O.txt

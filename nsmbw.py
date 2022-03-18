@@ -4,6 +4,7 @@ Entity data: 2 bytes
 
 
 from random import randint
+import globalVars
 
 
 BinfileName = "Stage/Extract/course/course1_bgdatL1.bin"
@@ -58,13 +59,6 @@ def writeDef(binList):
 
     bytearr = bytearr_h + bytearr_c
     return bytearr
-
-def readRandoRule():
-    global erList
-    rf = open("Enemy Shuffle List.txt")
-    _erList = rf.read().split("\n")
-    erList = list(map(lambda l:int(l),_erList))
-    rf.close()
 
 class NSMBWtileset:
     #Only implemented this to fix problematic level
@@ -156,11 +150,13 @@ class NSMBWsprite:
         #print(erList)
         for i in range(0,len(reData)):
             #print(reData[i][0])
-            if reData[i][0] in erList:
-                reData[i][0] = erList[randint(0,len(erList)-1)]
-                if reData[i][0] not in relData:
-                    relData.append(reData[i][0])
-                #print(reData[i])
+            for eLis in globalVars.enemyList:
+                #print(eLis)
+                if reData[i][0] in eLis:
+                    reData[i][0] = erList[randint(0,len(erList)-1)]
+                    if reData[i][0] not in relData:
+                        relData.append(reData[i][0])
+                    #print(reData[i])
             
         return reData,relData
 

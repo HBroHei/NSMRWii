@@ -5,18 +5,32 @@ from nsmbw import NSMBWLoadSprite, NSMBWsprite, NSMBWtileset
 import u8_m
 from sys import exit
 from random import randint
+from json import loads
+import globalVars
 
 tileList1b = [b"Pa1_obake",b"Pa1_sabaku",b"Pa1_toride_sabaku",b'Pa1_shiro',b'Pa1_gake']
+
+#Folder name
+STG_OLD = "Stage_Unshuffled"
+STG_NEW = "Stage_Shuffled"
+
+def readRandoRule():
+    global erList
+    rf = open("config.json")
+    rulesDict = loads(rf.read())
+    rf.close()
+    # Move the files that needs to be in the orginal names
+    for istr in rulesDict["Skip"]:
+        print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+        shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+    globalVars.enemyList = rulesDict["Enemies"]
 
 
 ########### MAIN ############
 
 if not os.path.exists("Stage"):
-    print("Stage folder not found. Exiting the program...")
+    print("Stage folder not found. Please place the 'Stage' folder and try again.")
     exit()
-#Folder name
-STG_OLD = "Stage_Unshuffled"
-STG_NEW = "Stage_Shuffled"
 
 shutil.rmtree(STG_OLD,True)
 shutil.rmtree(STG_NEW,True)
@@ -24,16 +38,20 @@ shutil.rmtree(STG_NEW,True)
 
 print("Copying the Stage folder...")
 shutil.copytree("Stage",STG_OLD)
+
+#Load Preset files
+readRandoRule()
+
 # Move the files that needs to be in the orginal names
-skipF = open("Skip List.txt","r")
-skipL = skipF.read().split("\n")
-
-for istr in skipL:
-    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
-    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
-
+#skipF = open("Skip List.txt","r")
+#skipL = skipF.read().split("\n")
+#
+#for istr in skipL:
+#    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+#    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+#
 # Move the files that is bugged
-skipF = open("Level to be fixed","r")
+#skipF = open("Level to be fixed","r")
 skipB = []
 #skipB = skipF.read().split("\n")
 #
@@ -43,9 +61,6 @@ skipB = []
 
 odir = os.listdir(STG_OLD)
 odir_c = odir[:]
-
-#Load Preset files
-nsmbw.readRandoRule()
 
 #Loop through each levels
 for istr in odir_c:
@@ -96,7 +111,7 @@ for istr in odir_c:
     #lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
     #print(u8list["Raw Data"][:520])
     #u8_m.saveTextData("u8r.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
-    #break #NOTE: break for debugging purpose
+    break #NOTE: break for debugging purpose
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)

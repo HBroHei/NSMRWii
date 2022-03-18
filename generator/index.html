@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NSMRW Generator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <style>
+        #eTable table,td,tr,th{
+            margin:0%;
+            border-style: solid;
+            border-collapse: collapse;
+            background-color: limegreen;
+        }
+        #lTable table,td,tr,th{
+            margin:0%;
+            border-style: solid;
+            border-collapse: collapse;
+            background-color: burlywood;
+        }
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: skyblue;
+        }
+        .opGpTitle{
+            font-weight: bold;
+            font-size: 2em;
+        }
+        .opGpSubtitle{
+            font-weight: bold;
+            font-size: 1.25em;
+        }
+        #aboutDialog{
+            display:none;
+            z-index: 1;
+            background-color: #0000004F;
+            position: fixed;
+            top:0;
+            left:0;
+            width: 100vw;
+            height:100vh;
+            padding-top: 15%;
+
+        }
+        #dialog_a{
+            background-color: white;
+            padding:1%;
+        }
+        button{
+            padding: 1%;
+            background-color: yellow;
+        }
+    </style>
+    <body>
+        <div style="width:99%;text-align: center; border-style: dashed;">
+            <br>
+            <span style="font-size: 3.5em; font-weight: bold;">New Super Mario Randomizer Wii</span><br>
+            <span style="font-size: 2.5em;">Configuration file generator</span>
+            <br>
+        </div>
+        <div>
+            <button onclick="document.getElementById('aboutDialog').style.display = 'block'">About</button>
+            <button onclick="window.open('tut.html','_blank').focus()">How to use</button>
+        </div>
+        <br>
+        <div style="display: inline;">
+            <span class="opGpTitle">Randomize list</span><br><br>
+            <span class="opGpSubtitle">Skip level...</span>
+            <div id="lTable"><table>
+                <tr><th></th><th>Level</th><th>Action</th></tr>
+                <tr>
+                    <th>Level to be randomized</th>
+                    <td>
+                        <select id="lvlSel">
+                            <option id="01-01.arc" value="01-01.arc"	>1-1</option>
+                            <option id="01-02.arc" value="01-02.arc"	>1-2</option>
+                            <option id="01-03.arc" value="01-03.arc"	>1-3</option>
+                            <option id="01-04.arc" value="01-04.arc"	>1-4</option>
+                            <option id="01-05.arc" value="01-05.arc"	>1-5</option>
+                            <option id="01-06.arc" value="01-06.arc"	>1-6</option>
+                            <option id="01-20.arc" value="01-20.arc"	>1-Coin Battle</option>
+                            <option id="01-22.arc" value="01-22.arc"	>1-Tower</option>
+                            <option id="01-24.arc" value="01-24.arc"	>1-Castle</option>
+                            <option id="01-26.arc" value="01-26.arc"	>1-Toad House 1</option>
+                            <option id="01-27.arc" value="01-27.arc"	>1-Toad House 2</option>
+                            <option id="01-28.arc" value="01-28.arc"	>1-Toad House 3</option>
+                            <option id="01-29.arc" value="01-29.arc"	>1-Toad House 4</option>
+                            <option id="01-33.arc" value="01-33.arc"	>1-Ambush 1</option>
+                            <option id="01-34.arc" value="01-34.arc"	>1-Ambush 2</option>
+                            <option id="01-35.arc" value="01-35.arc"	>1-Ambush 3</option>
+                            <option id="01-36.arc" value="01-36.arc"	>1-Ambush 4</option>
+                            <option id="02-01.arc" value="02-01.arc"	>2-1</option>
+                            <option id="02-02.arc" value="02-02.arc"	>2-2</option>
+                            <option id="02-03.arc" value="02-03.arc"	>2-3</option>
+                            <option id="02-04.arc" value="02-04.arc"	>2-4</option>
+                            <option id="02-05.arc" value="02-05.arc"	>2-5</option>
+                            <option id="02-06.arc" value="02-06.arc"	>2-6</option>
+                            <option id="02-20.arc" value="02-20.arc"	>2-Coin Battle</option>
+                            <option id="02-22.arc" value="02-22.arc"	>2-Tower</option>
+                            <option id="02-24.arc" value="02-24.arc" disabled	>2-Castle (Disabled)</option>
+                            <option id="02-26.arc" value="02-26.arc"	>2-Toad House 1</option>
+                            <option id="02-27.arc" value="02-27.arc"	>2-Toad House 2</option>
+                            <option id="02-28.arc" value="02-28.arc"	>2-Toad House 3</option>
+                            <option id="02-33.arc" value="02-33.arc"	>2-Ambush 1</option>
+                            <option id="02-34.arc" value="02-34.arc"	>2-Ambush 2</option>
+                            <option id="02-35.arc" value="02-35.arc"	>2-Ambush 3</option>
+                            <option id="02-36.arc" value="02-36.arc"	>2-Ambush 4</option>
+                            <option id="03-01.arc" value="03-01.arc"	>3-1</option>
+                            <option id="03-02.arc" value="03-02.arc"	>3-2</option>
+                            <option id="03-03.arc" value="03-03.arc"	>3-3</option>
+                            <option id="03-04.arc" value="03-04.arc"	>3-4</option>
+                            <option id="03-05.arc" value="03-05.arc"	>3-5</option>
+                            <option id="03-20.arc" value="03-20.arc"	>3-Coin Battle</option>
+                            <option id="03-21.arc" value="03-21.arc"	>3-Ghost House</option>
+                            <option id="03-22.arc" value="03-22.arc"	>3-Tower</option>
+                            <option id="03-24.arc" value="03-24.arc"	>3-Castle</option>
+                            <option id="03-26.arc" value="03-26.arc"	>3-Toad House 1</option>
+                            <option id="03-27.arc" value="03-27.arc"	>3-Toad House 2</option>
+                            <option id="03-28.arc" value="03-28.arc"	>3-Toad House 3</option>
+                            <option id="03-29.arc" value="03-29.arc"	>3-Toad House 4</option>
+                            <option id="03-33.arc" value="03-33.arc"	>3-Ambush 1</option>
+                            <option id="03-34.arc" value="03-34.arc"	>3-Ambush 2</option>
+                            <option id="03-35.arc" value="03-35.arc"	>3-Ambush 3</option>
+                            <option id="03-36.arc" value="03-36.arc"	>3-Ambush 4</option>
+                            <option id="04-01.arc" value="04-01.arc"	>4-1</option>
+                            <option id="04-02.arc" value="04-02.arc"	>4-2</option>
+                            <option id="04-03.arc" value="04-03.arc"	>4-3</option>
+                            <option id="04-04.arc" value="04-04.arc"	>4-4</option>
+                            <option id="04-05.arc" value="04-05.arc"	>4-5</option>
+                            <option id="04-20.arc" value="04-20.arc"	>4-Coin Battle</option>
+                            <option id="04-21.arc" value="04-21.arc"	>4-Ghost House</option>
+                            <option id="04-22.arc" value="04-22.arc"	>4-Tower</option>
+                            <option id="04-24.arc" value="04-24.arc"	>4-Castle</option>
+                            <option id="04-26.arc" value="04-26.arc"	>4-Toad House 1</option>
+                            <option id="04-27.arc" value="04-27.arc"	>4-Toad House 2</option>
+                            <option id="04-28.arc" value="04-28.arc"	>4-Toad House 3</option>
+                            <option id="04-29.arc" value="04-29.arc"	>4-Toad House 4</option>
+                            <option id="04-33.arc" value="04-33.arc"	>4-Ambush 1</option>
+                            <option id="04-34.arc" value="04-34.arc"	>4-Ambush 2</option>
+                            <option id="04-35.arc" value="04-35.arc"	>4-Ambush 3</option>
+                            <option id="04-36.arc" value="04-36.arc"	>4-Ambush 4</option>
+                            <option id="04-38.arc" value="04-38.arc"	>4-Airship</option>
+                            <option id="05-01.arc" value="05-01.arc"	>5-1</option>
+                            <option id="05-02.arc" value="05-02.arc"	>5-2</option>
+                            <option id="05-03.arc" value="05-03.arc"	>5-3</option>
+                            <option id="05-04.arc" value="05-04.arc"	>5-4</option>
+                            <option id="05-05.arc" value="05-05.arc"	>5-5</option>
+                            <option id="05-20.arc" value="05-20.arc"	>5-Coin Battle</option>
+                            <option id="05-21.arc" value="05-21.arc"	>5-Ghost House</option>
+                            <option id="05-22.arc" value="05-22.arc"	>5-Tower</option>
+                            <option id="05-24.arc" value="05-24.arc"	>5-Castle</option>
+                            <option id="05-26.arc" value="05-26.arc"	>5-Toad House 1</option>
+                            <option id="05-27.arc" value="05-27.arc"	>5-Toad House 2</option>
+                            <option id="05-28.arc" value="05-28.arc"	>5-Toad House 3</option>
+                            <option id="05-29.arc" value="05-29.arc"	>5-Toad House 4</option>
+                            <option id="05-33.arc" value="05-33.arc"	>5-Ambush 1</option>
+                            <option id="05-34.arc" value="05-34.arc"	>5-Ambush 2</option>
+                            <option id="05-35.arc" value="05-35.arc"	>5-Ambush 3</option>
+                            <option id="05-36.arc" value="05-36.arc"	>5-Ambush 4</option>
+                            <option id="06-01.arc" value="06-01.arc"	>6-1</option>
+                            <option id="06-02.arc" value="06-02.arc"	>6-2</option>
+                            <option id="06-03.arc" value="06-03.arc"	>6-3</option>
+                            <option id="06-04.arc" value="06-04.arc"	>6-4</option>
+                            <option id="06-05.arc" value="06-05.arc"	>6-5</option>
+                            <option id="06-06.arc" value="06-06.arc"	>6-6</option>
+                            <option id="06-22.arc" value="06-22.arc"	>6-Tower</option>
+                            <option id="06-24.arc" value="06-24.arc"	>6-Castle</option>
+                            <option id="06-26.arc" value="06-26.arc"	>6-Toad House 1</option>
+                            <option id="06-27.arc" value="06-27.arc"	>6-Toad House 2</option>
+                            <option id="06-28.arc" value="06-28.arc"	>6-Toad House 3</option>
+                            <option id="06-33.arc" value="06-33.arc"	>6-Ambush 1</option>
+                            <option id="06-34.arc" value="06-34.arc"	>6-Ambush 2</option>
+                            <option id="06-35.arc" value="06-35.arc"	>6-Ambush 3</option>
+                            <option id="06-36.arc" value="06-36.arc"	>6-Ambush 4</option>
+                            <option id="06-38.arc" value="06-38.arc"	>6-Airship</option>
+                            <option id="07-01.arc" value="07-01.arc"	>7-1</option>
+                            <option id="07-02.arc" value="07-02.arc"	>7-2</option>
+                            <option id="07-03.arc" value="07-03.arc"	>7-3</option>
+                            <option id="07-04.arc" value="07-04.arc"	>7-4</option>
+                            <option id="07-05.arc" value="07-05.arc"	>7-5</option>
+                            <option id="07-06.arc" value="07-06.arc"	>7-6</option>
+                            <option id="07-21.arc" value="07-21.arc"	>7-Ghost House</option>
+                            <option id="07-22.arc" value="07-22.arc"	>7-Tower</option>
+                            <option id="07-24.arc" value="07-24.arc"	>7-Castle</option>
+                            <option id="07-26.arc" value="07-26.arc"	>7-Toad House 1</option>
+                            <option id="07-27.arc" value="07-27.arc"	>7-Toad House 2</option>
+                            <option id="07-28.arc" value="07-28.arc"	>7-Toad House 3</option>
+                            <option id="07-29.arc" value="07-29.arc"	>7-Toad House 4</option>
+                            <option id="07-33.arc" value="07-33.arc"	>7-Ambush 1</option>
+                            <option id="07-34.arc" value="07-34.arc"	>7-Ambush 2</option>
+                            <option id="07-35.arc" value="07-35.arc"	>7-Ambush 3</option>
+                            <option id="08-01.arc" value="08-01.arc"	>8-1</option>
+                            <option id="08-02.arc" value="08-02.arc"	>8-2</option>
+                            <option id="08-03.arc" value="08-03.arc"	>8-3</option>
+                            <option id="08-04.arc" value="08-04.arc"	>8-4</option>
+                            <option id="08-05.arc" value="08-05.arc"	>8-5</option>
+                            <option id="08-06.arc" value="08-06.arc"	>8-6</option>
+                            <option id="08-07.arc" value="08-07.arc"	>8-7</option>
+                            <option id="08-22.arc" value="08-22.arc"	>8-Tower</option>
+                            <option id="08-24.arc" value="08-24.arc"	>8-Castle</option>
+                            <option id="08-26.arc" value="08-26.arc"	>8-Toad House 1</option>
+                            <option id="08-27.arc" value="08-27.arc"	>8-Toad House 2</option>
+                            <option id="08-28.arc" value="08-28.arc"	>8-Toad House 3</option>
+                            <option id="08-33.arc" value="08-33.arc"	>8-Ambush 1</option>
+                            <option id="08-34.arc" value="08-34.arc"	>8-Ambush 2</option>
+                            <option id="08-35.arc" value="08-35.arc"	>8-Ambush 3</option>
+                            <option id="08-38.arc" value="08-38.arc"	>8-Airship</option>
+                            <option id="09-01.arc" value="09-01.arc"	>9-1</option>
+                            <option id="09-02.arc" value="09-02.arc"	>9-2</option>
+                            <option id="09-03.arc" value="09-03.arc"	>9-3</option>
+                            <option id="09-04.arc" value="09-04.arc"	>9-4</option>
+                            <option id="09-05.arc" value="09-05.arc"	>9-5</option>
+                            <option id="09-06.arc" value="09-06.arc"	>9-6</option>
+                            <option id="09-07.arc" value="09-07.arc"	>9-7</option>
+                            <option id="09-08.arc" value="09-08.arc"	>9-8</option>
+                            <option id="09-26.arc" value="09-26.arc"	>9-Toad House 1</option>
+                            <option id="09-27.arc" value="09-27.arc"	>9-Toad House 2</option>
+                            <option id="09-28.arc" value="09-28.arc"	>9-Toad House 3</option>
+                        </select><br>
+                        File Name: <input id="lvlId" style="width: fit-content;" value="01-01.arc">
+                    </td><td>
+                        <button onclick="addLevel()">Add</button>
+                    </td>
+                </tr><tr>
+                    <th>Level not to be randomized</th>
+                    <td>
+                        <select id="rlvList"></select>
+                    </td><td>
+                        <button onclick="rmLevel()">Remove</button>
+                    </td>
+                </tr>
+            </table></div>
+            <br>
+            <span class="opGpSubtitle">Randomize enemies...</span>
+            <div id="eTable"><table>
+                <tr><th></th><th>Enemy</th><th>Action</th></tr>
+                <tr>
+                    <th>Enemies to not be randomized</th>
+                    <td>
+                        <select id="enemySel">
+                            <option id="20" value="20"	>Goomba</option>
+                            <option id="21" value="21"	>Paragoomba</option>
+                            <option id="200" value="200"	>Micro Goomba</option>
+                            <option id="199" value="199"	>Mega Goomba</option>
+                            <option id="170" value="170"	>Prickly Goomba</option>
+                            <option id="57" value="57"	>Koopa</option>
+                            <option id="58" value="58"	>Paratroopa</option>
+                            <option id="24" value="24"	>Buzzy Beetle</option>
+                            <option id="25" value="25"	>Spiny</option>
+                            <option id="80" value="80"	>Fire Bro</option>
+                            <option id="94" value="94"	>Boomerang Bro</option>
+                            <option id="95" value="95"	>Hammer Bro</option>
+                            <option id="308" value="308"	>Platform Hammer Bro</option>
+                            <option id="272" value="272"	>Ice Bro</option>
+                            <option id="120" value="120"	>Sledge Brro</option>
+                            <option id="73" value="73"	>Pirana Plant (Standalone)</option>
+                            <option id="74" value="74"	>Big Pirana Plant</option>
+                            <option id="75" value="75"	>Fire Pirana Plant (Standalone)</option>
+                            <option id="76" value="76"	>Big Fire Pirana Plant</option>
+                            <option id="264" value="264"	>Stalking Pirana Plant</option>
+                            <option id="342" value="342"	>Muncher</option>
+                            <option id="92" value="92"	>Bill Blaster</option>
+                            <option id="93" value="93"	>Big Bill Blaster</option>
+                            <option id="338" value="338"	>Bill Blaster (Up<=>Down)</option>
+                            <option id="136" value="136"	>Bill Blaster (Left<=>Right)</option>
+                            <option id="326" value="326"	>King Bill</option>
+                            <option id="130" value="130"	>Wiggler</option>
+                            <option id="240" value="240"	>Big Wiggler</option>
+                            <option id="230" value="230"	>Bramball</option>
+                            <option id="303" value="303"	>Monty Mole</option>
+                            <option id="195" value="195"	>CRAB</option>
+                            <option id="238" value="238"	>Foo</option>
+                            <option id="369" value="369"	>Penguin</option>
+                            <option id="146" value="146"	>Chain Chomp</option>
+                            <option id="177" value="177"	>Fire Chomp</option>
+                            <option id="54" value="54"	>Lakitu</option>
+                            <option id="370" value="370"	>Lakitu Block</option>
+                            <option id="104" value="104"	>Amp</option>
+                            <option id="105" value="105"	>Pokey</option>
+                            <option id="158" value="158"	>Fire Snake</option>
+                            <option id="414" value="414"	>Spike / Stone Spike</option>
+                            <option id="100" value="100"	>Swoop</option>
+                            <option id="46" value="46"	>Podoboo</option>
+                            <option id="118" value="118"	>Dry Bones</option>
+                            <option id="119" value="119"	>Big Dry Bones</option>
+                            <option id="101" value="101"	>Bob-omb</option>
+                            <option id="47" value="47"	>Thowmp</option>
+                            <option id="48" value="48"	>Big Thowmp</option>
+                            <option id="63" value="63"	>Spiked Ball</option>
+                            <option id="98" value="98"	>Giant Spike Ball</option>
+                            <option id="109" value="109"	>Chained Spike Ball</option>
+                            <option id="62" value="62"	>Fire Bar</option>
+                            <option id="394" value="394"	>Lemmy Ball</option>
+                            <option id="413" value="413"	>Wendy Ring</option>
+                            <option id="131" value="131"	>Boo</option>
+                            <option id="61" value="61"	>Big Boo</option>
+                            <option id="323" value="323"	>Boo Ring</option>
+                            <option id="102" value="102"	>Broozer</option>
+                            <option id="134" value="134"	>Crowber</option>
+                            <option id="262" value="262"	>Fake ? Block</option>
+                            <option id="271" value="271"	>Scardy Rats</option>
+                            <option id="232" value="232"	>Mecha-Koopa</option>
+                            <option id="269" value="269"	>Parachute Bob-omb</option>
+                            <option id="352" value="352"	>Rocky Wrench</option>
+                            <option id="476" value="476"	>Flying Wrench</option>
+                            <option id="114" value="114"	>Burner (Continous)</option>
+                            <option id="304" value="304"	>Burner (Rotating)</option>
+                            <option id="298" value="298"	>Cannonball Cannon</option>
+                            <option id="299" value="299"	>Cannonball Cannon (45 Degrees)</option>
+                            <option id="300" value="300"	>4-Way Cannon</option>
+                        </select><br>
+                        ID: <input id="eId" type="number" min="1" max="482" style="width: fit-content;" value="20">
+                    </td><td>
+                        <button onclick="addEnemy()">Add</button>
+                    </td>
+                </tr><tr>
+                    <th>Enemies to be randomized</th>
+                    <td>
+                        <select id="reList"></select>
+                    </td><td>
+                        <button onclick="rmEnemy()">Remove</button>
+                    </td>
+                </tr>
+            </table></div>
+            <div id="aboutDialog">
+                <div id="dialog_a">
+                    <h2>New Super Mario Randomizer Wii</h2>
+                    <p>A New Super Mario Bros Wii randomizer.
+                        Support levels and enemies randomization,
+                        with more features planned to be implemented.
+
+                        For more information, please visit <a href="https://www.github.com/HBroHei/NSMRWii">https://www.github.com/HBroHei/NSMRWii</a>
+                    </p>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div id="fileGen"><button onclick="genJson()">Generate</button></div>
+            
+            <div>
+                <span class="opGpTitle">Preview</span><br><br>
+                <code id="jsonCode" style="background-color: white;">{}</code>
+            </div>
+            <iframe id="downFrame" style="display:none"></iframe>
+        </div>
+    </body>
+    <script src="vars.js"></script>
+    <script src="index.js"></script>
+</html>
