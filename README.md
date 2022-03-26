@@ -8,6 +8,7 @@
 - Randomize enemies
 
 ## Usage
+ A more in-depth guide is now available at https://hbrohei.github.io/NSMRWii/generator/tut.html
  ### Prerequest
  - Python 3.x (Only tested on 3.9 or above): https://www.python.org/downloads/ 
    - Windows store version can be installed instead
