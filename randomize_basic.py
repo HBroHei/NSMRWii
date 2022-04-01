@@ -75,7 +75,7 @@ for istr in odir_c:
     if istr not in skipB:
         u8list = u8_m.openFile(STG_NEW+"/"+odir[rdm],STG_OLD + "/" + istr)
 
-        u8_m.saveTextData("U8s.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
+        #u8_m.saveTextData("U8s.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
 
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
@@ -99,8 +99,8 @@ for istr in odir_c:
         u8n = u8_m.repackToBytes(u8list,(tilesetInfo[1] in tileList1b))
         u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
 
-        u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
-        u8_m.saveTextData("U8O.txt",u8_m.splitWithEachEle(u8o))
+        #u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
+        #u8_m.saveTextData("U8O.txt",u8_m.splitWithEachEle(u8o))
 
         u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
         #u8_m.saveByteData(odir[rdm],u8n)
