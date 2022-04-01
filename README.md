@@ -8,25 +8,8 @@
 - Randomize enemies
 
 ## Usage
- A more in-depth guide is now available at https://hbrohei.github.io/NSMRWii/generator/tut.html
- ### Prerequest
- - Python 3.x (Only tested on 3.9 or above): https://www.python.org/downloads/ 
-   - Windows store version can be installed instead
- - NSMBW Stage folder (The one that would be used for the Reggie! Editor)
- - This project (Download this as zip, and unzip on the local computer)
- ### Procedure
- **This instruction is for Windows only. MacOS and Linux command will be created shortly.** \
- **Type python3 randomize_basic.py directly into the terminal for now**
- 1. Place the "Stage" folder at the root directory (Obtained in the game's file: DATA/files/)
- 2. Open the file "Start.bat"
- 3. The folder "Stage_Shuffled" will appear. Replace the "Stage" folder in NSMBW with that generated folder.
- ### Randomize enemies
- Insert the Sprite ID in "Enemy Shuffle List.txt"
- - **New line for each Sprite ID entry**
- - **Empty line will cause error. Remove empty lines in the file**
- - IDs can be found in the Spreadsheet file "Enemy ID.xls", or in the Reggie Editor
- - **This feature only received limited testing. Crashes or bugs may be expected in current stage**
-
+ A guide on how to use the program is now available at https://hbrohei.github.io/NSMRWii/generator/tut.html
+ 
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
 - Configuration file
