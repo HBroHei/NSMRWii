@@ -134,7 +134,8 @@ class NSMBWsprite:
             if len(prop)==8:
                 returnByte += (ID).to_bytes(2,"big")+(x).to_bytes(2,"big")+(y).to_bytes(2,"big")+prop+b"\x00\x00"
             else:
-                print("WARNING: properties not in 8 bytes")
+                pass
+                #print("WARNING: properties not in 8 bytes")
         
         returnByte += b"\xff\xff\xff\xff"
 
@@ -151,10 +152,10 @@ class NSMBWsprite:
         for i in range(0,len(reData)):
             #print(reData[i][0])
             for eLis in globalVars.enemyList:
-                #print(eLis)
-                if reData[i][0] in eLis:
-                    reData[i][0] = erList[randint(0,len(erList)-1)]
-                    if reData[i][0] not in relData:
+                #print(reData[i][0],eLis,reData[i][0] in eLis)
+                if reData[i][0] in eLis: # Enemy in the list
+                    reData[i][0] = eLis[randint(0,len(eLis)-1)] #randomize
+                    if reData[i][0] not in relData: #Add to the sprite loading list
                         relData.append(reData[i][0])
                     #print(reData[i])
             

@@ -1,6 +1,7 @@
 var eList = []
 var lvList = ["Texture","02-24.arc"]
 function addEnemy(){
+    //Add enemy from the selected items
     if(document.getElementById(document.getElementById("eId").value).disabled){
         alert("'" + document.getElementById("eId").value + "' already exist in the list.")
         return
@@ -11,7 +12,6 @@ function addEnemy(){
         document.getElementById("enemySel").options[enemyPreList.indexOf(document.getElementById("eId").value)].text : document.getElementById("eId").value
     eOpt.value = document.getElementById("eId").value
     document.getElementById("reList").add(eOpt)
-    //document.getElementById("enemySel").remove(enemyPreList.indexOf(document.getElementById("eId").value))
     document.getElementById(document.getElementById("eId").value).disabled = true
     document.getElementById("eId").value = document.getElementById("enemySel").options[document.getElementById("enemySel").selectedIndex].value
 }
@@ -67,7 +67,7 @@ document.getElementById("enemySel").onchange = function(){
 
 function toJson(){
     return {
-        "Skip": lvList,
+        "Skip Level": lvList,
         "Enemies": eList
     }
 }

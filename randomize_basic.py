@@ -20,7 +20,7 @@ def readRandoRule():
     rulesDict = loads(rf.read())
     rf.close()
     # Move the files that needs to be in the orginal names
-    for istr in rulesDict["Skip"]:
+    for istr in rulesDict["Skip Level"]:
         print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
         shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
     globalVars.enemyList = rulesDict["Enemies"]
@@ -111,7 +111,7 @@ for istr in odir_c:
     #lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
     #print(u8list["Raw Data"][:520])
     #u8_m.saveTextData("u8r.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
-    break #NOTE: break for debugging purpose
+    #break #NOTE: break for debugging purpose
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)

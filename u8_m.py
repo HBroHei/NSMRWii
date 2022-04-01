@@ -139,7 +139,7 @@ def openFile(ARCfileName,orginalFileName):
     # Divide the number by 8, you will get the number of area(s) of that level.
     x00Num = offsetFileData-(offsetFirstNode+sizeAllNodes)
     noAreas = x00Num//8
-    print(offsetFileData,(offsetFirstNode+sizeAllNodes))
+    #print(offsetFileData,(offsetFirstNode+sizeAllNodes))
 
     # For Root: loop through each dir/files
     # (Each nodes are placed next to each other, forming an array/list)
@@ -226,7 +226,7 @@ def repackToBytes(u8List,_1byte):
     #                                    Node Size   RootNodeSize  Offset         String Name Section Size Offset   Length of 0x00 Section
     pHeadSize = (len(u8List["File Name List"]))*12 +         12 + 1 + (len("0".join(u8List["File Name List"]))) + 1 #+u8List["Number of area"]*8
     pFileDataOffset = 32 + pHeadSize + u8List["Number of area"]*8
-    print(u8List["Number of area"])
+    #print(u8List["Number of area"])
     for istr in u8List["File Name List"]:
         nodeDetails = [b"\x00",b"",b"",b""]
         

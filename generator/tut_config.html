@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>NSMRW Generator Config.json Documentation</title>
+    </head>
+    <style>
+        body{
+            background-color: skyblue;
+            padding: 0%;
+            margin: 0%;
+        }
+        img{
+            width:45%
+        }
+        .bottomNav{
+            margin-left:0
+        }
+        #padd{
+            padding: 0.5%;
+            margin: 0.5%;
+        }
+        .code{
+            font-family: 'Courier New', Courier, monospace;
+            background-color: darkgrey;
+
+        }
+        .code_single{
+            font-family: 'Courier New', Courier, monospace;
+            background-color: darkgrey;
+            padding: 0.2em;
+        }
+    </style>
+    <body>
+        <div id="topbar" style="width:100%"></div>
+        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
+        <div style="height: 5vh;"></div>
+        <div id="padd">
+            <div style="width:99%;text-align: center; border-style: dashed;">
+                <br>
+                <span style="font-size: 3.5em; font-weight: bold;">New Super Mario Randomizer Wii</span><br>
+                <span style="font-size: 2.5em;">Config.json Documentation</span>
+                <br>
+            </div>
+            <ol>
+                <li><a href="#Introduction">Introduction</a></li>
+                <li><a href="#Format">Format</a></li>
+                <li><a href="#Skip_Level">"Skip level" Section</a></li>
+                <li><a href="#Enemies">"Enemies" Section</a></li>
+                
+            </ol>
+            <h2 id="Introduction">Introduction</h2>
+            <p>
+                The config.json file foe New Super Mario Randomizer Wii (NSMRW) is used to read randomization preference.
+                It is usually stored in the same folder as the NSMRW Source code.
+            </p>
+            <br>
+            <h2 id="Format">Format</h2>
+            <p>
+                The config file consists of 2 parts: <span class="code_single">Skip Level</span> and <span class="code_single">Enemies</span>.<br>
+                The format should be structured as below:<br>
+                <pre>
+                    <div class="code">{
+    "Skip":[],
+    "Enemies":[]
+}</div>
+                </pre>
+            </p>
+            <br>
+            <h2 id="Skip_Level">"Skip Level" Section</h2>
+            <div class="code_single">"Skip": Array</div>
+            <p>A list of levels that will be skipped during randomization. Can be useful if some levels prevents progress.</p>
+            Parameter:<br>
+            <span class="code_single">Array</span> A list of <span style="font-weight: bold;">file names</span> of the levels to not be randomized (Skipped)<br>
+            <strong>NOTE: "Texture" should ALWAYS be included in the list to avoid errors when using the program (unless the "Texture" folder is not included in the "Stage" folder. In this case, DO NOT include "Texture" in the list.)</strong><br><br>
+            Example:<div class="code_single">"Skip Level":["Texture","01-26.arc","01-27.arc","01-28.arc","01-29.arc","01-36.arc","01-40.arc","01-41.arc","01-42.arc","02-36.arc","02-24.arc","02-26.arc","02-27.arc","02-28.arc","03-26.arc"]</div>
+            <br>
+            <h2 id="Enemies">"Enemies" Section</h2>
+            <div class="code_single">"Enemies": [Array]</div>
+            <p>
+                Lists of enemies to be randomized.<br>
+                That is, the enemies in the list will be randomized to another enemy in the same list.<br>
+                Enemies outside of the list will not be randomized.<br>
+                The Array is a multi-dimentional array. Enemies can be grouped in an array, therefore forming a randomization group.<br>
+                Enemies in the same group will only be randomized and changed to another enemy in the same group.
+            </p>
+            Parameter:<br>
+            <span class="code_single">[Array]</span> Arrays of array of <span style="font-weight: bold;">sprite IDs</span> to be randomized.<br>
+            Each array will be classified as 1 group, and will randomize only within the group.<br>
+            Note: Items can be included in multiple groups, and can be repeated within the group. The number of repeats decides the weight of that item in the respective group.<br>
+            The order of the groups will also affects the randomization effects. If the latter group contains the same item as the 
+            Example:<br><div class="code_single"><pre class="code">"Enemies":[
+    [20,21,200,199,170],
+    [57,58,80,94,95,308,272,120],
+    [20,57,24,25]
+]</pre>
+            </div>
+        </div>
+    </body>
+</html>

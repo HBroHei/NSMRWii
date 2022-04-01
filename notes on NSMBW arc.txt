@@ -95,16 +95,3 @@ Sections:
     SECTION 10: LOCATIONS
 
     SECTION 11: CAMERAS
-
-
-===========RANDO DEVELOPER NOTES============ (section written for reference in development of this program)
-
-entrance.txt
---
-335: Start of entrance info
-343: Entrance ID
-
-
-enemy&entrance.txt
-365 enemy loc
-331 entrance loc
