@@ -1,18 +1,5 @@
 var eList = []
 var lvList = ["Texture","02-24.arc"]
-var e_rand_sel = document.getElementById("e_rand_sel");
-
-document.getElementById("e_rand_sel").onchange = function(evt) {
-    document.getElementById("r_description").innerHTML = e_presets_desc[e_rand_sel.options[e_rand_sel.options.selectedIndex].value]
-}
-
-document.getElementById("SSE").onchange = function(evt) {
-    document.getElementById("S3-4").disabled = document.getElementById("SSE").checked
-    document.getElementById("S3-4").checked = false;
-}
-
-
-/*
 function addEnemy(){
     //Add enemy from the selected items
     if(document.getElementById(document.getElementById("eId").value).disabled){
@@ -76,33 +63,9 @@ document.getElementById("lvlSel").onchange = function(){
 }
 document.getElementById("enemySel").onchange = function(){
     document.getElementById("eId").value = document.getElementById("enemySel").options[document.getElementById("enemySel").selectedIndex].value
-}*/
+}
 
 function toJson(){
-    let lvList = ["Texture","02-24.arc","01-40.arc"]
-    if(document.getElementById("S3-4").checked){
-        lvList.push("03-24.arc");
-    }
-    if(document.getElementById("S08-24").checked){
-        lvList.push("08-24.arc");
-    }
-    if(document.getElementById("SSE").checked){
-        lvList.push("01-03.arc");
-        lvList.push("02-04.arc");
-        lvList.push("02-06.arc");
-        lvList.push("03-04.arc");
-        lvList.push("03-05.arc");
-        lvList.push("03-21.arc");
-        lvList.push("04-21.arc");
-        lvList.push("04-22.arc");
-        lvList.push("05-21.arc");
-        lvList.push("06-05.arc");
-        lvList.push("06-06.arc");
-        lvList.push("07-21.arc");
-        lvList.push("07-22.arc");
-        lvList.push("08-02.arc");
-    }
-    let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
     return {
         "Skip Level": lvList,
         "Enemies": eList
@@ -111,7 +74,7 @@ function toJson(){
 
 function genJson(){
     //console.log(JSON.stringify(toJson()))
-    //document.getElementById("jsonCode").innerHTML = JSON.stringify(toJson())
+    document.getElementById("jsonCode").innerHTML = JSON.stringify(toJson())
     var downBlob = new Blob([JSON.stringify(toJson())])
     //document.getElementById("fileGen").innerHTML = '<button>Generate</button>'
     document.getElementById("downFrame").src = window.URL.createObjectURL(downBlob)
