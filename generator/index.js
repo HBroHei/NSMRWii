@@ -79,13 +79,15 @@ document.getElementById("enemySel").onchange = function(){
 }*/
 
 function toJson(){
-    let lvList = ["Texture","02-24.arc","01-40.arc"]
-    if(document.getElementById("S3-4").checked){
-        lvList.push("03-24.arc");
-    }
+    lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
+    
     if(document.getElementById("S08-24").checked){
-        lvList.push("08-24.arc");
+        lvList_skip.push("08-24.arc");
     }
+    getSkipOption("Secret",document.getElementById("SSE"))
+    getSkipOption("Cannon",document.getElementById("SCannon"))
+    getSkipOption("Toad",document.getElementById("SToadHse"))
+    /*
     if(document.getElementById("SSE").checked){
         lvList.push("01-03.arc");
         lvList.push("02-04.arc");
@@ -101,11 +103,12 @@ function toJson(){
         lvList.push("07-21.arc");
         lvList.push("07-22.arc");
         lvList.push("08-02.arc");
-    }
+    }*/
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
     return {
-        "Skip Level": lvList,
-        "Enemies": eList
+        "Skip Level": lvList_skip,
+        "Enemies": eList,
+        "Level Group": lvList_same
     }
 }
 

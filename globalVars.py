@@ -1,1 +1,3 @@
 enemyList = []
+lvlGroup = []
+skipLvl = []

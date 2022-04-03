@@ -4,6 +4,8 @@
         <title>NSMRW Generator</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
+        <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
+        <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
     </head>
     <style>
         table,td,tr,th{
@@ -76,9 +78,27 @@
         <br>
         <button class="setup">Step 1: Level options</button>
         <div id="d_step1" class="step">
-            <label for="#S3-4">Skip 3-4</label><input id="S3-4" type="checkbox" disabled title="Skips 3-4, which is the Red switch level. There will be a chance that the game cannot progress if this option is turned off."><br>
-            <label for="#S08-24">Skip 8-Castle</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)"><br>
-            <label for="#SSE">Skip Secret Exit levels</label><input id="SSE" type="checkbox" checked title="Skips ALL Secret Exit levels, including 3-4. Some levels may be inaccessible if this option is turned off."><br>
+            <label for="#S08-24">8-Castle: Skip randomizing</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)"><br>
+            <label for="#SSE">Secret Exit levels: </label>
+            <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4.">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
+                <option id="s_same" value="s_same" selected="selected">Randomize with other Secret Exit level</option>
+                <option id="s_skip" value="s_skip">Skip randomization (Enemies will still be randomized)</option>
+                <option id="s_skip_3-4" value="s_skip_3-4">Only skip 3-4 (To prevent the chance of not able to finish the game)</option>
+            </select><br>
+            <label for="#SCannon">Cannon: </label>
+            <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels).">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
+                <option id="s_same" value="s_same">Randomize with other Cannon level (Warning: untested for what happen with backwards-warpping)</option>
+                <option id="s_skip" value="s_skip" selected="selected">Skip randomization</option>
+            </select><br>
+            <label for="#SToadHse">Toad Houses: </label>
+            <select id="SToadHse" title="Decide what to do for Toad Houses.">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (Normal levels may become Toad House and vice versa)</option>
+                <option id="s_same" value="s_same" selected="selected">Randomize with other Toad Houses</option>
+                <option id="s_skip" value="s_skip">Skip randomization</option>
+            </select><br>
+
         </div>
 
         <button class="setup">Step 2: Enemies options</button>
@@ -116,5 +136,6 @@
         <iframe id="downFrame" style="display:none"></iframe>
         <script src="index.js"></script>
         <script src="index_vars.js"></script>
+        <script src="index_level.js"></script>
     </body>
 </html>

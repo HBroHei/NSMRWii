@@ -33,3 +33,13 @@ const e_presets_data = {
         [131,61,323,102,262,271]
     ]
 }
+
+// Level options - Skip / Group level
+const lvlJson = {
+    "Secret":["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
+    "Cannon":["01-36.arc","02-36.arc","03-36.arc","04-36.arc","05-36.arc","06-36.arc",],
+    "Toad":["01-26.arc","01-27.arc","01-28.arc","01-29.arc","02-26.arc","02-27.arc","02-28.arc","03-26.arc","03-27.arc","03-28.arc","03-29.arc","04-26.arc","04-27.arc","04-28.arc","04-29.arc","05-26.arc","05-27.arc","05-28.arc","05-29.arc","06-26.arc","06-27.arc","06-28.arc","07-26.arc","07-27.arc","07-28.arc","07-29.arc","08-26.arc","08-27.arc","08-28.arc","09-26.arc","09-27.arc","09-28.arc"]
+}
+
+var lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"]
+var lvList_same = []

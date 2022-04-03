@@ -19,11 +19,48 @@ def readRandoRule():
     rf = open("config.json")
     rulesDict = loads(rf.read())
     rf.close()
-    # Move the files that needs to be in the orginal names
-    for istr in rulesDict["Skip Level"]:
-        print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
-        shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+    #Read enemy randomization list
     globalVars.enemyList = rulesDict["Enemies"]
+    # Move the files that needs to be in the orginal names
+    globalVars.skipLvl = rulesDict["Skip Level"]
+    for istr in rulesDict["Skip Level"]:
+        print("Processing [S]",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+        shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+        if not istr=="Texture":
+            editArcFile(istr,istr)
+    # Group levels
+    try:
+        globalVars.lvlGroup = rulesDict["Level Group"]
+    except KeyError:
+        pass
+
+
+def editArcFile(istr,newName):
+    #print(istr)
+    u8list = u8_m.openFile(STG_NEW+"/"+newName,STG_OLD + "/" + istr)
+    u8FileList = u8list["File Name List"]
+    areaNo = u8list["Number of area"]
+    if areaNo==0:
+        areaNo = 4
+    for i in range(1,areaNo+1):
+        lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
+        tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
+        
+        spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
+        sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
+        spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+newName)
+
+        lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
+        lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
+        u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
+
+    u8n = u8_m.repackToBytes(u8list,(tilesetInfo[1] in tileList1b))
+    u8o = u8_m.openByteData(STG_NEW+"/"+newName)
+
+    #u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
+    #u8_m.saveTextData("U8O.txt",u8_m.splitWithEachEle(u8o))
+
+    u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
 
 
 ########### MAIN ############
@@ -61,57 +98,38 @@ skipB = []
 
 odir = os.listdir(STG_OLD)
 odir_c = odir[:]
+print("Processing grouped levels...")
+#Randomizing Grouped levels first
+for ilis in globalVars.lvlGroup:
+    ilis_c = ilis[:]
+    for istr in ilis_c:
+        if not istr in odir_c:
+            print(istr,": File not found in Stage folder. Please check if the file is missing or misspelled")
+            if istr in globalVars.skipLvl:
+                print("Hint: This level also appears in the Skip List. Do you still wish to randomize it?")
+            exit()
+        rdm = randint(0,len(ilis)-1)
+        print("Processing [G] ",istr,": Renaming to ",ilis[rdm])
+        os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + ilis[rdm]) #Rename and move the file
+
+        # U8 Archive Editting
+        if istr not in skipB:
+            editArcFile(istr,ilis[rdm])
+        
+        del odir[odir.index(ilis[rdm])]
+        del ilis[rdm]
+        
+odir_c = odir[:]
 
 #Loop through each levels
 for istr in odir_c:
     rdm = randint(0,len(odir)-1)
-    #rdm = 0
-    #istr = "05-21.arc"
-    #odir[rdm] = istr
     print("Processing ",istr,": Renaming to ",odir[rdm])
     os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
 
     # U8 Archive Editting
     if istr not in skipB:
-        u8list = u8_m.openFile(STG_NEW+"/"+odir[rdm],STG_OLD + "/" + istr)
-
-        #u8_m.saveTextData("U8s.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
-
-        u8FileList = u8list["File Name List"]
-        areaNo = u8list["Number of area"]
-        if areaNo==0:
-            areaNo = 4
-        for i in range(1,areaNo+1):
-            #print("i",i)
-            lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
-            #print(lvlSetting)
-            tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
-            
-            spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-            sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
-            spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+odir[rdm])
-
-            lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
-            lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
-            u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
-
-            #print(b"Pa1_obake" in tilesetInfo)
-        u8n = u8_m.repackToBytes(u8list,(tilesetInfo[1] in tileList1b))
-        u8o = u8_m.openByteData(STG_NEW+"/"+odir[rdm])
-
-        #u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
-        #u8_m.saveTextData("U8O.txt",u8_m.splitWithEachEle(u8o))
-
-        u8_m.saveByteData(STG_NEW + "/" + odir[rdm],u8n)
-        #u8_m.saveByteData(odir[rdm],u8n)
-
-    
-    #u8list = u8_m.openFile(odir[rdm],None)
-    #u8FileList = u8list["File Name List"]
-    #lvlSetting = nsmbw.readDef(u8list["course1.bin"]["Data"])
-    #print(u8list["Raw Data"][:520])
-    #u8_m.saveTextData("u8r.txt",u8_m.splitWithEachEle(u8list["Raw Data"][:520]))
-    #break #NOTE: break for debugging purpose
+        editArcFile(istr,odir[rdm])
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)

@@ -2,7 +2,10 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>NSMRW Generator Config.json Documentation</title>
+        <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
+        <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
     </head>
     <style>
         body{
@@ -23,13 +26,15 @@
         .code{
             font-family: 'Courier New', Courier, monospace;
             background-color: darkgrey;
-
         }
+
         .code_single{
             font-family: 'Courier New', Courier, monospace;
             background-color: darkgrey;
             padding: 0.2em;
         }
+
+        
     </style>
     <body>
         <div id="topbar" style="width:100%"></div>
@@ -48,6 +53,7 @@
                 <li><a href="#Format">Format</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
+                <li><a href="#Level_Group">"Level Group" Section</a></li>
                 
             </ol></div>
             <h2 id="Introduction">Introduction</h2>
@@ -63,7 +69,8 @@
                 <pre>
                     <div class="code">{
     "Skip":[],
-    "Enemies":[]
+    "Enemies":[],
+    "Level Group":[]
 }</div>
                 </pre>
             </p>
@@ -95,6 +102,31 @@
     [57,58,80,94,95,308,272,120],
     [20,57,24,25]
 ]</pre>
+            </div>
+            <br>
+            <h2 id="Level_Group">"Level Group" Section (Optional)</h2>
+            <div class="code_single">"Level Group": [Array]</div>
+            <p>
+                Lists of grouped levels to be randomized.<br>
+                Like how enemy group works, the levels in the group will be changed to another level in the list.<br>
+                Levels not included in the groups will be randomized with other ungrouped levels.<br>
+                To NOT randomize a group of level, use <a href="#Skip_Level">"Skip level"</a>.
+            </p>
+            Parameter:<br>
+            <span class="code_single">[Array]</span> Arrays of array of <span style="font-weight: bold;">file names</span> to be randomized.<br>
+            Each array will be classified as 1 group, and will randomize only within the group.<br>
+            Note: Items can be included in multiple groups, but CANNOT be repeated within the group. Attempt to include repeats will results in Error.<br>
+            The order of the groups will also affects the randomization effects. If the item is randomized once, it will be randomized with the latter group once more.<br>
+            Example:<button onclick="
+                if(document.getElementById('lvlGpCode').style.display!='none'){
+                    document.getElementById('lvlGpCode').style.display = 'none'
+                }else{
+                    document.getElementById('lvlGpCode').style.display = 'block'
+                }">Show/Hide</button><br>
+            <div id="lvlGpCode" style="display: none;" class="code_single"><pre class="code">"Level Group":[
+    ["01-01.arc","01-02.arc","01-04.arc","01-05.arc","01-06.arc","01-20.arc","01-22.arc","01-24.arc","01-26.arc","01-27.arc","01-28.arc","01-29.arc","01-33.arc","01-34.arc","01-35.arc","01-36.arc"],
+    ["02-01.arc","02-02.arc","02-03.arc","02-05.arc","02-20.arc","02-22.arc","02-26.arc","02-27.arc","02-28.arc","02-33.arc","02-34.arc","02-35.arc","02-36.arc"]
+],</pre>
             </div>
         </div>
     </body>
