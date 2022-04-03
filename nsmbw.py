@@ -148,7 +148,7 @@ class NSMBWsprite:
     def randomEnemy(eData,leData,lvName):
         reData = eData
         relData = leData
-        #print(erList)
+        #print(len(reData))
         for i in range(0,len(reData)):
             #print(reData[i][0])
             for eLis in globalVars.enemyList:
