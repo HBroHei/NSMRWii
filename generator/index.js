@@ -2,6 +2,8 @@ var eList = []
 var lvList = ["Texture","02-24.arc"]
 var e_rand_sel = document.getElementById("e_rand_sel");
 
+document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647
+
 document.getElementById("e_rand_sel").onchange = function(evt) {
     document.getElementById("r_description").innerHTML = e_presets_desc[e_rand_sel.options[e_rand_sel.options.selectedIndex].value]
 }
@@ -81,6 +83,13 @@ document.getElementById("enemySel").onchange = function(){
 function toJson(){
     lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
     
+    try{
+        var seeds = Number(document.getElementById("seed").value)
+    }
+    catch(e){
+        var seeds = document.getElementById("seed").value
+    }
+
     if(document.getElementById("S08-24").checked){
         lvList_skip.push("08-24.arc");
     }
@@ -106,6 +115,7 @@ function toJson(){
     }*/
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
     return {
+        "Seed": seeds,
         "Skip Level": lvList_skip,
         "Enemies": eList,
         "Level Group": lvList_same

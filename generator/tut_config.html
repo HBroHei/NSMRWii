@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>NSMRW Generator Config.json Documentation</title>
+        <title>NSMRW Config.json Documentation</title>
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
     </head>
@@ -51,6 +51,7 @@
             <div><ol>
                 <li><a href="#Introduction">Introduction</a></li>
                 <li><a href="#Format">Format</a></li>
+                <li><a href="#Seed">"Seed" Section</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
@@ -68,12 +69,21 @@
                 The format should be structured as below:<br>
                 <pre>
                     <div class="code">{
+    "Seed":"",
     "Skip":[],
     "Enemies":[],
     "Level Group":[]
 }</div>
                 </pre>
             </p>
+            <br>
+            <h2 id="Seed">"Seed" Section</h2>
+            <div class="code_single">"Seed": Integer | String</div>
+            <p>The seed that will be used or randomization. Same seed will always yield same randomization result.</p>
+            Parameter:<br>
+            <span class="code_single">Integer | String</span> The seed to be used. Can be either a String or a 32-bit Integer<br>
+            Example 1:<div class="code_single">"Seed":523814998</div><br>
+            Example 2:<div class="code_single">"Seed":"NSMRW"</div>
             <br>
             <h2 id="Skip_Level">"Skip Level" Section</h2>
             <div class="code_single">"Skip": Array</div>

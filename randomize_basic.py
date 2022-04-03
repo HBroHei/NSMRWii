@@ -5,6 +5,7 @@ from nsmbw import NSMBWLoadSprite, NSMBWsprite, NSMBWtileset
 import u8_m
 from sys import exit
 from random import randint
+from random import seed
 from json import loads
 import globalVars
 
@@ -19,6 +20,8 @@ def readRandoRule():
     rf = open("config.json")
     rulesDict = loads(rf.read())
     rf.close()
+    # Initalize seed
+    seed(rulesDict["Seed"])
     #Read enemy randomization list
     globalVars.enemyList = rulesDict["Enemies"]
     # Move the files that needs to be in the orginal names
