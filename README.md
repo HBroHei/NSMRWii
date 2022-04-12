@@ -12,13 +12,11 @@
  
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
-- Configuration file
 - Unique enemies (Randomize properties)
 - Block randomization
 - Tileset randomizaion
 - Area / Entrance randomization
 - Support for level description for levels made by Reggie!
-- Seed system
 
 ## Notes
  - Although this project was not based on the Reggie! NSMBW level editor,

@@ -1,6 +1,6 @@
 const e_presets_desc = {
-    "r_all" : "All the enemies, including non-movable obsticles, will be randomized.",
-    "r_all_b" : "All the standalone enemies will be randomized.",
+    "r_all" : "All the enemies, including non-movable obsticles, will be randomized.<br> MAY CAUSE LAG OR CRASHES!",
+    "r_all_b" : "All the standalone enemies will be randomized.<br> MAY CAUSE LAG OR CRASHES!",
     "r_world" : "Randomize enemies in groups with their respective World.",
     "r_type" : "Randomize enemies in groups with their respective species."
 };
