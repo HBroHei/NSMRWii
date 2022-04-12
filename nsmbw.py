@@ -126,7 +126,6 @@ class NSMBWsprite:
         return returnList
     
     def toByteData(sprList,orgLen):
-        i = 0
         returnByte = b""
         for ID,x,y,prop in sprList:
             #print(int(ID).to_bytes(2,"big")+int(x).to_bytes(2,"big")+int(y).to_bytes(2,"big")+prop+b"\x00\x00")
@@ -134,8 +133,8 @@ class NSMBWsprite:
             if len(prop)==8:
                 returnByte += (ID).to_bytes(2,"big")+(x).to_bytes(2,"big")+(y).to_bytes(2,"big")+prop+b"\x00\x00"
             else:
-                pass
-                #print("WARNING: properties not in 8 bytes")
+                print("WARNING: properties not in 8 bytes for object",ID)
+                orgLen -=16
         
         returnByte += b"\xff\xff\xff\xff"
 
@@ -145,21 +144,28 @@ class NSMBWsprite:
         return returnByte
 
     ################## RANDO ####################
-    def randomEnemy(eData,leData,lvName):
+    def processSprites(eData,leData,lvName):
         reData = eData
         relData = leData
-        #print(len(reData))
-        for i in range(0,len(reData)):
-            #print(reData[i][0])
+
+        posList = []
+        
+        for enemyData in reData:
             for eLis in globalVars.enemyList:
-                #print(reData[i][0],eLis,reData[i][0] in eLis)
-                if reData[i][0] in eLis: # Enemy in the list
-                    reData[i][0] = eLis[randint(0,len(eLis)-1)] #randomize
-                    if reData[i][0] not in relData: #Add to the sprite loading list
-                        relData.append(reData[i][0])
-                    #print(reData[i])
-            
-        return reData,relData
+                if enemyData[0] in eLis: # Enemy in the list
+                    # Sprite Limit check
+                    #print(any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList))
+                    if not (any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList) and any(i_int[1] in range(enemyData[2]-50,enemyData[2]+50) for i_int in posList)) or not globalVars.reduceLag:
+                        #print("pass")
+                        posList.append((enemyData[1],enemyData[2]))
+                        enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
+                        if enemyData[0] not in relData: #Add to the sprite loading list
+                            relData.append(enemyData[0])
+                    else:
+                        del reData[reData.index(enemyData)]
+                        #print("Too many sprites! Sprite", enemyData[0], "will be deleted in",lvName)
+        #print(len(reData)*16)
+        return reData,relData,len(reData)*16
 
 
 

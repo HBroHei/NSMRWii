@@ -11,6 +11,8 @@ import globalVars
 
 tileList1b = [b"Pa1_obake",b"Pa1_sabaku",b"Pa1_toride_sabaku",b'Pa1_shiro',b'Pa1_gake']
 
+isDebugging = False
+
 #Folder name
 STG_OLD = "Stage_Unshuffled"
 STG_NEW = "Stage_Shuffled"
@@ -22,14 +24,16 @@ def readRandoRule():
     rf.close()
     # Initalize seed
     seed(rulesDict["Seed"])
-    #Read enemy randomization list
+    # Read enemy randomization list
     globalVars.enemyList = rulesDict["Enemies"]
+    # Check the reduce lag option
+    globalVars.reduceLag = rulesDict["Reduce Lag"]
     # Move the files that needs to be in the orginal names
     globalVars.skipLvl = rulesDict["Skip Level"]
     for istr in rulesDict["Skip Level"]:
         print("Processing [S]",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
         shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
-        if not istr=="Texture":
+        if not istr=="Texture" and not isDebugging:
             editArcFile(istr,istr)
     # Group levels
     try:
@@ -49,24 +53,45 @@ def editArcFile(istr,newName):
         lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
         tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
         
+        # Sprite Handling
+        #print("SprData Size",lvlSetting[7]["Size"])
         spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
+        #u8_m.saveTextData("SPRITEDATA.txt",str(lvlSetting[7]["Data"]))
         sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
-        spriteData,sprLoadData = NSMBWsprite.randomEnemy(spriteData,sprLoadData,STG_NEW+"/"+newName)
+        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,STG_NEW+"/"+newName)
 
         lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
         lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
         u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
 
     u8n = u8_m.repackToBytes(u8list,(tilesetInfo[1] in tileList1b))
-    u8o = u8_m.openByteData(STG_NEW+"/"+newName)
+    u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
+
+    if isDebugging:
+        u8_de = u8_m.openFile(STG_NEW+"/"+newName,STG_NEW+"/"+newName)
+        areaNo = u8list["Number of area"]
+        if areaNo==0:
+            areaNo = 4
+        for i in range(1,areaNo+1):
+            lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
+            tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
+            
+            # Sprite Handling
+            #print("SprData Size",lvlSetting[7]["Size"])
+            spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
+            u8_m.saveTextData("SPRITEDATA_NEW.txt",str(lvlSetting[7]["Data"]))
+    #u8o = u8_m.openByteData(STG_NEW+"/"+newName)
 
     #u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
     #u8_m.saveTextData("U8O.txt",u8_m.splitWithEachEle(u8o))
 
-    u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
+    
 
 
 ########### MAIN ############
+t1 = [(99,11,20),(99,9,1),(99,5,20)]
+print(any(t2[1] in range(0,10) for t2 in t1) and any(t2[2] in range(0,10) for t2 in t1))
+
 
 if not os.path.exists("Stage"):
     print("Stage folder not found. Please place the 'Stage' folder and try again.")
@@ -82,22 +107,13 @@ shutil.copytree("Stage",STG_OLD)
 #Load Preset files
 readRandoRule()
 
-# Move the files that needs to be in the orginal names
-#skipF = open("Skip List.txt","r")
-#skipL = skipF.read().split("\n")
-#
-#for istr in skipL:
-#    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
-#    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
-#
-# Move the files that is bugged
-#skipF = open("Level to be fixed","r")
+### DEBUG ### RE-COMMENT WHEN DONE ###
+#isDebugging = True
+#os.rename(STG_OLD + "/09-07.arc" , STG_NEW + "/LESS_ENEMY.arc") #Rename and move the file
+#editArcFile("09-07.arc","LESS_ENEMY.arc")
+#exit()
+
 skipB = []
-#skipB = skipF.read().split("\n")
-#
-#for istr in skipB:
-#    print("MOVING",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
-#    shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
 
 odir = os.listdir(STG_OLD)
 odir_c = odir[:]

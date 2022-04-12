@@ -52,6 +52,7 @@
                 <li><a href="#Introduction">Introduction</a></li>
                 <li><a href="#Format">Format</a></li>
                 <li><a href="#Seed">"Seed" Section</a></li>
+                <li><a href="#ReduceLag">"Reduce Lag" Section</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
@@ -70,6 +71,7 @@
                 <pre>
                     <div class="code">{
     "Seed":"",
+    "Reduce Lag":True|False,
     "Skip":[],
     "Enemies":[],
     "Level Group":[]
@@ -82,6 +84,13 @@
             <p>The seed that will be used or randomization. Same seed will always yield same randomization result.</p>
             Parameter:<br>
             <span class="code_single">Integer | String</span> The seed to be used. Can be either a String or a 32-bit Integer<br>
+            Example 1:<div class="code_single">"Seed":523814998</div><br>
+            Example 2:<div class="code_single">"Seed":"NSMRW"</div>
+            <br>
+            <h2 id="ReduceLag">"Reduce Lag" Section</h2>
+            <div class="code_single">"Reduce Lag": Boolean</div>
+            <p>Determine if the randomizer should delete sprites to improve performance.</p>Parameter:<br>
+            <span class="code_single">Boolean</span> Will the randomizer delete sprites to reduce lag. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
             Example 1:<div class="code_single">"Seed":523814998</div><br>
             Example 2:<div class="code_single">"Seed":"NSMRW"</div>
             <br>

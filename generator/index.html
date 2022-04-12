@@ -80,7 +80,7 @@
         <br>
         <button class="setup">Step 1: Level options</button>
         <div id="d_step1" class="step">
-            <label for="#S08-24">8-Castle: Skip randomizing</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)"><br>
+            <label for="#S08-24">8-Castle: Skip randomizing</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)" checked><br>
             <label for="#SSE">Secret Exit levels: </label>
             <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4.">
                 <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
@@ -119,10 +119,12 @@
                         All the standalone enemies will be randomized.
                     </td>
                 </tr>
-            </table>
+            </table><br>
+            <label for="#LagReduce">Reduce Lag</label><input id="LagReduce" type="checkbox" checked title="Some sprites will be deleted if there are too many sprites in the surroundinng area."><br>
+            
         </div>
 
-        <label for="#seed">Seed: </label><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result.">
+        <label for="#seed">Seed: </label><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result." checked>
 
         <div id="aboutDialog">
             <div id="dialog_a">

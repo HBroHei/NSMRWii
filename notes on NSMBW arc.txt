@@ -83,7 +83,7 @@ Sections:
         0x0D    PaddingByte     /          -from 0D to 0E
 
     {1} Refer to the datas in Reggie Editor for ID list
-    {2} Most of the time is a flag(i.e. 0 or 1), but it is a hex value
+    {2} Most of the time is a flag(i.e. 0 or 1), but it is actually a hex value
 
     SECTION 8: LOADED SPRITES
     Used to identify the reources needed to load the sprites in the level
