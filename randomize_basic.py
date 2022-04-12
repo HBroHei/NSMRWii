@@ -24,8 +24,10 @@ def readRandoRule():
     rf.close()
     # Initalize seed
     seed(rulesDict["Seed"])
-    #Read enemy randomization list
+    # Read enemy randomization list
     globalVars.enemyList = rulesDict["Enemies"]
+    # Check the reduce lag option
+    globalVars.reduceLag = rulesDict["Reduce Lag"]
     # Move the files that needs to be in the orginal names
     globalVars.skipLvl = rulesDict["Skip Level"]
     for istr in rulesDict["Skip Level"]:

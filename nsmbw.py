@@ -155,7 +155,7 @@ class NSMBWsprite:
                 if enemyData[0] in eLis: # Enemy in the list
                     # Sprite Limit check
                     #print(any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList))
-                    if not (any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList) and any(i_int[1] in range(enemyData[2]-50,enemyData[2]+50) for i_int in posList)):
+                    if not (any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList) and any(i_int[1] in range(enemyData[2]-50,enemyData[2]+50) for i_int in posList)) or not globalVars.reduceLag:
                         #print("pass")
                         posList.append((enemyData[1],enemyData[2]))
                         enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
