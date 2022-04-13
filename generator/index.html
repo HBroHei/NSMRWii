@@ -124,6 +124,27 @@
             
         </div>
 
+        <button class="setup">Step 3: Tiles options</button>
+        <div id="d_step2" class="step">
+            <table class="no_border_table" style="width:100%; display:none">
+                <tr>
+                    <td>
+                        <select id="t_rand_sel" size="7">
+                            <option id="t_r_all" value="r_all">Chaos madness</option>
+                            <option id="t_r_all_b" value="r_all_b" selected="selected">Total randoms</option>
+                            <option id="t_r_world" value="r_world">World's shifting</option>
+                            <option id="t_r_type" value="r_type">Type mix</option>
+                        </select>
+                    </td>
+                    <td id="t_r_description">
+                        All the standalone enemies will be randomized.
+                    </td>
+                </tr>
+            </table><br>
+            <label for="#TileRandomize">Randomize power-up blocks</label><input id="TileRandomize" type="checkbox" checked title="Brick Blocks and ? Blocks with power-ups will be randomized."><br>
+            More options will be available soon.
+        </div>
+
         <label for="#seed">Seed: </label><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result." checked>
 
         <div id="aboutDialog">

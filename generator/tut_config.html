@@ -56,8 +56,9 @@
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
-                
+                <li><a href="#Tile_Group">"Tile Group" Section</a></li>
             </ol></div>
+            <br>Last updated 13/4/2022<br>
             <h2 id="Introduction">Introduction</h2>
             <p>
                 The config.json file foe New Super Mario Randomizer Wii (NSMRW) is used to read randomization preference.
@@ -74,7 +75,8 @@
     "Reduce Lag":True|False,
     "Skip":[],
     "Enemies":[],
-    "Level Group":[]
+    "Level Group":[],
+    "Tile Group":[]
 }</div>
                 </pre>
             </p>
@@ -147,6 +149,20 @@
     ["02-01.arc","02-02.arc","02-03.arc","02-05.arc","02-20.arc","02-22.arc","02-26.arc","02-27.arc","02-28.arc","02-33.arc","02-34.arc","02-35.arc","02-36.arc"]
 ],</pre>
             </div>
+            <br>
+            <h2 id="Tile_Group">"Tile Group" Section (Optional)</h2>
+            <div class="code_single">"Tile Group": [Array]</div>
+            <p>
+                Lists of grouped tile object ID to be randomized.<br>
+                Each array will be classified as 1 group, and will randomize only within the group.<br>
+                </p>
+            Parameter:<br>
+            <span class="code_single">[Array]</span> Arrays of array of <span style="font-weight: bold;">tile object IDs</span> to be randomized.<br>
+            Each array will be classified as 1 group, and will randomize only within the group.<br>
+            Note: Items can be included in multiple groups, and can be repeated within the group. The number of repeats decides the weight of that item in the respective group.<br>
+            The order of the groups will also affects the randomization effects. If the item is randomized once, it will be randomized with the latter group once more.<br>
+            Example:<br>
+            <div class="code_single"><pre class="code">"Tile Group":[[39,40,41,44,45,46,47,48],[29,30,31,33,34,35,36,37]]</pre></div>
         </div>
     </body>
 </html>

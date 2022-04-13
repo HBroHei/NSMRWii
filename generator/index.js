@@ -15,6 +15,7 @@ document.getElementById("SSE").onchange = function(evt) {
 
 function toJson(){
     lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
+    var tileRan = [[]]
     
     try{
         var seeds = Number(document.getElementById("seed").value)
@@ -25,6 +26,9 @@ function toJson(){
 
     if(document.getElementById("S08-24").checked){
         lvList_skip.push("08-24.arc");
+    }
+    if(document.getElementById("TileRandomize").checked){ //Temporay, implement the system that enemy use.
+        tileRan = [[39,40,41,44,45,46,47,48],[29,30,31,33,34,35,36,37]]
     }
     getSkipOption("Secret",document.getElementById("SSE"))
     getSkipOption("Cannon",document.getElementById("SCannon"))
@@ -52,7 +56,8 @@ function toJson(){
         "Reduce Lag": document.getElementById("LagReduce").checked,
         "Skip Level": lvList_skip,
         "Enemies": eList,
-        "Level Group": lvList_same
+        "Level Group": lvList_same,
+        "Tile Group": tileRan
     }
 }
 
