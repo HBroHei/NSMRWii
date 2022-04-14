@@ -67,7 +67,10 @@ def findSpritesInArea(enData,enPosList):
     return not (any(i_int[0] in range(enData[1]-50,enData[1]+50) for i_int in enPosList) and any(i_int[1] in range(enData[2]-50,enData[2]+50) for i_int in enPosList))
 
 def isThwompAlwaysFalling(enData):
-    return enData[3]==b"\x00\x00\x00\x00\x00\x02\x00\x00" and (enData[0]==47 or enData[0]==48)
+    if enData[3]==b"":
+        return False
+    return (int.from_bytes(enData[3],"big") & 131072)==131072 and (enData[0]==47 or enData[0]==48)
+    # Using bitwise as we do not want to change the 4th "place"
 
 class NSMBWbgDat:
     def phraseByteData(byteData):
@@ -208,7 +211,10 @@ class NSMBWsprite:
 
                 # TODO MAKE THIS A TOGGIBLE OPTION
                 if isThwompAlwaysFalling(enemyData):
-                    enemyData[3]==b"\x00\x00\x00\x00\x00\x02\x00\x00"
+                    enemyData[3] = enemyData[3][:5] + (enemyData[3][5]-2).to_bytes(1,"big") + enemyData[3][6:]
+                    #print("Thwomp_A",enemyData[3])
+
+                    
         #print(len(reData)*16)
         return reData,relData,len(reData)*16
 
