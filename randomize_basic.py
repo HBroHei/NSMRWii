@@ -1,7 +1,7 @@
 import os
 import shutil
 import nsmbw
-from nsmbw import NSMBWLoadSprite, NSMBWsprite, NSMBWtileset
+from nsmbw import NSMBWLoadSprite, NSMBWsprite, NSMBWtileset, NSMBWbgDat
 import u8_m
 from sys import exit
 from random import randint
@@ -40,10 +40,17 @@ def readRandoRule():
         globalVars.lvlGroup = rulesDict["Level Group"]
     except KeyError:
         pass
+    # Group blocks(Tiles)
+    try:
+        globalVars.tileGroup = rulesDict["Tile Group"]
+    except KeyError:
+        pass
 
 
 def editArcFile(istr,newName):
     #print(istr)
+    globalVars.tileData = [[],[],[]]
+
     u8list = u8_m.openFile(STG_NEW+"/"+newName,STG_OLD + "/" + istr)
     u8FileList = u8list["File Name List"]
     areaNo = u8list["Number of area"]
@@ -52,11 +59,19 @@ def editArcFile(istr,newName):
     for i in range(1,areaNo+1):
         lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
         tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
+
+        # Read tiles
+        for j in range(0,2):
+            if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list:
+                #u8_m.saveTextData(newName + " course"+ str(i) +"_bgdatL" + str(j) + ".txt",str(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"]))
+                globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
+                globalVars.tilesData[j] = NSMBWbgDat.processTiles(globalVars.tilesData[j])
+                #print(globalVars.tilesData)
+                u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
         
         # Sprite Handling
-        #print("SprData Size",lvlSetting[7]["Size"])
         spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-        #u8_m.saveTextData("SPRITEDATA.txt",str(lvlSetting[7]["Data"]))
+        #print(spriteData[3])
         sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
         spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,STG_NEW+"/"+newName)
 
@@ -68,6 +83,7 @@ def editArcFile(istr,newName):
     u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
 
     if isDebugging:
+        print("\n============DEBUG INFO============\n")
         u8_de = u8_m.openFile(STG_NEW+"/"+newName,STG_NEW+"/"+newName)
         areaNo = u8list["Number of area"]
         if areaNo==0:
@@ -76,10 +92,14 @@ def editArcFile(istr,newName):
             lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
             
-            # Sprite Handling
-            #print("SprData Size",lvlSetting[7]["Size"])
-            spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-            u8_m.saveTextData("SPRITEDATA_NEW.txt",str(lvlSetting[7]["Data"]))
+            for j in range(0,2):
+                if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list:
+                    #u8_m.saveTextData(newName + " course"+ str(i) +"_bgdatL" + str(j) + ".txt",str(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"]))
+                    globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
+                    print(globalVars.tilesData)
+                    #u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
+
+
     #u8o = u8_m.openByteData(STG_NEW+"/"+newName)
 
     #u8_m.saveTextData("U8N.txt",u8_m.splitWithEachEle(u8n))
@@ -104,13 +124,15 @@ shutil.rmtree(STG_NEW,True)
 print("Copying the Stage folder...")
 shutil.copytree("Stage",STG_OLD)
 
+# NOTE DEBUG TAG
+#isDebugging = True
 #Load Preset files
 readRandoRule()
 
-### DEBUG ### RE-COMMENT WHEN DONE ###
-#isDebugging = True
-#os.rename(STG_OLD + "/09-07.arc" , STG_NEW + "/LESS_ENEMY.arc") #Rename and move the file
-#editArcFile("09-07.arc","LESS_ENEMY.arc")
+### NOTE DEBUG TAG ### RE-COMMENT WHEN DONE ###
+
+#os.rename(STG_OLD + "/01-01.arc" , STG_NEW + "/DEBUG.arc") #Rename and move the file
+#editArcFile("01-01.arc","DEBUG.arc")
 #exit()
 
 skipB = []
