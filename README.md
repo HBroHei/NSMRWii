@@ -1,4 +1,4 @@
-# New Super Mario Randomizer Wii
+# New Super Mario Rando Wii
  A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
  Currently the project is a work-in-progress. \
 ***DISCLAMER: This program only received limited testing. The game may crash or glitched at any time***
@@ -13,8 +13,6 @@
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
 - Unique enemies (Randomize properties)
-- Block randomization
-- Tileset randomizaion
 - Area / Entrance randomization
 - Support for level description for levels made by Reggie!
 
