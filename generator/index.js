@@ -1,11 +1,16 @@
 var eList = []
 var lvList = ["Texture","02-24.arc"]
 var e_rand_sel = document.getElementById("e_rand_sel");
+var t_rand_sel = document.getElementById("t_rand_sel");
 
 document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647
 
 document.getElementById("e_rand_sel").onchange = function(evt) {
     document.getElementById("r_description").innerHTML = e_presets_desc[e_rand_sel.options[e_rand_sel.options.selectedIndex].value]
+}
+
+document.getElementById("t_rand_sel").onchange = function(evt) {
+    document.getElementById("t_r_description").innerHTML = t_presets_desc[t_rand_sel.options[t_rand_sel.options.selectedIndex].value]
 }
 
 document.getElementById("SSE").onchange = function(evt) {
@@ -15,7 +20,6 @@ document.getElementById("SSE").onchange = function(evt) {
 
 function toJson(){
     lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
-    var tileRan = [[]]
     
     try{
         var seeds = Number(document.getElementById("seed").value)
@@ -26,9 +30,6 @@ function toJson(){
 
     if(document.getElementById("S08-24").checked){
         lvList_skip.push("08-24.arc");
-    }
-    if(document.getElementById("TileRandomize").checked){ //Temporay, implement the system that enemy use.
-        tileRan = [[39,40,41,44,45,46,47,48],[29,30,31,33,34,35,36,37]]
     }
     getSkipOption("Secret",document.getElementById("SSE"))
     getSkipOption("Cannon",document.getElementById("SCannon"))
@@ -51,6 +52,7 @@ function toJson(){
         lvList.push("08-02.arc");
     }*/
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
+    let tileRan = t_presets_data[t_rand_sel.options[t_rand_sel.options.selectedIndex].value];
     return {
         "Seed": seeds,
         "Reduce Lag": document.getElementById("LagReduce").checked,

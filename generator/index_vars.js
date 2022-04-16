@@ -34,6 +34,23 @@ const e_presets_data = {
     ]
 }
 
+const t_presets_desc = {
+    "t_r_all" : "All the blocks (Brick Blocks, ? Blocks and Hidden Blocks) will be randomized (Except Vine blocks). Hidden blocks may turn visible.",
+    "t_r_ex_sec" : "All the blocks (Brick Blocks, ? Blocks and Hidden Blocks) will be randomized (Except Vine blocks), but hidden blocks will remain hidden.",
+    "t_r_pup" : "Only blocks with power-ups will be randomized.",
+    "t_r_pup_m" : "Blocks with power-ups will be randomized both in block type and power-up.",
+    "t_r_none" : "Blocks wil not be randomized"
+};
+
+const t_presets_data = {
+    "t_r_all": [[17,18,19,20,22,23,24,25,26,27,28,29,30,31,33,34,35,36,37,38,39,40,41,43,44,45,46,47,48]],
+    "t_r_ex_sec" : [[17,18,19,20,22,23,24,25],[26,27,28,29,30,31,33,34,35,36,37,38,39,40,41,43,44,45,46,47,48]],
+    "t_r_pup" : [[39,40,41,44,45,46,47,48],[29,30,31,33,34,35,36,37]],
+    "t_r_pup_m" : [[39,40,41,44,45,46,47,48,29,30,31,33,34,35,36,37]],
+    "t_r_none" : [[]]
+}
+
+
 // Level options - Skip / Group level
 const lvlJson = {
     "Secret":["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
