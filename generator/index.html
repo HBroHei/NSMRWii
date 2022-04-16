@@ -126,18 +126,19 @@
 
         <button class="setup">Step 3: Tiles options</button>
         <div id="d_step2" class="step">
-            <table class="no_border_table" style="width:100%; display:none">
+            <table class="no_border_table" style="width:100%;">
                 <tr>
                     <td>
                         <select id="t_rand_sel" size="7">
-                            <option id="t_r_all" value="r_all">Chaos madness</option>
-                            <option id="t_r_all_b" value="r_all_b" selected="selected">Total randoms</option>
-                            <option id="t_r_world" value="r_world">World's shifting</option>
-                            <option id="t_r_type" value="r_type">Type mix</option>
+                            <option id="t_r_all" value="t_r_all">All Blocks</option>
+                            <option id="t_r_ex_sec" value="t_r_ex_sec">Keeps It Secret</option>
+                            <option id="t_r_pup" value="t_r_pup" selected="selected">Power-up Mix</option>
+                            <option id="t_r_pup_m" value="t_r_pup_m">Power-up Mega Mix</option>
+                            <option id="t_r_none" value="t_r_none">No change</option>
                         </select>
                     </td>
                     <td id="t_r_description">
-                        All the standalone enemies will be randomized.
+                        Only blocks with power-ups will be randomized.
                     </td>
                 </tr>
             </table><br>
