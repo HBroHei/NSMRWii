@@ -15,7 +15,7 @@
 Note: Planned features may be changed or removed at anytime
 - Unique enemies (Randomize properties)
 - Area / Entrance randomization
-- Support for level description for levels made by Reggie!
+- Support for custom levels (It should work at the moment but no guarentee)
 
 ## Notes
  - Although this project was not based on the Reggie! NSMBW level editor,
