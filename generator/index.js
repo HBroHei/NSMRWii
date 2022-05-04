@@ -58,6 +58,7 @@ function toJson(){
         "Reduce Lag": document.getElementById("LagReduce").checked,
         "Skip Level": lvList_skip,
         "Enemies": eList,
+        "Enemy Variation": [],
         "Level Group": lvList_same,
         "Tile Group": tileRan
     }

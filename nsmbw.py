@@ -89,7 +89,7 @@ class NSMBWbgDat:
     
     def toByteData(tilesData):
         byteData = b""
-        for i_lis in tilesData[:-2]:
+        for i_lis in tilesData[:-1]:
             for int_val in i_lis:
                 byteData += int_val.to_bytes(2,"big")
 
@@ -196,23 +196,26 @@ class NSMBWsprite:
         posList = []
         
         for enemyData in reData:
+            #Randomize enemy
             for eLis in globalVars.enemyList:
                 if enemyData[0] in eLis: # Enemy in the list
-                    # Sprite Limit check
-                    #print(any(i_int[0] in range(enemyData[1]-50,enemyData[1]+50) for i_int in posList))
+                    # Sprite Limit check, kinda buggy but I will let it slide for the time being
                     if (findSpritesInArea(enemyData,posList)) or (not globalVars.reduceLag):
-                        #print("pass")
                         posList.append((enemyData[1],enemyData[2]))
                         enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
                         if enemyData[0] not in relData: #Add to the sprite loading list
                             relData.append(enemyData[0])
                     else:
                         del reData[reData.index(enemyData)]
-
-                # TODO MAKE THIS A TOGGIBLE OPTION
-                if isThwompAlwaysFalling(enemyData):
-                    enemyData[3] = enemyData[3][:5] + (enemyData[3][5]-2).to_bytes(1,"big") + enemyData[3][6:]
-                    #print("Thwomp_A",enemyData[3])
+            
+            #Randomize enemy variation
+            if str(enemyData[0]) in globalVars.enemyVarList:
+                varList = globalVars.enemyVarList[str(enemyData[0])]
+                enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
+            else: #Reset enemy state to default
+                if any(enemyData[0] in eLis for eLis in globalVars.enemyList):
+                    enemyData[3] = b"\x00\x00\x00\x00\x00\x00\x00\x00"
+        del reData[-1] # This is the most hacky way to fix a bug but it works.
 
                     
         #print(len(reData)*16)

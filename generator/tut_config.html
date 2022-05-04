@@ -55,6 +55,7 @@
                 <li><a href="#ReduceLag">"Reduce Lag" Section</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
+                <li><a href="#Enemy_Var">"Enemy Variation" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
                 <li><a href="#Tile_Group">"Tile Group" Section</a></li>
             </ol></div>
@@ -75,6 +76,7 @@
     "Reduce Lag":True|False,
     "Skip":[],
     "Enemies":[],
+    "Enemy Variation":{},
     "Level Group":[],
     "Tile Group":[]
 }</div>
@@ -123,6 +125,34 @@
     [57,58,80,94,95,308,272,120],
     [20,57,24,25]
 ]</pre>
+            </div>
+            <br>
+            <h2 id="Enemy_Var">"Enemy Variartion" Section</h2>
+            <div class="code_single">"Enemy Variation": {ID : enemyVariation, ID : enemyVariation, ...}</div>
+            <p>
+                Lists of enemy variation to be randomized.<br>
+                That is, the enemies in the json list will be randomized to another form in the list.<br>
+                Enemies outside of the list will not be randomized.<br>
+            </p>
+            Parameter:<br>
+            <span class="code_single">ID</span> String <span style="font-weight: bold;">sprite IDs</span> to be randomized.<br>
+            Due to limitations, The field ONLY accepts STRING.<br>
+            <span class="code_single">enemyVariation</span> Array of String <span style="font-weight: bold;">"Raw Data"</span> of the enemy variation in hex(but wrapped by quotation ("")).<br>
+            The data can be found via the Sprite Properties window in the Reggie! level editor. ("Modify Raw Data" Section)<br>
+            Note: Items can be repeated within the group. The number of repeats decides the weight of that item in the respective group.<br>
+            Example:<br><div class="code_single"><pre class="code">"Enemy Variation":{
+    "57":[
+        "0000 2000 0010 0000",
+        "0000 0000 0000 0000",
+        "0000 0000 0001 0000"
+    ],
+    "54":[
+        "0000 0000 0002 0000",
+        "0000 0000 0100 0000",
+        "0000 0000 0000 0000",
+        "0000 0000 0102 0000"
+    ]
+},</pre>
             </div>
             <br>
             <h2 id="Level_Group">"Level Group" Section (Optional)</h2>

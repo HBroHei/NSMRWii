@@ -1,4 +1,5 @@
 enemyList = []
+enemyVarList = [[]]
 lvlGroup = []
 tileGroup = []
 skipLvl = []
@@ -6,3 +7,5 @@ skipLvl = []
 reduceLag = True
 
 tilesData = [[],[],[]]
+
+log = ""

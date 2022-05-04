@@ -1,3 +1,4 @@
+import glob
 import os
 import shutil
 import nsmbw
@@ -24,14 +25,20 @@ def readRandoRule():
     rf.close()
     # Initalize seed
     seed(rulesDict["Seed"])
-    # Read enemy randomization list
+    # Read enemy randomization list and preference
     globalVars.enemyList = rulesDict["Enemies"]
+    try:
+        globalVars.enemyVarList = rulesDict["Enemy Variation"]
+        
+    except KeyError:
+        globalVars.log += str("[i] 'Enemy Variation' not included" + "\n")
+        pass
     # Check the reduce lag option
     globalVars.reduceLag = rulesDict["Reduce Lag"]
     # Move the files that needs to be in the orginal names
     globalVars.skipLvl = rulesDict["Skip Level"]
     for istr in rulesDict["Skip Level"]:
-        print("Processing [S]",STG_OLD + "/" + istr,"to",STG_NEW + "/" + istr)
+        globalVars.log += str("Processing [S]"+STG_OLD + "/" + istr+"to"+STG_NEW + "/" + istr + "\n")
         shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
         if not istr=="Texture" and not isDebugging:
             editArcFile(istr,istr)
@@ -39,11 +46,13 @@ def readRandoRule():
     try:
         globalVars.lvlGroup = rulesDict["Level Group"]
     except KeyError:
+        globalVars.log += str("[i] 'Level Group' not included" + "\n")
         pass
     # Group blocks(Tiles)
     try:
         globalVars.tileGroup = rulesDict["Tile Group"]
     except KeyError:
+        globalVars.log += str("[i] 'Tile Group' not included" + "\n")
         pass
 
 
@@ -66,6 +75,7 @@ def editArcFile(istr,newName):
                 #u8_m.saveTextData(newName + " course"+ str(i) +"_bgdatL" + str(j) + ".txt",str(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"]))
                 globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
                 globalVars.tilesData[j] = NSMBWbgDat.processTiles(globalVars.tilesData[j])
+                de_t = globalVars.tilesData[:]
                 #print(globalVars.tilesData)
                 u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
         
@@ -91,13 +101,19 @@ def editArcFile(istr,newName):
         for i in range(1,areaNo+1):
             lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
+            spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
             
             for j in range(0,2):
                 if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list:
                     #u8_m.saveTextData(newName + " course"+ str(i) +"_bgdatL" + str(j) + ".txt",str(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"]))
                     globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
-                    print(globalVars.tilesData)
+                    print(len(de_t[j])==len(globalVars.tilesData[j]))
+                    for tilesData in de_t:
+                        for blockData in tilesData:
+                            print(blockData, blockData in globalVars.tilesData[j])
                     #u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
+            
+            
 
 
     #u8o = u8_m.openByteData(STG_NEW+"/"+newName)
@@ -109,10 +125,6 @@ def editArcFile(istr,newName):
 
 
 ########### MAIN ############
-t1 = [(99,11,20),(99,9,1),(99,5,20)]
-print(any(t2[1] in range(0,10) for t2 in t1) and any(t2[2] in range(0,10) for t2 in t1))
-
-
 if not os.path.exists("Stage"):
     print("Stage folder not found. Please place the 'Stage' folder and try again.")
     exit()
@@ -131,8 +143,8 @@ readRandoRule()
 
 ### NOTE DEBUG TAG ### RE-COMMENT WHEN DONE ###
 
-#os.rename(STG_OLD + "/01-01.arc" , STG_NEW + "/DEBUG.arc") #Rename and move the file
-#editArcFile("01-01.arc","DEBUG.arc")
+#os.rename(STG_OLD + "/05-04.arc" , STG_NEW + "/DEBUG.arc") #Rename and move the file
+#editArcFile("08-32.arc","DEBUG.arc")
 #exit()
 
 skipB = []
@@ -150,7 +162,7 @@ for ilis in globalVars.lvlGroup:
                 print("Hint: This level also appears in the Skip List. Do you still wish to randomize it?")
             exit()
         rdm = randint(0,len(ilis)-1)
-        print("Processing [G] ",istr,": Renaming to ",ilis[rdm])
+        globalVars.log += ("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
         os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + ilis[rdm]) #Rename and move the file
 
         # U8 Archive Editting
@@ -165,7 +177,7 @@ odir_c = odir[:]
 #Loop through each levels
 for istr in odir_c:
     rdm = randint(0,len(odir)-1)
-    print("Processing ",istr,": Renaming to ",odir[rdm])
+    globalVars.log += ("Processing "+istr+": Renaming to "+odir[rdm] + "\n")
     os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
 
     # U8 Archive Editting
@@ -174,5 +186,10 @@ for istr in odir_c:
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)
+
+lf = open("log.txt","w")
+lf.write(globalVars.log)
+lf.close()
+print("Log file is written in log.txt")
 
 #input("Shuffle completed. Press Enter to continue...")
