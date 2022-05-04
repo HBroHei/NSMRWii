@@ -12,3 +12,4 @@ config.json
 .gitignore
 U8N.txt
 U8O.txt
+log.txt
