@@ -13,7 +13,6 @@
  
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
-- Unique enemies (Randomize properties)
 - Area / Entrance randomization
 - Support for custom levels (It should work at the moment but no guarentee)
 
