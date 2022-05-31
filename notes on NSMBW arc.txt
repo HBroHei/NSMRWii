@@ -41,8 +41,26 @@ FILE STRUCTUIRE
             (The rest of the strig is filled with 0x00)
 
         SECTION 1: LEVEL PROPERTIES
+        20 bytes for each entry
+        Format:                                [TODO] SEARCH FOR ACTUAL DESCRIPTION
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    UnsignedInt  Integer       Event A
+            0x04    UnsignedInt  Integer       Event B
+            0x08    UnsignShort  Integer       Wrap Byte
+            0x0A    Short        Integer       Time Limit
+            0x0C    _Bool        Bool          Credit Flag
+            0x0D    Unsign Char  Integer       UNKNOWN
+            0x0E    PaddingByte     /          -From 0E to 0F       
+            0x10    Unsign Char  Integer       Level spawn (Entrance)
+            0x11    _Bool        Bool          Ambush flag
+            0x12    Unsign Char  Integer       Toad Hse Flag
+            0x13    PaddingByte     /          -Only 1 byte
 
         SECTION 2: ZONES (GEOMETRIES(Pos, Size))
+
+        SECTION 3: UNKNOWN (LEVEL PROPERTIES PART 2?)
+        2 datas (According to reggie)
+            0x02 to 0x03, 0x04 to 0x05, all as unsigned shorts
 
         SECTION 4: TOP BACKGROUND
 

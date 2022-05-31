@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>About - New Super MArio Rando Wii</title>
+        <title>About - New Super Mario Rando Wii</title>
         <meta name="viewport" content="width=device-width">
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
@@ -22,7 +22,7 @@
             padding: 1%;
             margin: 1%;
         }
-        td,th{
+        table,tr,td,th{
             border-style: solid;
             border-width: 1;
             border-collapse:collapse;
@@ -43,7 +43,8 @@
             </div>
             <br><br>
             <p>
-                A New Super Mario Bros. Wii Randomizer that can randomize enemies, levels and more!
+                A New Super Mario Bros. Wii Randomizer that can randomize enemies, levels and more!<br>
+                Below is a large piece of text that descripe the process of the project. Be prepared.
             </p>
             <h1>The inspiration</h1>
             <p>
@@ -60,18 +61,90 @@
                 also gain knowledge in game modding.
             </p>
             <hr>
-            <h1>How I started</h1>
+            <h1>How I got started</h1>
             <p>
                 At the time I was already familar with Wii modding scene enough to know for how this project will be going.
                 Here is a list of them:
                 <table>
-                    <tr><th>Item</th><th>Item used</th><th>Description</th></tr>
+                    <tr><th>Item</th><th>Approach</th><th>Description</th></tr>
                     <tr>
                         <td>Programming language</td>
                         <td>Python</td>
-                        <td>Can we just talk about how much more convenient Python is, compared to something like Java and C?</td>
+                        <td>Can we just talk about how much more convenient Python is, compared to something like Java and C?<br>
+                        Although, I have only learnt Python for a few months. (but I have been learning programming for 6 years!)</td>
+                    </tr>
+                    <tr>
+                        <td>Oprating System</td>
+                        <td>Web (JSON Generator)<br>Win/MacOS/Linux/whatever OS that can run Python locally(Randomizer)</td>
+                        <td>I still wish to make it an executable (.exe)(mainly I have no experience in this subject), but the Batch script should be sufficent for now</td>
+                    </tr>
+                    <tr>
+                        <td>User Interface</td>
+                        <td>GUI (JSON Generator)<br>CLI (Randomizer)</td>
+                        <td>I wish I could make the program GUI in clients' end (the actual Python script), but I will need to learn how to make a GUI application for Python first.<Br>
+                        In the mean time, since I am familar with HTML, CSS and JS, I will use that as the GUI platform.</td>
+                    </tr>
+                    <tr>
+                        <td>File format reference</td>
+                        <td><a href="https://wiki.tockdom.com/wiki/U8_(File_Format)">Custom Mario Kart Wiki</a> and<br><a href="https://www.github.com/CLF78/Reggie-Next">Reggie! Level editor</a></td>
+                        <td>Shout out to the modders out there that "decode" how the file format works, I would not have known how it works otherwise.</td>
                     </tr>
                 </table>
+            </p>
+            <hr>
+            <h1>How the program works</h1>
+            <span style="background-color: gold;">For a more detailed guide on how to use the randomizer, see <a href="https://hbrohei.github.io/NSMRWii/generator/tut.html">this guide</a></span>
+            <p>
+                First, the program would make a backup of all the files so that datas will not be lost during editing. It will also read the configuration file.<br>
+                Second, the program would start processing each files.<br>
+                The program would first process the levels in th "Skip Level" Section.<br>
+                Then it would randomize the levels according to their groups order. That is, the group in front would be processed first.<br>
+                Finally, it would process the levels by the file name in asending order.<br>
+                During the level randomization process, other level modiications would be made, such as enemy randomization, to reduce the iteration times.<br><br>
+                The randomized levels would be in the "Stage_Shuffled" folder.
+            </p>
+            <hr>
+            <h1>Updates</h1>
+            <p>
+                One step at a time is always a good thing, especially when there is no time pressure. That's why I have been rolling out updates to this project.<br>
+                Having updates also means that bugs can be traced more easily, unlike developing all the thing at once.<br>
+                Here is a list of updates for this project:<br>
+                <span style="background-color: gold;">Note: this isn't an "offical" changelog</span>
+                <table>
+                    <tr><th>Version</th><th>Item</th><th>Description</th></tr>
+                    <tr>
+                        <td>v1.0.0</td>
+                        <td>First release</td>
+                        <td>I am surprised that I do not have some v0.x release.<br>
+                            Anyways, it was released on April fools (which I did not considered during releasing this), so I released v1.2.0 pretty soon to avoid confusion for april fools jokes<br>
+                            (Unrelated but I just wanted to talk about Stack overflow's April fools joke is fantastic)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>v1.2.0</td>
+                        <td>Seeds, level groups and new UI</td>
+                        <td>
+                            I am impressed that I can work for that many features in a few days.<br>
+                            Especially the new generator page. The old one took long enough to develop, and it is hard to decided that it needs a new one in a short period of time.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>v1.2.2</td>
+                        <td>Block Variants</td>
+                        <td>The release of this version means that I can read most of the content in the NSMBW arc level files.<br>Also fixed the Thwomp "Crush Forever" bug, which was caused by another oversight.</td>
+                    </tr>
+                    <tr>
+                        <td>v1.2.3</td>
+                        <td>Enemy Variants</td>
+                        <td>I am kind of not satisfied with how the "Enemy Variants" work in the configuration file, but it was the best approach I have came up with (at least at the moment).<br>
+                        (I mean that currently you have to know the raw data, which can be inconvenient at times.)</td>
+                    </tr>
+                </table>
+            </p>
+            <hr>
+            <h1></h1>
+            <p>
+
             </p>
         </div>
         <div id="bottomNav" style="width:95%">
