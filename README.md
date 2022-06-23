@@ -2,7 +2,7 @@
  A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
  Currently the project is a work-in-progress. \
  Details: https://HBroHei.github.io/NSMRWii \
-***DISCLAMER: This program only received limited testing. The game may crash or glitched at any time***
+***DISCLAMER: This program only received limited testing. The game may crash or glitch at any time***
 
 ## Features
 - Shuffle levels
