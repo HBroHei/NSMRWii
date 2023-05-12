@@ -5,7 +5,7 @@ function getSkipOption(name,ele){
     else if(ele.options[ele.options.selectedIndex].value=="s_skip"){
         lvList_skip.push(...lvlJson[name])
     }
-    else if(ele.options[ele.options.selectedIndex].value=="s_skip"){
+    else if(ele.options[ele.options.selectedIndex].value=="s_skip_3-4"){
         lvList_skip.push("03-04.arc")
     }
 }

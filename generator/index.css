@@ -1,0 +1,99 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    /*background-color: #c9f8ff;*/
+    padding: 0%;
+    margin: 0%;
+    background-color: green;
+}
+#mainContent{
+    margin:1%;
+    padding: 1%;
+    background-color: white;
+    height: 96vh;
+}
+#title_box{
+    width:99%;
+    text-align: center;
+    border-style: dashed; 
+    background-image: url('../big_title.jpg');
+    background-position: center;
+    text-shadow: 4px 4px black, -4px -4px black, -4px 4px black, 4px -4px black;
+    color: white;
+}
+.opGpTitle{
+    font-weight: bold;
+    font-size: 2em;
+}
+.opGpSubtitle{
+    font-weight: bold;
+    font-size: 1.25em;
+}
+.setup{
+    width:100%;
+    text-align: left;
+    font-size: large;
+}
+#aboutDialog{
+    display:none;
+    z-index: 1;
+    background-color: #0000004F;
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100vw;
+    height:100vh;
+    padding-top: 15%;
+
+}
+#dialog_a{
+    background-color: #e0fbff;
+    padding:1%;
+}
+button{
+    padding: 1%;
+    background-color: #c9f8ff;
+}
+.no_border_table{
+    border-style: hidden;
+}
+.tabs{
+    border-spacing:0%;
+    border-style: solid;
+    border-collapse: collapse;
+    width:100%;
+}
+.tabs td{
+    border-style: solid;
+    border-bottom-color: transparent;
+    padding: 0%;
+}
+.tabs button{
+    background-color:transparent;
+    border-style: none;
+    width:100%;
+    height:100%;
+    font-size: larger;
+}
+
+label{
+    font-size: large;
+    font-weight: bold;
+    text-decoration: underline;
+}
+.no_label_style{
+    font-size:medium;
+    font-weight: 100;
+    text-decoration: none;
+}
+
+.tab_win_default_hidden{
+    display:none;
+}
+
+.tab_win{
+    padding: 5px;
+}
+
+.tab_chosen{
+    background-color: #c9f8ff;
+}
