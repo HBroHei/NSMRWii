@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NSMRW Generator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
+        <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
+    </head>
+    <style>
+        table,td,tr,th{
+            margin:0%;
+            border-style: solid;
+            border-collapse: collapse
+        }
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: skyblue;
+        }
+        .opGpTitle{
+            font-weight: bold;
+            font-size: 2em;
+        }
+        .opGpSubtitle{
+            font-weight: bold;
+            font-size: 1.25em;
+        }
+        .setup{
+            width:100%;
+            text-align: left;
+            font-size: large;
+        }
+        .step{
+            padding: 1%;
+            background-color:rgb(209, 177, 98);
+        }
+        #aboutDialog{
+            display:none;
+            z-index: 1;
+            background-color: #0000004F;
+            position: fixed;
+            top:0;
+            left:0;
+            width: 100vw;
+            height:100vh;
+            padding-top: 15%;
+
+        }
+        #dialog_a{
+            background-color: white;
+            padding:1%;
+        }
+        button{
+            padding: 1%;
+            background-color: yellow;
+        }
+        .no_border_table{
+            border-style: hidden;
+        }
+    </style>
+    <body>
+        <div id="topbar" style="width:100%"></div>
+        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
+        <div style="height: 5vh;"></div>
+        <div style="width:99%;text-align: center; border-style: dashed; background-image: url('big_title.jpg'); background-position: center;">
+            <br>
+            <span style="font-size: 3.5em; font-weight: bold;">New Super Mario Randomizer Wii</span><br>
+            <span style="font-size: 2.5em;">Configuration file generator</span>
+            <br>
+        </div>
+        <div>
+            <button onclick="document.getElementById('aboutDialog').style.display = 'block'">About</button>
+            <button onclick="window.open('tut.html','_blank').focus()">How to use</button>
+        </div>
+        <div style="padding: 2%; background-color: cornflowerblue;  font-size: large;">
+            I know the current UI sucks,<br>
+            but please bear with me while I work on a new UI
+        </div>
+        <br>
+        First-time user? Check the <a href="tut.html">tutorial</a> first!
+        <br>
+        Looking for a more advance edit? Check out the <a href="tut_config.html">config.json documentation</a> or <a href="index_old.html">the legacy generator</a>
+        <br>
+        <button class="setup">Step 1: Level options</button>
+        <div id="d_step1" class="step">
+            <label for="#S08-24">8-Castle: Skip randomizing</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)" checked><br>
+            <label for="#SSE">Secret Exit levels: </label>
+            <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4.">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
+                <option id="s_same" value="s_same" selected="selected">Randomize with other Secret Exit level</option>
+                <option id="s_skip" value="s_skip">Skip randomization (Enemies will still be randomized)</option>
+                <option id="s_skip_3-4" value="s_skip_3-4">Only skip 3-4 (To prevent the chance of not able to finish the game)</option>
+            </select><br>
+            <label for="#SCannon">Cannon: </label>
+            <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels).">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
+                <option id="s_same" value="s_same">Randomize with other Cannon level (The destination will still be the orginal, unrandomized world)</option>
+                <option id="s_skip" value="s_skip" selected="selected">Skip randomization</option>
+            </select><br>
+            <label for="#SToadHse">Toad Houses: </label>
+            <select id="SToadHse" title="Decide what to do for Toad Houses.">
+                <option id="s_all" value="s_all"  >Randomize with all other levels (Normal levels may become Toad House and vice versa)</option>
+                <option id="s_same" value="s_same" selected="selected">Randomize with other Toad Houses</option>
+                <option id="s_skip" value="s_skip">Skip randomization</option>
+            </select><br>
+
+        </div>
+
+        <button class="setup">Step 2: Enemies options</button>
+        <div id="d_step2" class="step">
+            <table class="no_border_table" style="width:100%">
+                <tr>
+                    <td>
+                        <select id="e_rand_sel" size="7">
+                            <option id="r_all" value="r_all">Chaos madness</option>
+                            <option id="r_all_b" value="r_all_b" selected="selected">Total randoms</option>
+                            <option id="r_world" value="r_world">World's shifting</option>
+                            <option id="r_type" value="r_type">Type mix</option>
+                        </select>
+                    </td>
+                    <td id="r_description">
+                        All the standalone enemies will be randomized.
+                    </td>
+                </tr>
+            </table><br>
+            <label for="#LagReduce">Reduce Lag</label><input id="LagReduce" type="checkbox" checked title="Some sprites will be deleted if there are too many sprites in the surroundinng area."><br>
+            
+        </div>
+
+        <button class="setup">Step 3: Tiles options</button>
+        <div id="d_step2" class="step">
+            <table class="no_border_table" style="width:100%;">
+                <tr>
+                    <td>
+                        <select id="t_rand_sel" size="7">
+                            <option id="t_r_all" value="t_r_all">All Blocks</option>
+                            <option id="t_r_ex_sec" value="t_r_ex_sec">Keeps It Secret</option>
+                            <option id="t_r_pup" value="t_r_pup" selected="selected">Power-up Mix</option>
+                            <option id="t_r_pup_m" value="t_r_pup_m">Power-up Mega Mix</option>
+                            <option id="t_r_none" value="t_r_none">No change</option>
+                        </select>
+                    </td>
+                    <td id="t_r_description">
+                        Only blocks with power-ups will be randomized.
+                    </td>
+                </tr>
+            </table><br>
+            <label for="#TileRandomize">Randomize power-up blocks</label><input id="TileRandomize" type="checkbox" checked title="Brick Blocks and ? Blocks with power-ups will be randomized."><br>
+            More options will be available soon.
+        </div>
+
+        <label for="#seed">Seed: </label><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result." checked>
+
+        <div id="aboutDialog">
+            <div id="dialog_a">
+                <h2>New Super Mario Randomizer Wii</h2>
+                <p>A New Super Mario Bros Wii randomizer.
+                    Support levels and enemies randomization,
+                    with more features planned to be implemented.
+
+                    For more information, please visit <a href="https://www.github.com/HBroHei/NSMRWii">https://www.github.com/HBroHei/NSMRWii</a>
+                </p>
+                <button onclick="document.getElementById('aboutDialog').style.display = 'none'">Close</button>
+            </div>
+        </div>
+        <div id="fileGen"><button onclick="genJson()">Generate</button></div>
+        <iframe id="downFrame" style="display:none"></iframe>
+        <script src="index.js"></script>
+        <script src="index_vars.js"></script>
+        <script src="index_level.js"></script>
+    </body>
+</html>
