@@ -1,0 +1,10 @@
+Sprites
+-Reduce unnessary load sprites
+-Bob-omb spawner in 3-Castle
+-Reduce Sprite before the goal (Prevent the goal despawning)
+-Prevent sprie before pipe
+
+Entrances
+-Check for unreachable area
+--Autoscroll levels don't start mid-way
+-Duplicate entrance (ref 2-tower (02-22))

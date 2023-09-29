@@ -2,9 +2,7 @@
 Entity data: 2 bytes
 """
 
-
-from email.encoders import encode_noop
-from random import randint
+from random import randint, shuffle
 import globalVars
 
 
@@ -43,8 +41,6 @@ def readDef(byteData):
         #print(i,offset[i],size[i])
 
     return returnList
-    
-    ### ENTRANCE HANDLING ###
 
 def writeDef(binList):
     bytearr_h = b""
@@ -71,6 +67,115 @@ def isThwompAlwaysFalling(enData):
         return False
     return (int.from_bytes(enData[3],"big") & 131072)==131072 and (enData[0]==47 or enData[0]==48)
     # Using bitwise as we do not want to change the 4th "place"
+
+def genPadding(num):
+    returnPadding = b""
+    for _ in range(1,num):
+        returnPadding += b"\x00"
+    return returnPadding
+
+def checkNonEnterableEntrance(entdata):
+    REROLL_LIST = [0,1,7,8,9,10]
+    #           Contains 0x80?          destination not set?
+    re_bool = (entdata[9]&128)!=0 or (entdata[3]==0 and entdata[4]==0)
+    return re_bool or (entdata[5] in REROLL_LIST)# or ((entdata[9]&128)==0 and entdata[5] in [20,24])
+
+class NSMBWEntrances:
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [int.from_bytes(byteData[0+i:2+i],"big"), #X
+                int.from_bytes(byteData[2+i:4+i],"big"),  #Y
+                # 5-7 Padding
+                int.from_bytes(byteData[8+i:9+i],"big"),  #ID
+                int.from_bytes(byteData[9+i:10+i],"big"),  #Dest ID (Area)
+                int.from_bytes(byteData[10+i:11+i],"big"),  #Dest ID (Entrance)
+                int.from_bytes(byteData[11+i:12+i],"big"),  #Type
+                # 1 padding byte
+                int.from_bytes(byteData[13+i:14+i],"big"),  #Zone ID?
+                int.from_bytes(byteData[14+i:15+i],"big"),  #Layer
+                int.from_bytes(byteData[15+i:16+i],"big"),  #Path
+                int.from_bytes(byteData[16+i:18+i],"big"),  #Settings Bytes (e.g. Enterable, Spawn half a tile, etc.)
+                int.from_bytes(byteData[18+i:19+i],"big"),  #Sends to World Map Bool
+                int.from_bytes(byteData[19+i:20+i],"big"),  #?
+                ]
+            )
+            i+=20 #Entry length
+        
+        return returnList
+    def toByteData(entranceData):
+        #print(genPadding(12))
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += i_lis[0].to_bytes(2,"big")
+            byteData += i_lis[1].to_bytes(2,"big")
+            byteData += b"\x00\x00\x00\x00"
+            byteData += i_lis[2].to_bytes(1,"big")
+            byteData += i_lis[3].to_bytes(1,"big")
+            byteData += i_lis[4].to_bytes(1,"big")
+            byteData += i_lis[5].to_bytes(1,"big")
+            byteData += b"\x00"
+            byteData += i_lis[6].to_bytes(1,"big")
+            byteData += i_lis[7].to_bytes(1,"big")
+            byteData += i_lis[8].to_bytes(1,"big")
+            byteData += i_lis[9].to_bytes(2,"big")
+            byteData += i_lis[10].to_bytes(1,"big")
+            byteData += i_lis[11].to_bytes(1,"big")
+
+        return byteData# + b"\xff\xff"
+    
+    ############### RANDO #################
+    
+    #Possible code optimisation: lvlName to lvlType (Number)
+    def processEntrances(_entData,olvlName,curArea):
+        entData = _entData
+        # Randomise Starting point (Area 1 only)
+        if curArea==1:
+            start_rand = randint(0,len(entData)-1)
+            dum = entData[start_rand][2]
+            entData[start_rand][2] = entData[0][2]
+            entData[0][2] = dum
+
+        # Randomise rest of entrances
+        
+        tmp_dest_list = []
+        tmp_nonshuffle_list = []
+
+        for i in range(0,len(entData)):
+            i_dat = entData[i]
+            if checkNonEnterableEntrance(i_dat) or ("24" in olvlName and i_dat[2]==3): # If it cannot be entered
+                tmp_nonshuffle_list.append((i,i_dat))
+            else:
+                # Only replaces the Entrance ID and Destination ID ********* (i_dat[3],i_dat[4])
+                tmp_dest_list.append(i_dat)
+
+        #print(len(entData),(len(tmp_dest_list)+len(tmp_nonshuffle_list)))
+
+        shuffle(tmp_dest_list)
+        
+        for i_dat in tmp_nonshuffle_list:
+            tmp_dest_list.insert(i_dat[0],i_dat[1])
+
+        # Change back to the oirginal destination after ID swap
+        for i in range(0,len(tmp_dest_list)):
+            tmp_dest_list[i][3] = entData[i][3]
+            tmp_dest_list[i][4] = entData[i][4]
+            if olvlName == "02-22.arc":
+                print(i,tmp_dest_list[i],_entData[i])
+
+        entData = tmp_dest_list[:]
+
+        if olvlName == "02-22.arc":
+            for i_dat in entData:
+                print(i_dat)
+
+        print("+++++++++" + olvlName + "+++++++++")
+
+        return entData
+
 
 class NSMBWbgDat:
     def phraseByteData(byteData):
@@ -106,7 +211,7 @@ class NSMBWbgDat:
             
 
 class NSMBWtileset:
-    #Only implemented this to fix problematic level
+    # WIP, Only implemented this to fix problematic level
     def phraseByteData(byteData):
         i = 0
         returnList = []
@@ -155,7 +260,7 @@ class NSMBWsprite:
         self.y = y
         self.prop = prop
     
-    def phraseByteData(byteData): #TODO UNTESTED, NEED TO DEBUG
+    def phraseByteData(byteData):
         i = 0
         returnList = []
         while i<=len(byteData):
@@ -206,7 +311,10 @@ class NSMBWsprite:
                         if enemyData[0] not in relData: #Add to the sprite loading list
                             relData.append(enemyData[0])
                     else:
-                        del reData[reData.index(enemyData)]
+                        try:
+                            del reData[reData.index(enemyData)]
+                        except ValueError:
+                            print("WARNING: Cannot remove sprite",enemyData)
             
             #Randomize enemy variation
             if str(enemyData[0]) in globalVars.enemyVarList:
