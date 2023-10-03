@@ -6,6 +6,8 @@ skipLvl = []
 
 reduceLag = True
 
+randomiseEntrance = False
+
 tilesData = [[],[],[]]
 
 log = ""

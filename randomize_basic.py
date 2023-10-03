@@ -37,6 +37,12 @@ def readRandoRule():
     # Check the reduce lag option
     globalVars.reduceLag = rulesDict["Reduce Lag"]
 
+    # Check th "randomise entrance" option
+    try:
+        globalVars.randomiseEntrance = rulesDict["Entrance Randomization"]
+    except KeyError:
+        pass
+
     # Move the files that needs to be in the orginal names (Skipped levels)
     globalVars.skipLvl = rulesDict["Skip Level"]
     for istr in rulesDict["Skip Level"]:
@@ -96,12 +102,13 @@ def editArcFile(istr,newName):
         spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
         sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
         # Process the sprites, i.e. randomize it
-        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,STG_NEW+"/"+newName)
-        # Phrase and randomise Entrance Info (Section 6)
-        entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])
-        entrances = NSMBWEntrances.processEntrances(entrances,istr,i)
-        # "Encode" back to byte data for NSMBW
-        lvlSetting[6]["Data"] = NSMBWEntrances.toByteData(entrances)
+        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
+        if globalVars.randomiseEntrance:
+            # Phrase and randomise Entrance Info (Section 6)
+            entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])
+            entrances = NSMBWEntrances.processEntrances(entrances,istr,i)
+            # "Encode" back to byte data for NSMBW
+            lvlSetting[6]["Data"] = NSMBWEntrances.toByteData(entrances)
         #print("ENT_RAW ",lvlSetting[6]["Data"])
         lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
         lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
@@ -179,7 +186,6 @@ for ilis in globalVars.lvlGroup:
             exit()
         rdm = randint(0,len(ilis)-1)
         globalVars.log += ("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
-        #print("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
         os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + ilis[rdm]) #Rename and move the file
 
         # U8 Archive Editting

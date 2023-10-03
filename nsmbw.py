@@ -4,6 +4,7 @@ Entity data: 2 bytes
 
 from random import randint, shuffle
 import globalVars
+from copy import deepcopy
 
 
 BinfileName = "Stage/Extract/course/course1_bgdatL1.bin"
@@ -59,7 +60,7 @@ def writeDef(binList):
 
 ### Sprites Limit check ###
 def findSpritesInArea(enData,enPosList):
-    #print("Endata",enData)
+    # Check if there are sprite within 100 blocks (square)
     return not (any(i_int[0] in range(enData[1]-50,enData[1]+50) for i_int in enPosList) and any(i_int[1] in range(enData[2]-50,enData[2]+50) for i_int in enPosList))
 
 def isThwompAlwaysFalling(enData):
@@ -104,7 +105,7 @@ class NSMBWEntrances:
                 ]
             )
             i+=20 #Entry length
-        
+
         return returnList
     def toByteData(entranceData):
         #print(genPadding(12))
@@ -131,7 +132,8 @@ class NSMBWEntrances:
     
     #Possible code optimisation: lvlName to lvlType (Number)
     def processEntrances(_entData,olvlName,curArea):
-        entData = _entData
+        entData = deepcopy(_entData)
+
         # Randomise Starting point (Area 1 only)
         if curArea==1:
             start_rand = randint(0,len(entData)-1)
@@ -152,27 +154,17 @@ class NSMBWEntrances:
                 # Only replaces the Entrance ID and Destination ID ********* (i_dat[3],i_dat[4])
                 tmp_dest_list.append(i_dat)
 
-        #print(len(entData),(len(tmp_dest_list)+len(tmp_nonshuffle_list)))
-
         shuffle(tmp_dest_list)
         
         for i_dat in tmp_nonshuffle_list:
             tmp_dest_list.insert(i_dat[0],i_dat[1])
 
         # Change back to the oirginal destination after ID swap
-        for i in range(0,len(tmp_dest_list)):
-            tmp_dest_list[i][3] = entData[i][3]
-            tmp_dest_list[i][4] = entData[i][4]
-            if olvlName == "02-22.arc":
-                print(i,tmp_dest_list[i],_entData[i])
+        for i in range(len(tmp_dest_list)): #TODO bugged here for duplicate destnation entrance
+            tmp_dest_list[i][3] = _entData[i][3]
+            tmp_dest_list[i][4] = _entData[i][4]
 
         entData = tmp_dest_list[:]
-
-        if olvlName == "02-22.arc":
-            for i_dat in entData:
-                print(i_dat)
-
-        print("+++++++++" + olvlName + "+++++++++")
 
         return entData
 
@@ -289,40 +281,48 @@ class NSMBWsprite:
         returnByte += b"\xff\xff\xff\xff"
 
         #TODO Fill in some padding data to match the orginal data length.
-        while len(returnByte)<orgLen:
-            returnByte += b"\x00"
+        #while len(returnByte)<orgLen:
+        #    returnByte += b"\x00"
         return returnByte
 
     ################## RANDO ####################
     def processSprites(eData,leData,lvName):
-        reData = eData
-        relData = leData
+        reData = deepcopy(eData)
+        relData = []#deepcopy(leData)
 
         posList = []
         
+        #print("=========== " + lvName)
+
         for enemyData in reData:
+            randomised = False
             #Randomize enemy
             for eLis in globalVars.enemyList:
                 if enemyData[0] in eLis: # Enemy in the list
+                    posList.append((enemyData[1],enemyData[2]))
+                    enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
                     # Sprite Limit check, kinda buggy but I will let it slide for the time being
-                    if (findSpritesInArea(enemyData,posList)) or (not globalVars.reduceLag):
-                        posList.append((enemyData[1],enemyData[2]))
-                        enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
-                        if enemyData[0] not in relData: #Add to the sprite loading list
-                            relData.append(enemyData[0])
-                    else:
+                    if (findSpritesInArea(enemyData,posList) or randint(0,2)==1) and (globalVars.reduceLag):
                         try:
                             del reData[reData.index(enemyData)]
+                            return
                         except ValueError:
                             print("WARNING: Cannot remove sprite",enemyData)
+                    else:
+                        randomised = True
+                        enemyData[3] = b"\x00\x00\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
             
+            if randomised: 
+                pass
+
             #Randomize enemy variation
             if str(enemyData[0]) in globalVars.enemyVarList:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
-            else: #Reset enemy state to default
-                if any(enemyData[0] in eLis for eLis in globalVars.enemyList):
-                    enemyData[3] = b"\x00\x00\x00\x00\x00\x00\x00\x00"
+
+            if enemyData[0] not in relData: #Add to the sprite loading list
+                relData.append(enemyData[0])
+            
         del reData[-1] # This is the most hacky way to fix a bug but it works.
 
                     
