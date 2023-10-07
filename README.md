@@ -7,13 +7,16 @@
 ## Features
 - Shuffle levels
 - Randomize enemies
+- Randomize power-ups
+- Randomize Entrance (EXPERIMENTAL)
 
 ## Usage
  A guide on how to use the program is now available at https://hbrohei.github.io/NSMRWii/generator/tut.html
  
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
-- Area / Entrance randomization
+- [Top priority] Fix Goal Pole / Door disappearing
+- Area (Zone) randomization
 - Support for custom levels (It should work at the moment but no guarentee)
 
 ## Notes

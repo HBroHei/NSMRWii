@@ -208,7 +208,7 @@ def splitWithEachEle(data):
 ###########################################################
 
 
-def repackToBytes(u8List,_1byte):
+def repackToBytes(u8List):
     #         FileMagic OffsetTo1stNode
     #                   -Always 0x20
     byteHead = b"U\xaa8-\x00\x00\x00 "
