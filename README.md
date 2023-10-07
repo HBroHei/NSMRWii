@@ -15,13 +15,12 @@
  
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
-- [Top priority] Fix Goal Pole / Door disappearing
 - Area (Zone) randomization
 - Support for custom levels (It should work at the moment but no guarentee)
 
 ## Notes
  - Although this project was not based on the Reggie! NSMBW level editor,
  Some U8 / Level data phrasing procedure were written with the help from the source code of the Reggie! Editor. \
-Reggie! Editor: https://www.github.com/RoadrunnerWMC/Reggie-Updated (Updated) / https://www.github.com/CLF78/Reggie-Next (Next) \
-Information about U8 archive is provided from https://wiki.tockdom.com/wiki/U8_(File_Format) and https://wiibrew.org/wiki/U8_archive \
+Reggie! Editor: https://www.github.com/NSMBW-Community/Reggie-Updated (Updated) / https://www.github.com/NSMBW-Community/Reggie-Next (Next) \
+Information about U8 archive is provided from https://wiki.tockdom.com/wiki/U8_(File_Format) and https://wiibrew.org/wiki/U8_archive
  - This is a passionate project of my own, so please expect updates to be infrequent.
