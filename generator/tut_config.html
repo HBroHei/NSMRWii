@@ -74,6 +74,7 @@
                     <div class="code">{
     "Seed":"",
     "Reduce Lag":True|False,
+    "Entrance Randomization":True|False,
     "Skip":[],
     "Enemies":[],
     "Enemy Variation":{},
@@ -95,8 +96,17 @@
             <div class="code_single">"Reduce Lag": Boolean</div>
             <p>Determine if the randomizer should delete sprites to improve performance.</p>Parameter:<br>
             <span class="code_single">Boolean</span> Will the randomizer delete sprites to reduce lag. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
-            Example 1:<div class="code_single">"Seed":523814998</div><br>
-            Example 2:<div class="code_single">"Seed":"NSMRW"</div>
+            Example 1:<div class="code_single">"Reduce Lag":true</div><br>
+            Example 2:<div class="code_single">"Reduce Lag":false</div>
+            <br>
+            <h2 id="EntRando">"Entrance Randomisation" Section [EXPERMENTIAL]</h2>
+            <div class="code_single">"Entrance Randomisation": Boolean</div>
+            <p>Determine if the randomizer should randomise Entrances in the level</p>
+            <strong>NOTE: This feature is in experimental. It may create unbeatable levels or inaccessible areas.</strong><br><br>
+            Parameter:<br>
+            <span class="code_single">Boolean</span> Will the randomizer randomise. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
+            Example 1:<div class="code_single">"Entrance Randomisation":true</div><br>
+            Example 2:<div class="code_single">"Entrance Randomisation":false</div>
             <br>
             <h2 id="Skip_Level">"Skip Level" Section</h2>
             <div class="code_single">"Skip": Array</div>
