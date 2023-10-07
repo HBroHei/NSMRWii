@@ -39,7 +39,6 @@ def readDef(byteData):
             "Size":size[i_dum],
             "Data":data[i_dum]
         })
-        #print(i,offset[i],size[i])
 
     return returnList
 
@@ -108,7 +107,6 @@ class NSMBWEntrances:
 
         return returnList
     def toByteData(entranceData):
-        #print(genPadding(12))
         byteData = b""
         for i_lis in entranceData:
             byteData += i_lis[0].to_bytes(2,"big")
@@ -224,18 +222,15 @@ class NSMBWLoadSprite:
         i = 0
         returnList = []
         while i<=len(byteData):
-            #print(byteData[0+i:2+i])
             if byteData[0+i:2+i] != b"":
                 returnList.append(int.from_bytes(byteData[0+i:2+i],"big"))
             i+=4
-            #print(returnList[-1])
         return returnList
 
     def toByteData(sprList,orgLen):
         i = 0
         returnByte = b""
         for ID in sprList:
-            #print(ID)
             returnByte += ID.to_bytes(2,"big") + b"\x00\x00"
 
         #Fill in some padding data to match the orginal data length.
@@ -256,7 +251,6 @@ class NSMBWsprite:
         i = 0
         returnList = []
         while i<len(byteData)-4:
-            #print(byteData[0+i:2+i])
             returnList.append(
                 [int.from_bytes(byteData[0+i:2+i],"big"), #ID
                 int.from_bytes(byteData[2+i:4+i],"big"),  #X
@@ -311,8 +305,6 @@ class NSMBWsprite:
                         except ValueError:
                             print("WARNING: Cannot remove sprite",enemyData)
                     else:
-                        if lvName=="05-21.arc":
-                            #print(enemyData)
                         if enemyData[0] not in globalVars.SKIP_SPRITES:
                             randomised = True
                             enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
@@ -330,8 +322,6 @@ class NSMBWsprite:
             
         del reData[-1] # This is the most hacky way to fix a bug but it works.
 
-                    
-        #print(len(reData)*16)
         return reData,relData,len(reData)*16
 
 

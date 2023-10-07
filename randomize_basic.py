@@ -85,7 +85,6 @@ def editArcFile(istr,newName):
         lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
         # Phrase area tileset (Section 0)
         tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
-        #print(entrances)
 
         # Read tiles
         for j in range(0,2): #Loop through every layers
