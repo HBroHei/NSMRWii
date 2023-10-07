@@ -255,13 +255,16 @@ class NSMBWsprite:
     def phraseByteData(byteData):
         i = 0
         returnList = []
-        while i<=len(byteData):
+        while i<len(byteData)-4:
             #print(byteData[0+i:2+i])
             returnList.append(
                 [int.from_bytes(byteData[0+i:2+i],"big"), #ID
                 int.from_bytes(byteData[2+i:4+i],"big"),  #X
                 int.from_bytes(byteData[4+i:6+i],"big"),  #Y
-                byteData[6+i:14+i]]                       #Properties
+                byteData[6+i:12+i],                        #Properties
+                int.from_bytes(byteData[12+i:13+i],"big"), #Zone ID
+                byteData[13+i:14+i] #an extra byte data?
+                ]
             )
             i+=16
         
@@ -269,14 +272,13 @@ class NSMBWsprite:
     
     def toByteData(sprList,orgLen):
         returnByte = b""
-        for ID,x,y,prop in sprList:
-            #print(int(ID).to_bytes(2,"big")+int(x).to_bytes(2,"big")+int(y).to_bytes(2,"big")+prop+b"\x00\x00")
-            #print(ID,x,y)
-            if len(prop)==8:
-                returnByte += (ID).to_bytes(2,"big")+(x).to_bytes(2,"big")+(y).to_bytes(2,"big")+prop+b"\x00\x00"
+        for ID,x,y,prop,zone,extraByte in sprList:
+            if len(prop)==6:
+                returnByte += (ID).to_bytes(2,"big")+(x).to_bytes(2,"big")+(y).to_bytes(2,"big")+prop+(zone).to_bytes(1,"big")+extraByte+b"\x00\x00"
             else:
-                #print("WARNING: properties not in 8 bytes for object",ID)
+                #print("WARNING: properties not in 6 bytes for object",ID)
                 orgLen -=16
+                
         
         returnByte += b"\xff\xff\xff\xff"
 
@@ -309,8 +311,11 @@ class NSMBWsprite:
                         except ValueError:
                             print("WARNING: Cannot remove sprite",enemyData)
                     else:
-                        randomised = True
-                        enemyData[3] = b"\x00\x00\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
+                        if lvName=="05-21.arc":
+                            #print(enemyData)
+                        if enemyData[0] not in globalVars.SKIP_SPRITES:
+                            randomised = True
+                            enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
             
             if randomised: 
                 pass

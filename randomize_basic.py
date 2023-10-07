@@ -102,7 +102,8 @@ def editArcFile(istr,newName):
         spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
         sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
         # Process the sprites, i.e. randomize it
-        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
+        if len(spriteData)>0:
+            spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
         if globalVars.randomiseEntrance:
             # Phrase and randomise Entrance Info (Section 6)
             entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])

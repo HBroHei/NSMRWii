@@ -11,3 +11,5 @@ randomiseEntrance = False
 tilesData = [[],[],[]]
 
 log = ""
+
+SKIP_SPRITES = [276,259,113]
