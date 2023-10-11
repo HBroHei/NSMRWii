@@ -1,4 +1,5 @@
 import glob
+import time
 import os
 import shutil
 import nsmbw
@@ -18,13 +19,24 @@ isDebugging = False
 STG_OLD = "Stage_Unshuffled"
 STG_NEW = "Stage_Shuffled"
 
+# Random seed generator for change seed without edit config.json
+def random_10_digits():
+    current_time_seconds = int(time.time())
+    current_time_ns = int(time.time_ns())
+    seed = current_time_seconds * 10**9 + current_time_ns
+    a = 6364136223846793005
+    c = 1
+    m = 2**64
+    seed = (a * seed + c) % m
+    return seed % (2 * 10**9 + 1) - 10**9
+
 def readRandoRule():
     global erList
     rf = open("config.json")
     rulesDict = loads(rf.read())
     rf.close()
     # Initalize seed
-    seed(rulesDict["Seed"])
+    rulesDict["Seed"] = random_10_digits()
 
     # Read enemy randomization list and preference
     globalVars.enemyList = rulesDict["Enemies"]
