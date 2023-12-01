@@ -3,6 +3,7 @@ import os
 import shutil
 import nsmbw
 from nsmbw import NSMBWEntrances, NSMBWLoadSprite, NSMBWsprite, NSMBWtileset, NSMBWbgDat
+from dolphinAutoTransfer import dolphinAutoTransfer
 import u8_m
 from sys import exit
 from random import randint
@@ -209,10 +210,25 @@ for istr in odir_c:
 
     del odir[rdm]
 shutil.rmtree(STG_OLD)
+print("Shuffle Complete")
+# Starting Transfer to dolphin
+print("Starting DolphinAutoTransfer module...")
+if dolphinAutoTransfer.verify_autotransfer_status(): 
+    print("Dolphin AutoTransfer : Beginning transfer setting verification")
+    if dolphinAutoTransfer.verify_transfer_settings():
+        print("Dolphin AutoTransfer : Transfer settings are valid, beginning transfer...")
+        if dolphinAutoTransfer.start_transfer(STG_NEW):
+            print("Dolphin AutoTransfer : Randomized Files and related Riivolution XML has been correctly transfered to Dolphin")
+        else:
+            print("Dolphin AutoTransfer : An error occurred during files transfer")
+    else:
+        print("Dolphin AutoTransfer : Transfer settings are invalid, aborting transfer")
+else:
+    print("Dolphin AutoTransfer : Dolphin AutoTransfer is disabled, don't forget to follow instructions for copy files")
 
 lf = open("log.txt","w")
 lf.write(globalVars.log)
 lf.close()
 print("Log file is written in log.txt")
 
-#input("Shuffle completed. Press Enter to continue...")
+input("Process Completed, Press Enter to continue...")
