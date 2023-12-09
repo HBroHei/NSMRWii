@@ -8,4 +8,3 @@ Sprites
 Entrances
 -Check for unreachable area
 --Autoscroll levels don't start mid-way
--Duplicate entrance (ref 2-tower (02-22))

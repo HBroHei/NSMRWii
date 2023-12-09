@@ -11,6 +11,14 @@
             "program": "randomize_basic.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Debug Levels",
+            "type": "python",
+            "request": "launch",
+            "program": "debug.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

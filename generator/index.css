@@ -5,6 +5,11 @@ body{
     margin: 0%;
     background-color: green;
 }
+
+input{
+    max-width: 100%;
+}
+
 #mainContent{
     margin:1%;
     padding: 1%;
@@ -19,6 +24,11 @@ body{
     background-position: center;
     text-shadow: 4px 4px black, -4px -4px black, -4px 4px black, 4px -4px black;
     color: white;
+}
+#changelog_box{
+    width:99%;
+    text-align: center;
+    border-style: dashed;
 }
 .opGpTitle{
     font-weight: bold;

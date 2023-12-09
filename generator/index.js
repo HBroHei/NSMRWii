@@ -5,6 +5,7 @@ var t_rand_sel = document.getElementById("t_rand_sel");
 
 var prevTab = "global";
 
+loadChangelog();
 document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647
 
 /*
@@ -19,6 +20,12 @@ document.getElementById("t_rand_sel").onchange = function(evt) {
 document.getElementById("SSE").onchange = function(evt) {
     document.getElementById("S3-4").disabled = document.getElementById("SSE").checked
     document.getElementById("S3-4").checked = false;
+}
+
+function loadChangelog(){
+    fetch("../LATEST").then(a => a.text().then(txt => {
+        document.getElementById("changelog_box").innerHTML = txt
+    }))
 }
 
 function openWin(ele){
@@ -60,7 +67,7 @@ function toJson(){
     //Set tile raandomization
     let includeTilesList = []
     const qBlock = [38,39,40,41,42,43,44,45,46,47,48]
-    const bBolck = [26,27,28,29,30,31,32,33,34,35,36,37]
+    let bBolck = [26,27,28,29,30,31,32,33,34,35,36,37]
     const hBlock = [17,18,19,20,21,22,23,24,25]
     const sBlock = [49,50,51,53,54]
     if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_same"){
@@ -68,6 +75,9 @@ function toJson(){
             includeTilesList.push(qBlock);
         }
         if(document.getElementById("block_bBlock").checked){
+            if(document.getElementById("block_exbBlock").checked){ // Exclude breakable bricks
+                bBolck.shift();
+            }
             includeTilesList.push(bBolck);
         }
         if(document.getElementById("block_hBlock").checked){
@@ -91,6 +101,52 @@ function toJson(){
             includeTilesList.join(sBlock);
         }
     }
+
+    var enemyVarients = {}
+
+    //Set Toad House randomisation
+    // 1-Up blast
+    if(document.getElementById("level_1upBlast_cb")){
+        enemyVarients["412"] = [
+            /*
+                From the third section:
+                1st byte: n-up, where byte value = n+1
+                2nd byte: -----
+                3rd byte: No handle boolean
+                4th byte: right/up and left/down toggle
+            */
+            "0000 0000 0010", // 1up, right/up
+            "0000 0000 0011", // 1up, left/down
+            "0000 0000 1010", // 2up, right/up
+            "0000 0000 1011", // 2up, left/down
+            "0000 0000 2010", // 3up, right/up
+            "0000 0000 2011", // 3up, left/down
+            "0000 0000 3010", // 4up, right/up
+            "0000 0000 3011" // 4up, left/down
+        ]
+    }
+
+    // Star House
+    if(document.getElementById("level_starHse_cb")){
+        enemyVarients["203"] = [
+            "0000 0000 0000", // Nothing
+            "0000 0000 0002", // Mushroom
+            "0000 0000 0003", // Fire Flower
+            "0000 0000 0004", // Propeller
+            "0000 0000 0005", // Penguin Suit
+            "0000 0000 0006", // Mini shroom
+            "0000 0000 0007", // Star
+            "0000 0000 0008", // Ice Flower
+            "0000 0000 000F"  // Random
+        ]
+    }
+
+    /*
+    // Reserved?
+    if(document.getElementById("").checked){
+        // Reserved for future use?
+    }
+    */
 
 
     /*
@@ -117,9 +173,10 @@ function toJson(){
     return {
         "Seed": seeds,
         "Reduce Lag": document.getElementById("LagReduce").checked,
+        "Entrance Randomisation": document.getElementById("exp_entRand").checked,
         "Skip Level": lvList_skip,
         "Enemies": eList,
-        "Enemy Variation": [],
+        "Enemy Variation": enemyVarients,
         "Level Group": lvList_same,
         "Tile Group": tileRan
     }

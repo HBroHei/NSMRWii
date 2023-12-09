@@ -1,4 +1,3 @@
-import glob
 import os
 import shutil
 import nsmbw
@@ -82,69 +81,49 @@ def editArcFile(istr,newName):
     
     #Loop through every area
     for i in range(1,areaNo+1):
-        # Main area settings file
-        lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
-        # Phrase area tileset (Section 0)
-        tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
-
-        # Read tiles
-        for j in range(0,2): #Loop through every layers
-            if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list: # if layer (j) exist
-                #Get tiles info
-                globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
-                globalVars.tilesData[j] = NSMBWbgDat.processTiles(globalVars.tilesData[j])
-                de_t = globalVars.tilesData[:] ## DEBUG VARIABLE TO STORE TILESDATA
-                # "Encode" and Save the layer tile data
-                u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
-        
-        # Sprite Handling (Section 7,8)
-        # "Decode" to Python array
-        spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-        sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
-        # Process the sprites, i.e. randomize it
-        if len(spriteData)>0:
-            spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
-        if globalVars.randomiseEntrance:
-            # Phrase and randomise Entrance Info (Section 6)
-            entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])
-            entrances = NSMBWEntrances.processEntrances(entrances,istr,i)
-            # "Encode" back to byte data for NSMBW
-            lvlSetting[6]["Data"] = NSMBWEntrances.toByteData(entrances)
-        #print("ENT_RAW ",lvlSetting[6]["Data"])
-        lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
-        lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
-        u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
+        u8list = readAndrandomise(i,istr,u8list)
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
     u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
-
-
-
-    ## DEBUGGING CODE
-    if isDebugging:
-        print("\n============DEBUG INFO============\n")
-        u8_de = u8_m.openFile(STG_NEW+"/"+newName,STG_NEW+"/"+newName)
-        areaNo = u8list["Number of area"]
-        if areaNo==0:
-            areaNo = 4
-        for i in range(1,areaNo+1):
-            lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
-            tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
-            spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
-            
-            for j in range(0,2):
-                if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list:
-                    #u8_m.saveTextData(newName + " course"+ str(i) +"_bgdatL" + str(j) + ".txt",str(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"]))
-                    globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
-                    print(len(de_t[j])==len(globalVars.tilesData[j]))
-                    for tilesData in de_t:
-                        for blockData in tilesData:
-                            print(blockData, blockData in globalVars.tilesData[j])
-                    #u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
             
 
+def readAndrandomise(i,istr,_u8list):
+    u8list = _u8list
+    # Main area settings file
+    lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
+    # Phrase area tileset (Section 0)
+    tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
 
+    # Read tiles
+    for j in range(0,2): #Loop through every layers
+        if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list: # if layer (j) exist
+            #Get tiles info
+            globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
+            globalVars.tilesData[j] = NSMBWbgDat.processTiles(globalVars.tilesData[j])
+            de_t = globalVars.tilesData[:] ## DEBUG VARIABLE TO STORE TILESDATA
+            # "Encode" and Save the layer tile data
+            u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
+    
+    # Sprite Handling (Section 7,8)
+    # "Decode" to Python array
+    spriteData = NSMBWsprite.phraseByteData(lvlSetting[7]["Data"])
+    sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
+    # Process the sprites, i.e. randomize it
+    if len(spriteData)>0:
+        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
+    if globalVars.randomiseEntrance:
+        # Phrase and randomise Entrance Info (Section 6)
+        entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])
+        entrances = NSMBWEntrances.processEntrances(entrances,istr,i)
+        # "Encode" back to byte data for NSMBW
+        lvlSetting[6]["Data"] = NSMBWEntrances.toByteData(entrances)
+    #print("ENT_RAW ",lvlSetting[6]["Data"])
+    lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
+    lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
+    u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
+
+    return u8list
     
 
 
@@ -212,23 +191,22 @@ for istr in odir_c:
 shutil.rmtree(STG_OLD)
 print("Shuffle Complete")
 # Starting Transfer to dolphin
-print("Starting DolphinAutoTransfer module...")
 if dolphinAutoTransfer.verify_autotransfer_status(): 
-    print("Dolphin AutoTransfer : Beginning transfer setting verification")
+    print("Auto Copying : Beginning transfer setting verification")
     if dolphinAutoTransfer.verify_transfer_settings():
-        print("Dolphin AutoTransfer : Transfer settings are valid, beginning transfer...")
+        print("Auto Copying : Transfer settings are valid, beginning transfer...")
         if dolphinAutoTransfer.start_transfer(STG_NEW):
-            print("Dolphin AutoTransfer : Randomized Files and related Riivolution XML has been correctly transfered to Dolphin")
+            print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
         else:
-            print("Dolphin AutoTransfer : An error occurred during files transfer")
+            print("Auto Copying : An error occurred during files transfer")
     else:
-        print("Dolphin AutoTransfer : Transfer settings are invalid, aborting transfer")
+        print("Auto Copying : Transfer settings are invalid, aborting transfer")
 else:
-    print("Dolphin AutoTransfer : Dolphin AutoTransfer is disabled, don't forget to follow instructions for copy files")
+    print("Auto Copying : Auto Copying is disabled, don't forget to follow instructions for copy files")
 
 lf = open("log.txt","w")
 lf.write(globalVars.log)
 lf.close()
 print("Log file is written in log.txt")
 
-input("Process Completed, Press Enter to continue...")
+#input("Process Completed, Press Enter to continue...")

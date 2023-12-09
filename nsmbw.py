@@ -301,16 +301,12 @@ class NSMBWsprite:
                     if (findSpritesInArea(enemyData,posList) or randint(0,2)==1) and (globalVars.reduceLag):
                         try:
                             del reData[reData.index(enemyData)]
-                            return
+                            continue
                         except ValueError:
                             print("WARNING: Cannot remove sprite",enemyData)
                     else:
                         if enemyData[0] not in globalVars.SKIP_SPRITES:
-                            randomised = True
                             enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
-            
-            if randomised: 
-                pass
 
             #Randomize enemy variation
             if str(enemyData[0]) in globalVars.enemyVarList:
@@ -323,7 +319,5 @@ class NSMBWsprite:
         del reData[-1] # This is the most hacky way to fix a bug but it works.
 
         return reData,relData,len(reData)*16
-
-
 
 

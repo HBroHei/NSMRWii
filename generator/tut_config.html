@@ -53,13 +53,14 @@
                 <li><a href="#Format">Format</a></li>
                 <li><a href="#Seed">"Seed" Section</a></li>
                 <li><a href="#ReduceLag">"Reduce Lag" Section</a></li>
+                <li><a href="#EntRando">"Entrance Randomisation" Section</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
                 <li><a href="#Enemy_Var">"Enemy Variation" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
                 <li><a href="#Tile_Group">"Tile Group" Section</a></li>
             </ol></div>
-            <br>Last updated 13/4/2022<br>
+            <br>Last updated 03/12/2023 (DD/MM/YYYY)<br>
             <h2 id="Introduction">Introduction</h2>
             <p>
                 The config.json file foe New Super Mario Randomizer Wii (NSMRW) is used to read randomization preference.
@@ -99,12 +100,13 @@
             Example 1:<div class="code_single">"Reduce Lag":true</div><br>
             Example 2:<div class="code_single">"Reduce Lag":false</div>
             <br>
-            <h2 id="EntRando">"Entrance Randomisation" Section [EXPERMENTIAL]</h2>
+            <h2 id="EntRando">"Entrance Randomisation" Section (Optional) [EXPERMENTIAL]</h2>
             <div class="code_single">"Entrance Randomisation": Boolean</div>
-            <p>Determine if the randomizer should randomise Entrances in the level</p>
+            <p>Determine if the randomizer should randomise wrap pipe / door exits and level spawn</p>
             <strong>NOTE: This feature is in experimental. It may create unbeatable levels or inaccessible areas.</strong><br><br>
             Parameter:<br>
-            <span class="code_single">Boolean</span> Will the randomizer randomise. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
+            <span class="code_single">Boolean</span> Will the randomiser randomise Entrances. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
+            Default: <span class="code_single">False</span><br>
             Example 1:<div class="code_single">"Entrance Randomisation":true</div><br>
             Example 2:<div class="code_single">"Entrance Randomisation":false</div>
             <br>
@@ -152,15 +154,15 @@
             Note: Items can be repeated within the group. The number of repeats decides the weight of that item in the respective group.<br>
             Example:<br><div class="code_single"><pre class="code">"Enemy Variation":{
     "57":[
-        "0000 2000 0010 0000",
-        "0000 0000 0000 0000",
-        "0000 0000 0001 0000"
+        "0000 2000 0010",
+        "0000 0000 0000",
+        "0000 0000 0001"
     ],
     "54":[
-        "0000 0000 0002 0000",
-        "0000 0000 0100 0000",
-        "0000 0000 0000 0000",
-        "0000 0000 0102 0000"
+        "0000 0000 0002",
+        "0000 0000 0100",
+        "0000 0000 0000",
+        "0000 0000 0102"
     ]
 },</pre>
             </div>

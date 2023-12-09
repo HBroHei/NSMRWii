@@ -30,16 +30,17 @@
             <br><br>
             <table class="tabs"><tr style="background-color: #edfdff;">
                 <td id="tab_global" class="tab_chosen"><button onclick="openWin(this)">Global</button></td>
-                <td id="tab_location"                 ><button onclick="openWin(this)">Location</button></td>
-                <td id="tab_block"                    ><button onclick="openWin(this)">Block</button></td>
-                <td id="tab_enemy"                    ><button onclick="openWin(this)">Enemy</button></td>
+                <td id="tab_map"                      ><button onclick="openWin(this)">Map</button></td>
+                <td id="tab_level"                    ><button onclick="openWin(this)">Level</button></td>
+                <td id="tab_experimental"             ><button onclick="openWin(this)">Experimental</button></td>
             </tr></table>
             <div id="win_global" class="tab_win" style="background-color: #c9f8ff;">
                 <label for="#seed">Seed</label><br><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result.">
                 <br>
+                <div id="changelog_box"></div>
             </div>
 
-            <div id="win_location" class="tab_win_default_hidden tab_win">
+            <div id="win_map" class="tab_win_default_hidden tab_win">
                 <label>8-Castle: Skip randomizing</label><br>
                 <label for="#S08-24" class="no_label_style">Enable</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)" checked><br>
                 <br>
@@ -64,21 +65,8 @@
                 </select><br><br>
             </div>
 
-            <div id="win_block" class="tab_win_default_hidden tab_win">
-                <label for="#block_blockRando">Blocks content Randomization</label><br>
-                <select id="block_blockRando" title="Decide if any blocks in the game should be randomized">
-                    <option id="block_none" value="block_none" >No randomization</option>
-                    <option id="block_same" value="block_same" selected="selected">Randomize within the same type of block (? block remains as ? block)</option>
-                    <option id="block_all" value="block_all">Randomize all block types(? block -> brick block, etc.)</option>
-                </select><br><br>
-                <label>Block Types to be randomized</label><br>
-                <label for="#block_qBlock" class="no_label_style">? Block</label><input id="block_qBlock" type="checkbox" checked title="Include ? blcok in the randomization" checked><br>
-                <label for="#block_bBlock" class="no_label_style">Brick Block</label><input id="block_bBlock" type="checkbox" checked title="Include brick block in the randomization" checked><br>
-                <label for="#block_hBlock" class="no_label_style">Hidden Block</label><input id="block_hBlock" type="checkbox" checked title="Include hidden block in the randomization" checked><br>
-                <label for="#block_sBlock" class="no_label_style">Solid Block</label><input id="block_sBlock" type="checkbox" checked title="Include solid (cannot-be-hit) block in the randomization"><br>
-            </div>
-
-            <div id="win_enemy" class="tab_win_default_hidden tab_win">
+            <div id="win_level" class="tab_win_default_hidden tab_win">
+                <h1>Enemies</h1>
                 <label for="#enemy_presets">Enemy randomization presets</label><br>
                 <select id="enemy_presets" title="Presets for the enemy raandomization">
                     <option id="r_type"  value="r_type"  >Randomize enemies in groups with their respective species</option>
@@ -89,6 +77,31 @@
                 <br><br>
                 <label>Reduce Lag</label><br>
                 <label for="#LagReduce" class="no_label_style">Enable</label><input id="LagReduce" type="checkbox" checked title="Delete some sprites to help make the game run smoother" checked><br>
+
+                <h1>Blocks</h1>
+                <label for="#block_blockRando">Blocks content Randomization</label><br>
+                <select id="block_blockRando" title="Decide if any blocks in the game should be randomized">
+                    <option id="block_none" value="block_none" >No randomization</option>
+                    <option id="block_same" value="block_same" selected="selected">Randomize within the same type of block (? block remains as ? block)</option>
+                    <option id="block_all" value="block_all">Randomize all block types(? block -> brick block, etc.)</option>
+                </select><br><br>
+                <label>Block Types to be randomized</label><br>
+                <label for="#block_qBlock" class="no_label_style">? Block</label><input id="block_qBlock" type="checkbox" checked title="Include ? blcok in the randomization" checked><br>
+                <label for="#block_bBlock" class="no_label_style">Brick Block</label><input id="block_bBlock" type="checkbox" checked title="Include brick block in the randomization" checked>
+                (<label for="#block_exbBlock" class="no_label_style">Exclude empty brick block</label><input id="block_exbBlock" type="checkbox" checked title="Exclude empty brick block to make some puzzles possible" checked>)<br>
+                <label for="#block_hBlock" class="no_label_style">Hidden Block</label><input id="block_hBlock" type="checkbox" checked title="Include hidden block in the randomization" checked><br>
+                <label for="#block_sBlock" class="no_label_style">Solid Block</label><input id="block_sBlock" type="checkbox" checked title="Include solid (cannot-be-hit) block in the randomization"><br>
+
+                <h1>Toad House</h1>
+                <label for="#level_1upBlast_cb" class="no_label_style">1up Blast Baloon value randomisation</label><input id="level_1upBlast_cb" type="checkbox" checked title="Include ? blcok in the randomization" checked><br>
+                <label for="#level_starHse_cb" class="no_label_style">Star House item randomisation</label><input id="level_starHse_cb" type="checkbox" checked title="Include brick block in the randomization" checked><br>
+            </div>
+
+            <div id="win_experimental" class="tab_win_default_hidden tab_win">
+                <label for="#exp_entRand">Randomise Entrance</label><br><input id="exp_entRand" type="checkbox" title="Randomise level spawn and wrap pipe and door exit.">
+                <br>
+                <strong>May cause inaccessible areas / unbeatable levels</strong>
+                <br>
             </div>
 
             <div id="aboutDialog">
