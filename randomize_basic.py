@@ -81,14 +81,14 @@ def editArcFile(istr,newName):
     
     #Loop through every area
     for i in range(1,areaNo+1):
-        u8list = readAndrandomise(i,istr,u8list)
+        u8list = readAndProcess(i,istr,u8list)
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
     u8_m.saveByteData(STG_NEW + "/" + newName,u8n)
             
 
-def readAndrandomise(i,istr,_u8list):
+def readAndProcess(i,istr,_u8list):
     u8list = _u8list
     # Main area settings file
     lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
@@ -101,7 +101,6 @@ def readAndrandomise(i,istr,_u8list):
             #Get tiles info
             globalVars.tilesData[j] = NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
             globalVars.tilesData[j] = NSMBWbgDat.processTiles(globalVars.tilesData[j])
-            de_t = globalVars.tilesData[:] ## DEBUG VARIABLE TO STORE TILESDATA
             # "Encode" and Save the layer tile data
             u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"] = NSMBWbgDat.toByteData(globalVars.tilesData[j])
     

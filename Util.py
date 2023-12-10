@@ -7,3 +7,8 @@ def convertNULL(char):
     else:
         return char
 
+def tilePosToObjPos(tilePos):
+    return [tilePos[0]*16,tilePos[1]*16]
+
+def objPosToTilePos(objPos):
+    return [objPos[0]//16,objPos[1]//16]
