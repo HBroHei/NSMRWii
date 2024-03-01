@@ -1,15 +1,22 @@
-import os
-import shutil
-import nsmbw
-from nsmbw import NSMBWEntrances, NSMBWLoadSprite, NSMBWsprite, NSMBWtileset, NSMBWbgDat
-from dolphinAutoTransfer import dolphinAutoTransfer
-import u8_m
+# Import file operation modules
+import os, shutil
 from sys import exit
 from random import randint
 from random import seed
 from json import loads
+
+# Import NSMBW-specific data operation modules
+from nsmbw import readDef, writeDef
+from nsmbw import NSMBWEntrances, NSMBWLoadSprite, NSMBWsprite, NSMBWtileset, NSMBWbgDat
+
+# General Wii File operation modules
+from dolphinAutoTransfer import dolphinAutoTransfer
+import u8_m
+
+# Module that stores all variables in the program
 import globalVars
 
+# Tileset
 tileList1b = [b"Pa1_obake",b"Pa1_sabaku",b"Pa1_toride_sabaku",b'Pa1_shiro',b'Pa1_gake']
 
 isDebugging = False
@@ -17,6 +24,36 @@ isDebugging = False
 #Folder name
 STG_OLD = "Stage_Unshuffled"
 STG_NEW = "Stage_Shuffled"
+
+def wirteLogFile():
+    lf = open("log.txt","w")
+    lf.write(globalVars.log)
+    lf.close()
+    print("Log file is written in log.txt")
+
+def copyStageFolder():
+    # Remove old folders
+    shutil.rmtree(STG_OLD,True)
+    shutil.rmtree(STG_NEW,True)
+
+    print("Copying the Stage folder...")
+    shutil.copytree("Stage",STG_OLD)
+
+def autoCopyDolphin():
+    # Starting Transfer to dolphin
+    if dolphinAutoTransfer.verify_autotransfer_status(): 
+        print("Auto Copying : Beginning transfer setting verification")
+        if dolphinAutoTransfer.verify_transfer_settings():
+            print("Auto Copying : Transfer settings are valid, beginning transfer...")
+            if dolphinAutoTransfer.start_transfer(STG_NEW):
+                print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
+            else:
+                print("Auto Copying : An error occurred during files transfer")
+        else:
+            print("Auto Copying : Transfer settings are invalid, aborting transfer")
+    else:
+        print("Auto Copying : Auto Copying is disabled, don't forget to follow instructions for copy files")
+
 
 def readRandoRule():
     global erList
@@ -91,7 +128,7 @@ def editArcFile(istr,newName):
 def readAndrandomise(i,istr,_u8list):
     u8list = _u8list
     # Main area settings file
-    lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
+    lvlSetting = readDef(u8list["course"+ str(i) +".bin"]["Data"])
     # Phrase area tileset (Section 0)
     tilesetInfo = NSMBWtileset.phraseByteData(lvlSetting[0]["Data"])
 
@@ -121,92 +158,79 @@ def readAndrandomise(i,istr,_u8list):
     #print("ENT_RAW ",lvlSetting[6]["Data"])
     lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
     lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
-    u8list["course"+ str(i) +".bin"]["Data"] = nsmbw.writeDef(lvlSetting)
+    u8list["course"+ str(i) +".bin"]["Data"] = writeDef(lvlSetting)
 
     return u8list
     
 
 
 ########### MAIN ############
-if not os.path.exists("Stage"):
-    print("Stage folder not found. Please place the 'Stage' folder and try again.")
-    exit()
+def main():
+    if not os.path.exists("Stage"):
+        print("Stage folder not found. Please place the 'Stage' folder and try again.")
+        exit()
 
-shutil.rmtree(STG_OLD,True)
-shutil.rmtree(STG_NEW,True)
+    copyStageFolder()
 
+    # NOTE DEBUG TAG
+    #isDebugging = True
+    #Load Preset files
+    readRandoRule()
 
-print("Copying the Stage folder...")
-shutil.copytree("Stage",STG_OLD)
+    ### NOTE DEBUG
 
-# NOTE DEBUG TAG
-#isDebugging = True
-#Load Preset files
-readRandoRule()
+    if isDebugging:
+        os.rename(STG_OLD + "/test_entrance.arc" , STG_NEW + "/DEBUG.arc") #Rename and move the file
+        editArcFile("","DEBUG.arc")
+        exit()
 
-### NOTE DEBUG TAG ### RE-COMMENT WHEN DONE ###
+    skipB = []
 
-#os.rename(STG_OLD + "/test_entrance.arc" , STG_NEW + "/DEBUG.arc") #Rename and move the file
-#editArcFile("","DEBUG.arc")
-#exit()
+    odir = os.listdir(STG_OLD)
+    odir_c = odir[:]
+    print("Processing grouped levels...")
+    #Randomizing Grouped levels first
+    for ilis in globalVars.lvlGroup:
+        ilis_c = ilis[:]
+        for istr in ilis_c:
+            if not istr in odir_c:
+                print(istr,": File not found in Stage folder. Please check if the file is missing or misspelled")
+                if istr in globalVars.skipLvl:
+                    print("Hint: This level also appears in the Skip List. Do you still wish to randomize it?")
+                exit()
+            rdm = randint(0,len(ilis)-1)
+            globalVars.log += ("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
+            os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + ilis[rdm]) #Rename and move the file
 
-skipB = []
+            # U8 Archive Editting
+            if istr not in skipB:
+                editArcFile(istr,ilis[rdm])
+            
+            del odir[odir.index(ilis[rdm])]
+            del ilis[rdm]
+            
+    odir_c = odir[:]
 
-odir = os.listdir(STG_OLD)
-odir_c = odir[:]
-print("Processing grouped levels...")
-#Randomizing Grouped levels first
-for ilis in globalVars.lvlGroup:
-    ilis_c = ilis[:]
-    for istr in ilis_c:
-        if not istr in odir_c:
-            print(istr,": File not found in Stage folder. Please check if the file is missing or misspelled")
-            if istr in globalVars.skipLvl:
-                print("Hint: This level also appears in the Skip List. Do you still wish to randomize it?")
-            exit()
-        rdm = randint(0,len(ilis)-1)
-        globalVars.log += ("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
-        os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + ilis[rdm]) #Rename and move the file
+    #Loop through each levels
+    for istr in odir_c:
+        rdm = randint(0,len(odir)-1)
+        globalVars.log += ("Processing "+istr+": Renaming to "+odir[rdm] + "\n")
+        os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
 
         # U8 Archive Editting
         if istr not in skipB:
-            editArcFile(istr,ilis[rdm])
-        
-        del odir[odir.index(ilis[rdm])]
-        del ilis[rdm]
-        
-odir_c = odir[:]
+            editArcFile(istr,odir[rdm])
 
-#Loop through each levels
-for istr in odir_c:
-    rdm = randint(0,len(odir)-1)
-    globalVars.log += ("Processing "+istr+": Renaming to "+odir[rdm] + "\n")
-    os.rename(STG_OLD + "/" + istr , STG_NEW + "/" + odir[rdm]) #Rename and move the file
+        del odir[rdm]
+    shutil.rmtree(STG_OLD)
+    print("Shuffle Complete")
+    
+    wirteLogFile()
 
-    # U8 Archive Editting
-    if istr not in skipB:
-        editArcFile(istr,odir[rdm])
+    autoCopyDolphin()
 
-    del odir[rdm]
-shutil.rmtree(STG_OLD)
-print("Shuffle Complete")
-# Starting Transfer to dolphin
-if dolphinAutoTransfer.verify_autotransfer_status(): 
-    print("Auto Copying : Beginning transfer setting verification")
-    if dolphinAutoTransfer.verify_transfer_settings():
-        print("Auto Copying : Transfer settings are valid, beginning transfer...")
-        if dolphinAutoTransfer.start_transfer(STG_NEW):
-            print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
-        else:
-            print("Auto Copying : An error occurred during files transfer")
-    else:
-        print("Auto Copying : Transfer settings are invalid, aborting transfer")
-else:
-    print("Auto Copying : Auto Copying is disabled, don't forget to follow instructions for copy files")
+    #input("Process Completed, Press Enter to continue...")
 
-lf = open("log.txt","w")
-lf.write(globalVars.log)
-lf.close()
-print("Log file is written in log.txt")
-
-#input("Process Completed, Press Enter to continue...")
+##### MAIN FUNCTION DEFINITION #####
+if __name__=="__main__":
+    main()

@@ -8,7 +8,7 @@
             "name": "Debug Program",
             "type": "python",
             "request": "launch",
-            "program": "randomize_basic.py",
+            "program": "main.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
