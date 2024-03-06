@@ -85,7 +85,7 @@ def dirHandle(byteFile,offset,isRoot=False):
 
 
 
-def openFile(ARCfileName,orginalFileName):
+def openFile(ARCfileName,orginalFileName=""):
     global nodesList
 
     ### OPEN FILE ###
