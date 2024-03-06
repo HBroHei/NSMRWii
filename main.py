@@ -56,7 +56,7 @@ def autoCopyDolphin():
 
 
 def readRandoRule():
-    global erList
+    #global erList
     rf = open("config.json")
     rulesDict = loads(rf.read())
     rf.close()

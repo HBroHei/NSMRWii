@@ -64,18 +64,20 @@ FILE STRUCTUIRE
             0x04    Signed Long  Integer       Camera Scroll Lower Bound (Normal)
             0x08    Signed Long  Integer       Camera Scroll Upper Bound (in Lakitu Cloud)
             0x0C    Signed Long  Integer       Camera Scroll Lower Bound (in Lakitu Cloud)
-            0x10    UnsignShort  Integer       Property ID
-            0x12    UnsignShort  Integer       
-            0x14    SignedShort  Integer       
-            0x16    SignedShort  Integer       
+            0x10    UnsignShort  Integer       "Entry ID"
+            0x12    UnsignShort  Integer       Map Camera Zoom adjust
+            0x14    SignedShort  Integer       Multiplayer Upper Bounds
+            0x16    SignedShort  Integer       Multiplayer Lower Bounds
 
         SECTION 3: UNKNOWN (LEVEL PROPERTIES PART 2?)
         2 datas (According to reggie)
             0x02 to 0x03, 0x04 to 0x05, all as unsigned shorts
 
         SECTION 4: TOP BACKGROUND
+        TODO Zones related, see section 9
 
         SECTION 5: BOTTOM BACKGROUND
+        TODO Zones Related, see section 9
 
         SECTION 6: ENTRANCE
         20 bytes for each entrance entry
@@ -126,6 +128,28 @@ FILE STRUCTUIRE
         Format: 2 bytes for the ID, with 2 padding bytes
 
         SECTION 9: ZONE (DATA)
+        Used to identify the zone that the player and the camera can move around
+        25 bytes for each entry
+        Format: (All offset from the start of the entry)
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    UnsignShort  Integer       Start X of the zone
+            0x02    UnsignShort  Integer       Start Y of the zone
+            0x04    UnsignShort  Integer       Width of the zone
+            0x06    UnsignShort  Integer       Height of the zone
+            0x08    UnsignShort  Integer       Zone theme
+            0x0A    UnsignShort  Integer       Terrain Lighting type
+            0x0C    Unsign Char  Integer       Zone ID
+            0x0D    Unsign Char  Integer       Zone Bound settings? (sth related to section 2??)
+            0x0E    Unsign Char  Integer       Camera Mode
+            0x0F    Unsign Char  Integer       Camera Zoom Level?
+            0x10    PaddingByte  /             -only 1 byte
+            0x11    Unsign Char  Integer       Darkness effect (TODO looks like some bitwising)
+            0x12    Unsign Char  Integer       Top background ("Scenery" in reggie?) (Ref. section 3)
+            0x13    Unsign Char  Integer       Bottom background ("Backdrop" in reggie?) (Ref. section 4)
+            0x14    Unsign Char  Integer       Camera Autoscroll Track ID?
+            0x15    PaddingByte  /             -From 0x15-0x16
+            0x17    Unsign Char  Integer       Music
+            0x18    Unsign Char  Integer       Effects modifier (Caves Echo, etc)
 
         SECTION 10: LOCATIONS
 
