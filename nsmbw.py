@@ -321,3 +321,10 @@ class NSMBWsprite:
         return reData,relData,len(reData)*16
 
 
+class NSMBZones:
+    def __init__(self):
+        pass
+    def phraseByteData(byteData):
+        pass
+    def toByteData(zone9Data):
+        pass
