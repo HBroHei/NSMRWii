@@ -151,19 +151,32 @@ FILE STRUCTUIRE
             0x17    Unsign Char  Integer       Music
             0x18    Unsign Char  Integer       Effects modifier (Caves Echo, etc)
 
-        SECTION 10: LOCATIONS (Used to define areas for objects / events / etc)
+        SECTION 10: LOCATIONS
+        Used to define areas for objects (*e.g. clouds) / event triggers / entrance area / etc
+        11 bytes for each entry
+        Format: (All offset from the start of the entry)
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    UnsignShort  Integer       X Pos
+            0x02    UnsignShort  Integer       Y Pos
+            0x04    UnsignShort  Integer       Width
+            0x06    UnsignShort  Integer       Height
+            0x08    Unsign Char  Integer       ID
+            0x09    PaddingByte  /             -From 0x09 to 0x0B
+
+        SECTION 11: CAMERA PROFILES
+        Used in conjunction with Events for event-based camera movement
+        ## NOTE: 1st camera profile must be a dummy profile due to bug.
+        20 bytes for each entry
         Format: (All offset from the start of the entry)
             Offset  DataType(C)  DataType(Py)  Description
             0x00    PaddingByte  /             -From 0x00 to 0x0B
-            0x0C    Unsign Char  Integer       TODO
-            0x0D    Unsign Char  Integer       TODO
-            0x0E    Unsign Char  Integer       TODO
-            0x0F    Unsign Char  Integer       TODO
+            0x0C    Unsign Char  Integer       TODO "bgngid" (number of zones+1?)
+            0x0D    Unsign Char  Integer       Camera movement type
+            0x0E    Unsign Char  Integer       Zoom Scale (0=14, etc. See reggie for list of options)
+            0x0F    Unsign Char  Integer       ??? (Seems to be always be 0)
             0x10    PaddingByte  /             -From 0x10 to 0x11
-            0x12    Unsign Char  Integer       TODO
+            0x12    Unsign Char  Integer       Event ID
             0x13    PaddingByte  /             -Only 1 byte
-
-        SECTION 11: CAMERA PROFILES
 
         SECTION 12: PATH
 
