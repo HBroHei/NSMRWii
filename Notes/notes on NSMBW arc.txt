@@ -207,7 +207,7 @@ FILE STRUCTUIRE
             0x02    UnsignShort  Integer       Y Pos
             0x04    Float        Float         Speed
             0x08    Float        Float         Accelerate
-            0x0C    SignedShort  Integer       Delay
+            0x0C    Short        Integer       Delay
             0x0E    PaddingByte  /             -From 0x0E to 0x0F
 
 2.course1_bgdatL0/L1/L2.bin

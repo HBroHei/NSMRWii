@@ -80,6 +80,40 @@ def checkNonEnterableEntrance(entdata):
     re_bool = (entdata[9]&128)!=0 or (entdata[3]==0 and entdata[4]==0)
     return re_bool or (entdata[5] in REROLL_LIST)# or ((entdata[9]&128)==0 and entdata[5] in [20,24])
 
+# Level tiles data
+class NSMBWbgDat:
+    def phraseByteData(byteData):
+        tilesData = []
+        i = 0
+        while i<=len(byteData)-2: #The last 2 bytes is always FFFF
+            tileData = []
+            tileData.append(int.from_bytes(byteData[i:i+2],"big"))
+            tileData.append(int.from_bytes(byteData[i+2:i+4],"big"))
+            tileData.append(int.from_bytes(byteData[i+4:i+6],"big"))
+            tileData.append(int.from_bytes(byteData[i+6:i+8],"big"))
+            tileData.append(int.from_bytes(byteData[i+8:i+10],"big"))
+            tilesData.append(tileData)
+            i += 10
+        return list(filter(None,tilesData))
+    
+    def toByteData(tilesData):
+        byteData = b""
+        for i_lis in tilesData[:-1]:
+            for int_val in i_lis:
+                byteData += int_val.to_bytes(2,"big")
+
+        return byteData + b"\xff\xff"
+    ############## RANDO ###############
+    def processTiles(tData):
+        reData = tData
+        
+        for tilesData in reData:
+            for tLis in globalVars.tileGroup:
+                if tilesData[0] in tLis: # Tile in the group
+                    tilesData[0] = tLis[randint(0,len(tLis)-1)] #randomize
+        return reData
+            
+
 class NSMBWtileset:
     # WIP, Only implemented this to fix problematic level
     def phraseByteData(byteData):
@@ -92,6 +126,88 @@ class NSMBWtileset:
                 returnList.append(byteData[0+i:32+i].strip(b"\x00"))
             i+=32
         return returnList
+
+# Section 1 Level Properties goes here if nessary
+
+class NSMBWZoneBound: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [int.from_bytes(byteData[0+i:4+i],"big"), # Cam Upper Bound
+                int.from_bytes(byteData[4+i:8+i],"big"),  # Cam Lower Bound
+                int.from_bytes(byteData[8+i:12+i],"big"),  # Cam Cloud Upper Bound
+                int.from_bytes(byteData[12+i:16+i],"big"),  # Cam Cloud Lower Bound
+
+                int.from_bytes(byteData[16+i:18+i],"big"),  # Entry ID
+                int.from_bytes(byteData[18+i:20+i],"big"),  # Map Camera Zoom adjust
+                int.from_bytes(byteData[20+i:22+i],"big"),  # Multiplayer Upper Bound
+                int.from_bytes(byteData[22+i:24+i],"big"),  # Multiplayer Lower Bound
+                ]
+            )
+            i+=24 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += i_lis[0].to_bytes(4,"big")
+            byteData += i_lis[1].to_bytes(4,"big")
+            byteData += i_lis[2].to_bytes(4,"big")
+            byteData += i_lis[3].to_bytes(4,"big")
+            byteData += i_lis[4].to_bytes(2,"big")
+            byteData += i_lis[5].to_bytes(2,"big")
+            byteData += i_lis[6].to_bytes(2,"big")
+            byteData += i_lis[7].to_bytes(2,"big")
+
+        return byteData# + b"\xff\xff"
+    
+# Applies to both top and bottom background
+class NSMBWZoneBG: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [
+                # 1 padding byte
+                int.from_bytes(byteData[1+i:2+i],"big"),  # ID
+                int.from_bytes(byteData[2+i:3+i],"big"),  # X Scroll rate
+                int.from_bytes(byteData[3+i:4+i],"big"),  # Y Scroll rate
+                int.from_bytes(byteData[4+i:5+i],"big"),  # Default Image Scroll Y Pos (inverted?)
+                int.from_bytes(byteData[5+i:6+i],"big"),  # Default Image Scroll X Pos
+                int.from_bytes(byteData[6+i:7+i],"big"),  # First background
+                int.from_bytes(byteData[7+i:8+i],"big"),  # Middle background
+                int.from_bytes(byteData[8+i:9+i],"big"),  # Last background
+                # 3 Padding byte
+                int.from_bytes(byteData[11+i:12+i],"big"),  # Zoom levels
+                # more padding bytes
+                ]
+            )
+            i+=16 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += b"\x00"
+            byteData += i_lis[0].to_bytes(1,"big")
+            byteData += i_lis[1].to_bytes(1,"big")
+            byteData += i_lis[2].to_bytes(1,"big")
+            byteData += i_lis[3].to_bytes(1,"big")
+            byteData += i_lis[4].to_bytes(1,"big")
+            byteData += i_lis[5].to_bytes(1,"big")
+            byteData += i_lis[6].to_bytes(1,"big")
+            byteData += i_lis[7].to_bytes(1,"big")
+            byteData += b"\x00\x00\x00"
+            byteData += i_lis[8].to_bytes(1,"big")
+
+        return byteData# + b"\xff\xff"
 
 class NSMBWEntrances:
     def phraseByteData(byteData):
@@ -179,39 +295,6 @@ class NSMBWEntrances:
 
         return entData
 
-
-class NSMBWbgDat:
-    def phraseByteData(byteData):
-        tilesData = []
-        i = 0
-        while i<=len(byteData)-2: #The last 2 bytes is always FFFF
-            tileData = []
-            tileData.append(int.from_bytes(byteData[i:i+2],"big"))
-            tileData.append(int.from_bytes(byteData[i+2:i+4],"big"))
-            tileData.append(int.from_bytes(byteData[i+4:i+6],"big"))
-            tileData.append(int.from_bytes(byteData[i+6:i+8],"big"))
-            tileData.append(int.from_bytes(byteData[i+8:i+10],"big"))
-            tilesData.append(tileData)
-            i += 10
-        return list(filter(None,tilesData))
-    
-    def toByteData(tilesData):
-        byteData = b""
-        for i_lis in tilesData[:-1]:
-            for int_val in i_lis:
-                byteData += int_val.to_bytes(2,"big")
-
-        return byteData + b"\xff\xff"
-    ############## RANDO ###############
-    def processTiles(tData):
-        reData = tData
-        
-        for tilesData in reData:
-            for tLis in globalVars.tileGroup:
-                if tilesData[0] in tLis: # Tile in the group
-                    tilesData[0] = tLis[randint(0,len(tLis)-1)] #randomize
-        return reData
-            
 class NSMBWLoadSprite:
     def __init__(self):
         pass
@@ -318,8 +401,7 @@ class NSMBWsprite:
 
         return reData,relData,len(reData)*16
 
-# TODO Incomplete implementation - add toByteData
-class NSMBZones:
+class NSMBZones: # TODO Untested
     def __init__(self):
         pass
     def phraseByteData(byteData):
@@ -349,8 +431,63 @@ class NSMBZones:
                 int.from_bytes(byteData[24+i:25+i],"big"),  #Sound effects
                 ]
             )
-            i+=20 #Entry length
+            i+=25 #Entry length
 
         return returnList
-    def toByteData(zone9Data):
-        pass
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += i_lis[0].to_bytes(2,"big")
+            byteData += i_lis[1].to_bytes(2,"big")
+            byteData += i_lis[2].to_bytes(2,"big")
+            byteData += i_lis[3].to_bytes(2,"big")
+            byteData += i_lis[4].to_bytes(2,"big")
+            byteData += i_lis[5].to_bytes(2,"big")
+            byteData += i_lis[6].to_bytes(1,"big")
+            byteData += i_lis[7].to_bytes(1,"big")
+            byteData += i_lis[8].to_bytes(1,"big")
+            byteData += i_lis[9].to_bytes(1,"big")
+            # 1 padding byte
+            byteData += i_lis[10].to_bytes(1,"big")
+            byteData += i_lis[11].to_bytes(1,"big")
+            byteData += i_lis[12].to_bytes(1,"big")
+            byteData += i_lis[13].to_bytes(1,"big")
+            # 2 padding bytes
+            byteData += i_lis[14].to_bytes(1,"big")
+            byteData += i_lis[15].to_bytes(1,"big")
+
+        return byteData
+    
+class NSMBWLocations: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [
+                # 1 padding byte
+                int.from_bytes(byteData[1+i:2+i],"big"),  # X
+                int.from_bytes(byteData[2+i:3+i],"big"),  # Y
+                int.from_bytes(byteData[3+i:4+i],"big"),  # Width
+                int.from_bytes(byteData[4+i:5+i],"big"),  # Height
+                int.from_bytes(byteData[5+i:6+i],"big"),  # ID
+                # 3 Padding byte
+                ]
+            )
+            i+=11 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += b"\x00"
+            byteData += i_lis[0].to_bytes(2,"big")
+            byteData += i_lis[1].to_bytes(2,"big")
+            byteData += i_lis[2].to_bytes(2,"big")
+            byteData += i_lis[3].to_bytes(2,"big")
+            byteData += i_lis[4].to_bytes(2,"big")
+            byteData += b"\x00\x00\x00"
+
+        return byteData
