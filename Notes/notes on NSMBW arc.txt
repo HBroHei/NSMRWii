@@ -74,6 +74,20 @@ FILE STRUCTUIRE
             0x02 to 0x03, 0x04 to 0x05, all as unsigned shorts (UnkVal1 and 2)
 
         SECTION 4: TOP BACKGROUND
+        Format: (All offset from the start of the entry)
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    PaddingByte  /             -only 1 byte
+            0x01    Unsign Char  Integer       
+            0x02    SignedShort  Integer       
+            0x03    SignedShort  Integer       
+            0x04    SignedShort  Integer       
+            0x05    SignedShort  Integer       
+            0x06    UnsignShort  Integer       
+            0x07    UnsignShort  Integer       
+            0x08    UnsignShort  Integer       
+            0x09    PaddingByte  /             -From 0x09 to 0x0B
+            0x0C    Unsign Char  Integer       
+            0x0D    PaddingByte  /             -From 0x0D to 0x10
         TODO Zones related, see section 9
 
         SECTION 5: BOTTOM BACKGROUND
@@ -178,10 +192,24 @@ FILE STRUCTUIRE
             0x12    Unsign Char  Integer       Event ID
             0x13    PaddingByte  /             -Only 1 byte
 
-        SECTION 12: PATH
-
-        SECTION 13: PATH NODES
-
+        SECTION 12: PATH (TODO verify them)
+        Format: (All offset from the start of the entry)
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    Unsign Char  Integer       ID
+            0x01    PaddingByte  /             -only 1 byte
+            0x02    UnsignShort  Integer       Start node ID
+            0x04    UnsignShort  Integer       Number of nodes
+            0x06    UnsignShort  Integer       Unknown
+        
+        SECTION 13: PATH NODES (TODO Verify them)
+        Format: (All offset from the start of the entry)
+            Offset  DataType(C)  DataType(Py)  Description
+            0x00    UnsignShort  Integer       X Pos
+            0x02    UnsignShort  Integer       Y Pos
+            0x04    Float        Float         Speed
+            0x08    Float        Float         Accelerate?
+            0x0C    SignedShort  Integer       Unknown
+            0x0E    PaddingByte  /             -From 0x0E to 0x0F
 
 2.course1_bgdatL0/L1/L2.bin
 (Ref.: loadLayer in reggie source)
