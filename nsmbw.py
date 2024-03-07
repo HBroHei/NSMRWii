@@ -80,6 +80,19 @@ def checkNonEnterableEntrance(entdata):
     re_bool = (entdata[9]&128)!=0 or (entdata[3]==0 and entdata[4]==0)
     return re_bool or (entdata[5] in REROLL_LIST)# or ((entdata[9]&128)==0 and entdata[5] in [20,24])
 
+class NSMBWtileset:
+    # WIP, Only implemented this to fix problematic level
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<=len(byteData):
+            #print(byteData[0+i:2+i])
+            if byteData[0+i:2+i] != b"":
+                #print("".join(list(filter(lambda l: l!=b"\x00",byteData[0+i:32+i]))))
+                returnList.append(byteData[0+i:32+i].strip(b"\x00"))
+            i+=32
+        return returnList
+
 class NSMBWEntrances:
     def phraseByteData(byteData):
         i = 0
@@ -199,21 +212,6 @@ class NSMBWbgDat:
                     tilesData[0] = tLis[randint(0,len(tLis)-1)] #randomize
         return reData
             
-
-class NSMBWtileset:
-    # WIP, Only implemented this to fix problematic level
-    def phraseByteData(byteData):
-        i = 0
-        returnList = []
-        while i<=len(byteData):
-            #print(byteData[0+i:2+i])
-            if byteData[0+i:2+i] != b"":
-                #print("".join(list(filter(lambda l: l!=b"\x00",byteData[0+i:32+i]))))
-                returnList.append(byteData[0+i:32+i].strip(b"\x00"))
-            i+=32
-        return returnList
-
-
 class NSMBWLoadSprite:
     def __init__(self):
         pass
@@ -320,11 +318,39 @@ class NSMBWsprite:
 
         return reData,relData,len(reData)*16
 
-
+# TODO Incomplete implementation - add toByteData
 class NSMBZones:
     def __init__(self):
         pass
     def phraseByteData(byteData):
-        pass
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [int.from_bytes(byteData[0+i:2+i],"big"), #X
+                int.from_bytes(byteData[2+i:4+i],"big"),  #Y
+                int.from_bytes(byteData[4+i:6+i],"big"),  #Width
+                int.from_bytes(byteData[6+i:8+i],"big"),  #Height
+                int.from_bytes(byteData[8+i:10+i],"big"),  #Zone theme
+                int.from_bytes(byteData[10+i:12+i],"big"),  #Terrain Lighting theme
+
+                int.from_bytes(byteData[12+i:13+i],"big"),  #Zone ID
+                int.from_bytes(byteData[13+i:14+i],"big"),  #Zone bound settings?
+                int.from_bytes(byteData[14+i:15+i],"big"),  #Camera Mode
+                int.from_bytes(byteData[15+i:16+i],"big"),  #Camera Zoom Level
+                # 1 padding byte
+                int.from_bytes(byteData[17+i:18+i],"big"),  #Darkness effect type
+                int.from_bytes(byteData[18+i:19+i],"big"),  #Top background (ref section 3)
+                int.from_bytes(byteData[19+i:20+i],"big"),  #Bottom background (ref section 4)
+                int.from_bytes(byteData[20+i:21+i],"big"),  #Autoscroll track path ID
+                # 2 padding bytes
+                int.from_bytes(byteData[23+i:24+i],"big"),  #Music ID
+                int.from_bytes(byteData[24+i:25+i],"big"),  #Sound effects
+                ]
+            )
+            i+=20 #Entry length
+
+        return returnList
     def toByteData(zone9Data):
         pass
