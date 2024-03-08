@@ -82,15 +82,15 @@ FILE STRUCTUIRE
             0x00    PaddingByte  /             -only 1 byte
             0x01    Unsign Char  Integer       ID
             0x02    SignedShort  Integer       X Scroll rate
-            0x03    SignedShort  Integer       Y Scroll rate
-            0x04    SignedShort  Integer       Default Image Scroll Y Pos
-            0x05    SignedShort  Integer       Default Image scroll X pos
-            0x06    UnsignShort  Integer       First Background
-            0x07    UnsignShort  Integer       Middle Background
-            0x08    UnsignShort  Integer       Last Background
-            0x09    PaddingByte  /             -From 0x09 to 0x0B
-            0x0C    Unsign Char  Integer       Zoom Level (0 = 100%, 1 = 125%, up to 200%)
-            0x0D    PaddingByte  /             -From 0x0D to 0x10
+            0x04    SignedShort  Integer       Y Scroll rate
+            0x06    SignedShort  Integer       Default Image Scroll Y Pos
+            0x08    SignedShort  Integer       Default Image scroll X pos
+            0x0A    UnsignShort  Integer       First Background
+            0x0C    UnsignShort  Integer       Middle Background
+            0x0E    UnsignShort  Integer       Last Background
+            0x10    PaddingByte  /             -From 0x10 to 0x12
+            0x13    Unsign Char  Integer       Zoom Level (0 = 100%, 1 = 125%, up to 200%)
+            0x14    PaddingByte  /             -From 0x14 to 0x18
 
         SECTION 6: ENTRANCE
         20 bytes for each entrance entry
@@ -192,15 +192,17 @@ FILE STRUCTUIRE
             0x13    PaddingByte  /             -Only 1 byte
 
         SECTION 12: PATH (TODO verify them)
+        8 bytes for each entry
         Format: (All offset from the start of the entry)
             Offset  DataType(C)  DataType(Py)  Description
             0x00    Unsign Char  Integer       ID
             0x01    PaddingByte  /             -only 1 byte
             0x02    UnsignShort  Integer       Start node ID
             0x04    UnsignShort  Integer       Number of nodes
-            0x06    UnsignShort  Integer       Unknown
+            0x06    UnsignShort  Integer       Path loops?
         
         SECTION 13: PATH NODES (TODO Verify them)
+        16 bytes for each entry
         Format: (All offset from the start of the entry)
             Offset  DataType(C)  DataType(Py)  Description
             0x00    UnsignShort  Integer       X Pos

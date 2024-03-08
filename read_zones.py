@@ -9,6 +9,9 @@ from Util import tilePosToObjPos
 outJson = dict()
 lvlSetting_arr = []
 
+# DEBUG FLAG TOGGLE
+isDebug = True
+
 def checkInZone(zoneData, tilePos):
     # for every zone, Check X pos, then Y pos
     for i in range(0,len(zoneData)-1):
@@ -42,26 +45,34 @@ def readAllSettings(raw_setting):
     # Section 11
     camProfile = nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"])
     # Section 12
+    pathProp = nsmbw.NSMBWPathProperties.phraseByteData(raw_setting[12]["Data"])
     # Section 13
-
+    pathNode = nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"])
 
     # DEBUG
-    print(zoneBound)
-    print(topBackground)
-    print(zoneData)
-    print(locData)
-    print(camProfile)
-    print("-----------------")
-    raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
-    raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
-    raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
-    raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
-    raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
-    print(nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
-    print(nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
-    print(nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
-    print(nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
-    print(nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
+    if isDebug:
+        # print(zoneBound)
+        # print(topBackground)
+        # print(zoneData)
+        # print(locData)
+        print(camProfile)
+        print(pathProp)
+        print(pathNode)
+        print("-----------------")
+        # raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
+        # raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
+        # raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
+        # raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
+        raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
+        raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
+        raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
+        # print(nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
+        # print(nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
+        # print(nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
+        # print(nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
+        print(nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
+        print(nsmbw.NSMBWPathProperties.phraseByteData(raw_setting[12]["Data"]))
+        print(nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"]))
 
 def main():
     global lvlSetting_arr
@@ -70,6 +81,9 @@ def main():
     # rf.close()
 
     for filename in listdir("./Stage"):
+        if isDebug:
+            if filename!="05-05.arc":
+                continue
         u8list = u8_m.openFile("Stage/" + filename)
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
@@ -83,7 +97,7 @@ def main():
         for i in range(1,areaNo+1):
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
-        exit()
+            exit()
 
         # Read tiles
         for j in range(0,2): #Loop through every layers

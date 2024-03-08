@@ -6,6 +6,8 @@ from random import randint, shuffle
 import globalVars
 from copy import deepcopy
 
+from struct import unpack, pack
+
 
 BinfileName = "Stage/Extract/course/course1_bgdatL1.bin"
 BinfileName = "Stage/Extract/course/course1.bin"
@@ -166,29 +168,28 @@ class NSMBWZoneBound:
         return byteData# + b"\xff\xff"
     
 # Applies to both top and bottom background
-class NSMBWZoneBG: # TODO Does not read properly
+class NSMBWZoneBG:
     def phraseByteData(byteData):
         i = 0
         returnList = []
         while i<len(byteData):
-            #print(byteData[0+i:2+i])
             returnList.append(
                 [
                 # 1 padding byte
                 int.from_bytes(byteData[1+i:2+i],"big"),  # ID
-                int.from_bytes(byteData[2+i:3+i],"big"),  # X Scroll rate
-                int.from_bytes(byteData[3+i:4+i],"big"),  # Y Scroll rate
-                int.from_bytes(byteData[4+i:5+i],"big"),  # Default Image Scroll Y Pos (inverted?)
-                int.from_bytes(byteData[5+i:6+i],"big"),  # Default Image Scroll X Pos
-                int.from_bytes(byteData[6+i:7+i],"big"),  # First background
-                int.from_bytes(byteData[7+i:8+i],"big"),  # Middle background
-                int.from_bytes(byteData[8+i:9+i],"big"),  # Last background
+                int.from_bytes(byteData[2+i:4+i],"big"),  # X Scroll rate
+                int.from_bytes(byteData[4+i:6+i],"big"),  # Y Scroll rate
+                int.from_bytes(byteData[6+i:8+i],"big"),  # Default Image Scroll Y Pos (inverted?)
+                int.from_bytes(byteData[8+i:10+i],"big"),  # Default Image Scroll X Pos
+                int.from_bytes(byteData[10+i:12+i],"big"),  # First background
+                int.from_bytes(byteData[12+i:14+i],"big"),  # Middle background
+                int.from_bytes(byteData[14+i:16+i],"big"),  # Last background
                 # 3 Padding byte
-                int.from_bytes(byteData[11+i:12+i],"big"),  # Zoom levels
-                # more padding bytes
+                int.from_bytes(byteData[19+i:20+i],"big"),  # Zoom levels
+                # 4 padding bytes
                 ]
             )
-            i+=16 #Entry length
+            i+=24 #Entry length
 
         return returnList
     
@@ -197,13 +198,13 @@ class NSMBWZoneBG: # TODO Does not read properly
         for i_lis in entranceData:
             byteData += b"\x00"
             byteData += i_lis[0].to_bytes(1,"big")
-            byteData += i_lis[1].to_bytes(1,"big")
-            byteData += i_lis[2].to_bytes(1,"big")
-            byteData += i_lis[3].to_bytes(1,"big")
-            byteData += i_lis[4].to_bytes(1,"big")
-            byteData += i_lis[5].to_bytes(1,"big")
-            byteData += i_lis[6].to_bytes(1,"big")
-            byteData += i_lis[7].to_bytes(1,"big")
+            byteData += i_lis[1].to_bytes(2,"big")
+            byteData += i_lis[2].to_bytes(2,"big")
+            byteData += i_lis[3].to_bytes(2,"big")
+            byteData += i_lis[4].to_bytes(2,"big")
+            byteData += i_lis[5].to_bytes(2,"big")
+            byteData += i_lis[6].to_bytes(2,"big")
+            byteData += i_lis[7].to_bytes(2,"big")
             byteData += b"\x00\x00\x00"
             byteData += i_lis[8].to_bytes(1,"big")
 
@@ -521,5 +522,70 @@ class NSMBWCamProfile: #TODO Untested
             byteData += i_lis[2].to_bytes(1,"big")
             byteData += b"\x00\x00"
             byteData += i_lis[3].to_bytes(1,"big")
+
+        return byteData
+    
+class NSMBWPathProperties: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [
+                int.from_bytes(byteData[0+i:1+i],"big"),  # Path ID
+                # 1 padding byte
+                int.from_bytes(byteData[2+i:4+i],"big"),  # Starting path node ID
+                int.from_bytes(byteData[4+i:6+i],"big"),  # Number of nodes
+                int.from_bytes(byteData[6+i:8+i],"big"),  # Path loops?
+                ]
+            )
+            i+=8 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += i_lis[0].to_bytes(1,"big")
+            byteData += b"\x00"
+            byteData += i_lis[1].to_bytes(2,"big")
+            byteData += i_lis[2].to_bytes(2,"big")
+            byteData += i_lis[3].to_bytes(2,"big")
+
+        return byteData
+    
+class NSMBWPathNode: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            # due to struct being the only way vanilla python can read byte array to float, here it is, struct
+            #TODO code here
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [
+                int.from_bytes(byteData[0+i:2+i],"big"),  # X pos
+                int.from_bytes(byteData[2+i:4+i],"big"),  # Y pos
+                int.from_bytes(byteData[4+i:8+i],"big"),  # Speed
+                float.from_bytes(byteData[8+i:12+i],"big"),  # Accelerate
+                int.from_bytes(byteData[12+i:14+i],"big"),  # Delay
+                # 2 padding byte
+                ]
+            )
+            i+=16 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            # TODO Unfinished. Implement struct here as well
+            # byteData += i_lis[0].to_bytes(1,"big")
+            # byteData += b"\x00"
+            # byteData += i_lis[1].to_bytes(2,"big")
+            # byteData += i_lis[2].to_bytes(2,"big")
+            # byteData += i_lis[3].to_bytes(2,"big")
+            pass
 
         return byteData
