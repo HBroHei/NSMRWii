@@ -23,22 +23,45 @@ def readAllSettings(raw_setting):
     # The function name lied. Only nessary settings will be read and stored.
     # TODO Add phrasing function to the following sections
 
+    # Section 2
+    zoneBound = nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"])
     # Section 4
+    topBackground = nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"])
     # Section 5
-
+    bottomBackground = nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[5]["Data"])
     # Phrase Entrance Info (Section 6)
     entrances = nsmbw.NSMBWEntrances.phraseByteData(raw_setting[6]["Data"])
-
     # Sprite Handling (Section 7,8)
     # "Decode" to Python array
     spriteData = nsmbw.NSMBWsprite.phraseByteData(raw_setting[7]["Data"])
     sprLoadData = nsmbw.NSMBWLoadSprite.phraseByteData(raw_setting[8]["Data"])
-
     # Section 9
+    zoneData = nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"])
     # Section 10
+    locData = nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"])
     # Section 11
+    camProfile = nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"])
     # Section 12
     # Section 13
+
+
+    # DEBUG
+    print(zoneBound)
+    print(topBackground)
+    print(zoneData)
+    print(locData)
+    print(camProfile)
+    print("-----------------")
+    raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
+    raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
+    raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
+    raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
+    raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
+    print(nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
+    print(nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
+    print(nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
+    print(nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
+    print(nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
 
 def main():
     global lvlSetting_arr
@@ -60,6 +83,7 @@ def main():
         for i in range(1,areaNo+1):
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
+        exit()
 
         # Read tiles
         for j in range(0,2): #Loop through every layers

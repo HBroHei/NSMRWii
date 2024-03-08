@@ -127,9 +127,9 @@ class NSMBWtileset:
             i+=32
         return returnList
 
-# Section 1 Level Properties goes here if nessary
+# Section 1 Level Properties goes here if necessary
 
-class NSMBWZoneBound: #TODO Untested
+class NSMBWZoneBound:
     def phraseByteData(byteData):
         i = 0
         returnList = []
@@ -166,7 +166,7 @@ class NSMBWZoneBound: #TODO Untested
         return byteData# + b"\xff\xff"
     
 # Applies to both top and bottom background
-class NSMBWZoneBG: #TODO Untested
+class NSMBWZoneBG: # TODO Does not read properly
     def phraseByteData(byteData):
         i = 0
         returnList = []
@@ -401,7 +401,7 @@ class NSMBWsprite:
 
         return reData,relData,len(reData)*16
 
-class NSMBZones: # TODO Untested
+class NSMBWZones:
     def __init__(self):
         pass
     def phraseByteData(byteData):
@@ -458,7 +458,7 @@ class NSMBZones: # TODO Untested
 
         return byteData
     
-class NSMBWLocations: #TODO Untested
+class NSMBWLocations:
     def phraseByteData(byteData):
         i = 0
         returnList = []
@@ -489,5 +489,37 @@ class NSMBWLocations: #TODO Untested
             byteData += i_lis[3].to_bytes(2,"big")
             byteData += i_lis[4].to_bytes(2,"big")
             byteData += b"\x00\x00\x00"
+
+        return byteData
+
+class NSMBWCamProfile: #TODO Untested
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [
+                # 11 padding byte
+                int.from_bytes(byteData[12+i:13+i],"big"),  # Movement type
+                int.from_bytes(byteData[13+i:14+i],"big"),  # Zoom Scale
+                int.from_bytes(byteData[14+i:15+i],"big"),  # ???
+                # 2 Padding byte
+                int.from_bytes(byteData[18+i:19+i],"big"),  # Event ID
+                ]
+            )
+            i+=11 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            byteData += i_lis[0].to_bytes(1,"big")
+            byteData += i_lis[1].to_bytes(1,"big")
+            byteData += i_lis[2].to_bytes(1,"big")
+            byteData += b"\x00\x00"
+            byteData += i_lis[3].to_bytes(1,"big")
 
         return byteData
