@@ -17,11 +17,6 @@ document.getElementById("t_rand_sel").onchange = function(evt) {
     document.getElementById("t_r_description").innerHTML = t_presets_desc[t_rand_sel.options[t_rand_sel.options.selectedIndex].value]
 }*/
 
-document.getElementById("SSE").onchange = function(evt) {
-    document.getElementById("S3-4").disabled = document.getElementById("SSE").checked
-    document.getElementById("S3-4").checked = false;
-}
-
 function loadChangelog(){
     fetch("../LATEST").then(a => a.text().then(txt => {
         document.getElementById("changelog_box").innerHTML = txt

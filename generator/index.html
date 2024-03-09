@@ -45,46 +45,56 @@
                 <label for="#S08-24" class="no_label_style">Enable</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)" checked><br>
                 <br>
                 <label for="#SSE">Secret Exit Levels</label><br>
-                <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4.">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
-                    <option id="s_same" value="s_same" selected="selected">Randomize with other Secret Exit level</option>
-                    <option id="s_skip" value="s_skip">Skip randomization (Enemies will still be randomized)</option>
-                    <option id="s_skip_3-4" value="s_skip_3-4">Only skip 3-4 (To prevent the chance of not able to finish the game)</option>
-                </select><br><br>
+                <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
+                    <option id="s_same" value="s_same">Randomize with other Secret Exit level</option>
+                    <option id="s_skip" value="s_skip">Skip randomization</option>
+                    <option id="s_skip_3-4" value="s_skip_3-4" selected="selected">Only skip 3-4</option>
+                </select><br>
+                <div id="SSE_explain"></div>
+                <br><br>
                 <label for="#SCannon">Cannon Levels</label><br>
-                <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels).">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
-                    <option id="s_same" value="s_same">Randomize with other Cannon level (The destination will still be the orginal, unrandomized world)</option>
-                    <option id="s_skip" value="s_skip" selected="selected">Skip randomization</option>
-                </select><br><br>
+                <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels)." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
+                    <option id="s_same" value="s_same" selected="selected">Randomize with other Cannon level</option>
+                    <option id="s_skip" value="s_skip">Skip randomization</option>
+                </select><br>
+                <div id="SCannon_explain"></div>
+                <br><br>
                 <label for="#SToadHse">Toad Houses</label><br>
-                <select id="SToadHse" title="Decide what to do for Toad Houses.">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (Normal levels may become Toad House and vice versa)</option>
+                <select id="SToadHse" title="Decide what to do for Toad Houses." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
                     <option id="s_same" value="s_same" selected="selected">Randomize with other Toad Houses</option>
                     <option id="s_skip" value="s_skip">Skip randomization</option>
-                </select><br><br>
+                </select>
+                <br>
+                <div id="SToadHse_explain"></div><br><br>
             </div>
 
             <div id="win_level" class="tab_win_default_hidden tab_win">
                 <h1>Enemies</h1>
                 <label for="#enemy_presets">Enemy randomization presets</label><br>
-                <select id="enemy_presets" title="Presets for the enemy raandomization">
-                    <option id="r_type"  value="r_type"  >Randomize enemies in groups with their respective species</option>
-                    <option id="r_world" value="r_world" >Randomize enemies in groups with their respective World.</option>
-                    <option id="r_all_b" value="r_all_b" >All the standalone enemies will be randomized. MAY CAUSE LAG OR CRASHES!</option>
-                    <option id="r_all"   value="r_all"   >All the enemies, including non-movable obsticles, will be randomized.MAY CAUSE LAG OR CRASHES!</option>
+                <select id="enemy_presets" title="Presets for the enemy raandomization" onchange="changeOpt(this)">
+                    <option id="r_type"  value="r_type">Same species</option>
+                    <option id="r_world" value="r_world" >Same world</option>
+                    <option id="r_all_b" value="r_all_b" >Controlled Chaos</option>
+                    <option id="r_all"   value="r_all"   >Everyone is here!</option>
                 </select>
+                <br>
+                <div id="enemy_presets_explain"></div>
                 <br><br>
                 <label>Reduce Lag</label><br>
                 <label for="#LagReduce" class="no_label_style">Enable</label><input id="LagReduce" type="checkbox" checked title="Delete some sprites to help make the game run smoother" checked><br>
 
                 <h1>Blocks</h1>
-                <label for="#block_blockRando">Blocks content Randomization</label><br>
-                <select id="block_blockRando" title="Decide if any blocks in the game should be randomized">
-                    <option id="block_none" value="block_none" >No randomization</option>
-                    <option id="block_same" value="block_same" selected="selected">Randomize within the same type of block (? block remains as ? block)</option>
-                    <option id="block_all" value="block_all">Randomize all block types(? block -> brick block, etc.)</option>
-                </select><br><br>
+                <label for="#block_blockRando">Blocks content Randomisation</label><br>
+                <select id="block_blockRando" title="Decide if any blocks in the game should be randomised" onchange="changeOpt(this)">
+                    <option id="block_none" value="block_none" >No randomisation</option>
+                    <option id="block_same" value="block_same" selected="selected">Same block type</option>
+                    <option id="block_all" value="block_all">All blocks,</option>
+                </select><br>
+                <div id="block_blockRando_explain"></div>
+                <br><br>
                 <label>Block Types to be randomized</label><br>
                 <label for="#block_qBlock" class="no_label_style">? Block</label><input id="block_qBlock" type="checkbox" checked title="Include ? blcok in the randomization" checked><br>
                 <label for="#block_bBlock" class="no_label_style">Brick Block</label><input id="block_bBlock" type="checkbox" checked title="Include brick block in the randomization" checked>
@@ -124,5 +134,6 @@
         <script src="index.js"></script>
         <script src="index_vars.js"></script>
         <script src="index_level.js"></script>
+        <script src="index_select.js"></script>
     </body>
 </html>
