@@ -525,8 +525,8 @@ class NSMBWCamProfile: #TODO Untested
 
         return byteData
     
-class NSMBWPathProperties: #TODO Untested
-    def phraseByteData(byteData):
+class NSMBWPathProperties:
+    def phraseByteData(byteData:list):
         i = 0
         returnList = []
         while i<len(byteData):
@@ -544,7 +544,7 @@ class NSMBWPathProperties: #TODO Untested
 
         return returnList
     
-    def toByteData(entranceData):
+    def toByteData(entranceData:list):
         byteData = b""
         for i_lis in entranceData:
             byteData += i_lis[0].to_bytes(1,"big")
@@ -556,23 +556,14 @@ class NSMBWPathProperties: #TODO Untested
         return byteData
     
 class NSMBWPathNode: #TODO Untested
-    def phraseByteData(byteData):
+    def phraseByteData(byteData:list):
         i = 0
         returnList = []
         while i<len(byteData):
-            # due to struct being the only way vanilla python can read byte array to float, here it is, struct
-            #TODO code here
-            #print(byteData[0+i:2+i])
-            returnList.append(
-                [
-                int.from_bytes(byteData[0+i:2+i],"big"),  # X pos
-                int.from_bytes(byteData[2+i:4+i],"big"),  # Y pos
-                int.from_bytes(byteData[4+i:8+i],"big"),  # Speed
-                float.from_bytes(byteData[8+i:12+i],"big"),  # Accelerate
-                int.from_bytes(byteData[12+i:14+i],"big"),  # Delay
-                # 2 padding byte
-                ]
-            )
+            # due to struct being the only way vanilla python can read byte array to float, here is the struct
+            returnList_item = unpack(">HHffhxx",byteData[i:i+16])
+            returnList.append(returnList_item)
+            
             i+=16 #Entry length
 
         return returnList
@@ -580,12 +571,7 @@ class NSMBWPathNode: #TODO Untested
     def toByteData(entranceData):
         byteData = b""
         for i_lis in entranceData:
-            # TODO Unfinished. Implement struct here as well
-            # byteData += i_lis[0].to_bytes(1,"big")
-            # byteData += b"\x00"
-            # byteData += i_lis[1].to_bytes(2,"big")
-            # byteData += i_lis[2].to_bytes(2,"big")
-            # byteData += i_lis[3].to_bytes(2,"big")
-            pass
+            print(i_lis)
+            byteData += pack(">HHffhxx",*i_lis)
 
         return byteData
