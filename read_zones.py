@@ -9,21 +9,45 @@ from Util import tilePosToObjPos
 outJson = dict()
 lvlSetting_arr = []
 
+# Area settings
+zoneBound = []
+topBackground = []
+bottomBackground = []
+entrances = []
+spriteData = []
+sprLoadData = []
+zoneData = []
+locData = []
+camProfile = []
+pathProp = []
+pathNode = []
+
 # DEBUG FLAG TOGGLE
 isDebug = True
 
-def checkInZone(zoneData, tilePos):
+# TODO Both checkPos functions needs to account for 16 blocks buffer.
+
+def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     # for every zone, Check X pos, then Y pos
     for i in range(0,len(zoneData)-1):
         zoneDat = zoneData[i]
         #              Min X                       Max X = min x + width
-        if tilePos[0]>=zoneDat[0] and tilePos[0]<=(zoneDat[0]+zoneDat[2])\
-            or tilePos[1]>=zoneDat[1] and tilePos[1]<=(zoneDat[1]+zoneDat[2]):
+        if sprPos[0]+width>=zoneDat[0] and sprPos[0]<=(zoneDat[0]+zoneDat[2])\
+            or sprPos[1]+height>=zoneDat[1] and sprPos[1]<=(zoneDat[1]+zoneDat[2]):
             return i
     return -1
 
+def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
+    # for every zone, Check X pos, then Y pos
+    #              Min X                       Max X = min x + width
+    return sprPos[0]+width>=zoneDat[0] and sprPos[0]<=(zoneDat[0]+zoneDat[2])\
+        or sprPos[1]+height>=zoneDat[1] and sprPos[1]<=(zoneDat[1]+zoneDat[2])
+
+
 def readAllSettings(raw_setting):
     # The function name lied. Only nessary settings will be read and stored.
+    # Inseerted global here since IDK when the variable will disfunction like a local variable
+    global zoneBound, topBackground, bottomBackground, entrances, spriteData, sprLoadData, zoneData, locData, camProfile, pathProp, pathNode
     # TODO Add phrasing function to the following sections
 
     # Section 2
@@ -81,6 +105,7 @@ def main():
     # rf.close()
 
     for filename in listdir("./Stage"):
+        outJson[filename] = {}
         if isDebug:
             if filename!="05-05.arc":
                 continue
@@ -97,7 +122,21 @@ def main():
         for i in range(1,areaNo+1):
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
-            exit()
+            # add zone to the output json
+            for zone in zoneData:
+                outJson[filename][zone[7]] = {
+                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == 1],
+                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == 1],
+                    "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
+                    "sprites" : [ent for ent in spriteData if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
+                    "zone" : zone,
+                    "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
+                    "cameraProfile" : camProfile,
+                    "path" : [], 
+                    "pathNode" : []
+                }
+
+                # TODO Append individual paths here
 
         # Read tiles
         for j in range(0,2): #Loop through every layers
@@ -105,8 +144,11 @@ def main():
                 # Get tiles info
                 globalVars.tilesData[j] = nsmbw.NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
                 for tile in globalVars.tilesData[j]:
-                    zoneNo = checkInZone(tilePosToObjPos((tile[1],tile[2])))
+                    # Zones are in sprite coordinate system
+                    zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
+                    outJson[filename][i]
                     if zoneNo!=-1:
+
                         print(zoneNo,tile)
         
 if __name__ == "__main__":
