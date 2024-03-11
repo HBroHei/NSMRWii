@@ -5,6 +5,7 @@ nodesList = []
 # NOTE: This file is modified to work with the randomizer
 # The actual file that works independently is u8.py
 
+template_u8 = {"Raw Data":b"","File Name List":[],"Number of area":-1}
 
 """
 A class used to store individual properties of U8 archives
@@ -274,6 +275,43 @@ def repackToBytes(u8List):
     #print(genx00(u8List["Number of area"]*8))
     
     return returnARC
+
+# function ONLY works for NSMBW level archives
+def constructArchiveFile_m(file_name, file_data, isDir = False):
+    # Some proerties are missing due to the fact that they are not required for repacking them to an U8 Arc
+    # TODO maybe I can make it compatible with other U8 archives in the future?
+    return {
+        "Name" : file_name,
+        # No Offset
+        # No Size
+        "isFile" : not isDir,
+        # Skip parent directory
+        # Skip next node offset
+        "Data" : file_data
+    }
+
+def constructFromScratch(noAreas,fileList):
+    ''' Template Dict structure
+    {"Raw Data":b"","File Name List":[],"Number of area":-1}
+    returnList[nodesList[i].fileName] = {
+            "Name":nodesList[i].fileName,
+            "Offset":nodesList[i].beginDataOffset,
+            "Size":nodesList[i].dataSize,
+            "isFile":nodesList[i].isFile,
+            "ParentDir":nodesList[i].parentDirIdx,
+            "NextNode":nodesList[i].nextNodeIdx,
+            "Data":byteFile[nodesList[i].beginDataOffset:nodesList[i].beginDataOffset+nodesList[i].dataSize]
+    }
+    '''
+    returnData = {
+        # Skips orginal Raw Data
+        "File Name List" : [fileDat["Name"] for fileDat in fileList],
+        "Number of area" : noAreas,
+    }
+    for fileDat in fileList:
+        returnData[fileDat["Name"]] = fileDat
+    
+    return returnData
 
 #openFile("Stage/01-01.arc")
 #printByteData("test1.arc")
