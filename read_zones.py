@@ -9,7 +9,8 @@ from Util import tilePosToObjPos, convertToJson
 outJson = dict()
 lvlSetting_arr = []
 
-# Area settings
+tileset = []
+areaSetting = []
 zoneBound = []
 topBackground = []
 bottomBackground = []
@@ -48,9 +49,13 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
 def readAllSettings(raw_setting):
     # The function name lied. Only nessary settings will be read and stored.
     # Inseerted global here since IDK when the variable will disfunction like a local variable
-    global zoneBound, topBackground, bottomBackground, entrances, spriteData, sprLoadData, zoneData, locData, camProfile, pathProp, pathNode
+    global tileset, areaSetting, zoneBound, topBackground, bottomBackground, entrances, spriteData, sprLoadData, zoneData, locData, camProfile, pathProp, pathNode
     # TODO Add phrasing function to the following sections
 
+    # Section 0
+    tileset = nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"])
+    # Section 1
+    areaSetting = nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"])
     # Section 2
     zoneBound = nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"])
     # Section 4
@@ -76,6 +81,8 @@ def readAllSettings(raw_setting):
 
     # DEBUG
     if isDebug:
+        print(tileset)
+        print(areaSetting)
         # print(zoneBound)
         # print(topBackground)
         # print(zoneData)
@@ -84,6 +91,8 @@ def readAllSettings(raw_setting):
         # print(pathProp)
         # print(pathNode)
         print("-----------------")
+        raw_setting[0]["Data"] = nsmbw.NSMBWtileset.toByteData(tileset)
+        raw_setting[1]["Data"] = nsmbw.NSMBWAreaProp.toByteData(areaSetting)
         # raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
         # raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
         # raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
@@ -91,6 +100,8 @@ def readAllSettings(raw_setting):
         raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
         # raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
         # raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
+        print(nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"]))
+        print(nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"]))
         # print(nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
         # print(nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
         # print(nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
@@ -131,6 +142,9 @@ def main():
             for zone in zoneData:
                 #print(zone)
                 outJson[filename][i][zone[6]] = {
+                    "tileset" : tileset,
+                    "AreaSetting" : areaSetting,
+                    "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
                     "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[7]],
                     "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
                     "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],

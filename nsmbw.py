@@ -44,6 +44,12 @@ def readDef(byteData):
 
     return returnList
 
+# Generate definition dict for sections
+def generateSectionDef(data):
+    # All other attributes are useless. Only Data is useful
+    # why did I code in that many attributes lol
+    return {"Data":data}
+
 def writeDef(binList):
     bytearr_h = b""
     bytearr_c = b""
@@ -122,14 +128,59 @@ class NSMBWtileset:
         i = 0
         returnList = []
         while i<=len(byteData):
-            #print(byteData[0+i:2+i])
             if byteData[0+i:2+i] != b"":
-                #print("".join(list(filter(lambda l: l!=b"\x00",byteData[0+i:32+i]))))
                 returnList.append(byteData[0+i:32+i].strip(b"\x00"))
             i+=32
         return returnList
+    
+    def toByteData(tilesetData):
+        byteArray = b""
+        for tilesetName in tilesetData:
+            tilesetName = tilesetName.ljust(32, b"\x00")
+            byteArray += tilesetName
+        return byteArray
 
 # Section 1 Level Properties goes here if necessary
+class NSMBWAreaProp:
+    def phraseByteData(byteData):
+        i = 0
+        returnList = []
+        while i<len(byteData):
+            #print(byteData[0+i:2+i])
+            returnList.append(
+                [int.from_bytes(byteData[0+i:4+i],"big"), # Event A
+                int.from_bytes(byteData[4+i:8+i],"big"),  # Event B
+                int.from_bytes(byteData[8+i:10+i],"big"),  # Wrap Byte
+                int.from_bytes(byteData[10+i:12+i],"big"),  # Time Limit
+                bool(byteData[12+i:13+i]),  # is Credit?
+                int.from_bytes(byteData[13+i:14+i],"big"),  # unknown
+                # 2 padding bytes
+                int.from_bytes(byteData[16+i:17+i],"big"),  # Spawn Entrance ID
+                bool(byteData[17+i:18+i]),  # is Ambush level?
+                int.from_bytes(byteData[18+i:19+i],"big"),  # Toad House Flag
+                # 1 padding byte
+                ]
+            )
+            i+=20 #Entry length
+
+        return returnList
+    
+    def toByteData(entranceData):
+        byteData = b""
+        for i_lis in entranceData:
+            byteData += i_lis[0].to_bytes(4,"big")
+            byteData += i_lis[1].to_bytes(4,"big")
+            byteData += i_lis[2].to_bytes(2,"big")
+            byteData += i_lis[3].to_bytes(2,"big")
+            byteData += int(i_lis[4]).to_bytes(1,"big")
+            byteData += i_lis[5].to_bytes(1,"big")
+            byteData += b"\x00\x00"
+            byteData += i_lis[6].to_bytes(1,"big")
+            byteData += i_lis[7].to_bytes(1,"big")
+            byteData += i_lis[8].to_bytes(1,"big")
+            byteData += b"\x00"
+
+        return byteData
 
 class NSMBWZoneBound:
     def phraseByteData(byteData):
