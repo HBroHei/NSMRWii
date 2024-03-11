@@ -4,7 +4,7 @@ from os import listdir
 import u8_m
 import nsmbw
 import globalVars
-from Util import tilePosToObjPos
+from Util import tilePosToObjPos, convertToJson
 
 outJson = dict()
 lvlSetting_arr = []
@@ -24,6 +24,8 @@ pathNode = []
 
 # DEBUG FLAG TOGGLE
 isDebug = True
+# Format output JSON file?
+jsonBeauty = False
 
 # TODO Both checkPos functions needs to account for 16 blocks buffer.
 
@@ -32,16 +34,15 @@ def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     for i in range(0,len(zoneData)-1):
         zoneDat = zoneData[i]
         #              Min X                       Max X = min x + width
-        if sprPos[0]+width>=zoneDat[0] and sprPos[0]<=(zoneDat[0]+zoneDat[2])\
-            or sprPos[1]+height>=zoneDat[1] and sprPos[1]<=(zoneDat[1]+zoneDat[2]):
-            return i
+        if checkPosInSpecificZone(zoneDat,sprPos,width,height):
+            return zoneDat[6]
     return -1
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos
     #              Min X                       Max X = min x + width
-    return sprPos[0]+width>=zoneDat[0] and sprPos[0]<=(zoneDat[0]+zoneDat[2])\
-        or sprPos[1]+height>=zoneDat[1] and sprPos[1]<=(zoneDat[1]+zoneDat[2])
+    return sprPos[0]+width>=(zoneDat[0]-16) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+16)\
+        or sprPos[1]+height>=(zoneDat[1]-16) and sprPos[1]<=(zoneDat[1]+zoneDat[2]+16)
 
 
 def readAllSettings(raw_setting):
@@ -105,10 +106,13 @@ def main():
     # rf.close()
 
     for filename in listdir("./Stage"):
+        if filename=="Texture":
+            continue
         outJson[filename] = {}
         if isDebug:
-            if filename!="05-05.arc":
+            if filename!="02-02.arc":
                 continue
+        print(filename)
         u8list = u8_m.openFile("Stage/" + filename)
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
@@ -122,21 +126,25 @@ def main():
         for i in range(1,areaNo+1):
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
+            outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
-                outJson[filename][zone[7]] = {
-                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == 1],
-                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == 1],
+                #print(zone)
+                outJson[filename][i][zone[6]] = {
+                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[7]],
+                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
                     "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
                     "sprites" : [ent for ent in spriteData if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
                     "zone" : zone,
                     "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
                     "cameraProfile" : camProfile,
-                    "path" : [], 
-                    "pathNode" : []
+                    #"path" : [path for path in pathProp if checkPosInSpecificZone(zone,(node[0],node[1]))],
+                    "pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
                 }
+                # Path
+                outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]],
 
-                # TODO Append individual paths here
+                
 
         # Read tiles
         for j in range(0,2): #Loop through every layers
@@ -146,10 +154,19 @@ def main():
                 for tile in globalVars.tilesData[j]:
                     # Zones are in sprite coordinate system
                     zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
-                    outJson[filename][i]
                     if zoneNo!=-1:
-
-                        print(zoneNo,tile)
+                        #print(i,j,outJson[filename][i].keys())
+                        if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
+                            outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
+                        outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
+                        #print(zoneNo,tile)
+    with open('out.json', 'w', encoding='utf-8') as f:
+        if not jsonBeauty:
+            json.dump(convertToJson(outJson), f)
+        else:
+            json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
+    isDebug = False
+    jsonBeauty = False
     main()
