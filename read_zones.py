@@ -32,7 +32,7 @@ jsonBeauty = False
 
 def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     # for every zone, Check X pos, then Y pos
-    for i in range(0,len(zoneData)-1):
+    for i in range(0,len(zoneData)):
         zoneDat = zoneData[i]
         if checkPosInSpecificZone(zoneDat,sprPos,width,height):
             return zoneDat[6]
@@ -40,6 +40,7 @@ def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos
+    #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
     #              Min X                       Max X = min x + width
     return sprPos[0]+width>=(zoneDat[0]-16) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+16)\
         or sprPos[1]+height>=(zoneDat[1]-16) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+16)

@@ -47,15 +47,15 @@ def main():
         # Write it to byte array
         u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + ".bin",nsmbw.writeDef(areaRawSettings)))
 
-        print(area.keys())
+        #print("KEYS",area.keys())
         # Add tiles data
         for i in range(0,2): # Loop through each areas
-            if "bgDatL"+str(i) in area:
-                print("in area")
-                for tiles in area["bgDatL" + str(i)]:
+            if "bgdatL"+str(i) in area.keys():
+                #print("in area")
+                for tiles in area["bgdatL" + str(i)]:
                     tileData[i].append(tiles)
                 # Convert to byte data
-                u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + "_bgDatL" + str(i) + ".bin",nsmbw.NSMBWbgDat.toByteData(tileData[i])))
+                u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + "_bgdatL" + str(i) + ".bin",nsmbw.NSMBWbgDat.toByteData(tileData[i])))
         # TODO Output the file as a U8 archive
                 
     # Create "course" folder
@@ -67,7 +67,10 @@ def main():
         f.write(returnARC)
 
     if isDebug:
-        u8_m.openFile("test_json.arc")
+        de_f = u8_m.openFile("test_json.arc")
+        de_f["Raw Data"] = b""
+        print(de_f["File Name List"])
+        
     pass
 
 if __name__=="__main__":
