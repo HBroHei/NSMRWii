@@ -397,7 +397,8 @@ class NSMBWsprite:
         
         return returnList
     
-    def toByteData(sprList,orgLen):
+    def toByteData(sprList,orgLen=0):
+        # TODO orgLen does nothing atm
         returnByte = b""
         for ID,x,y,prop,zone,extraByte in sprList:
             if len(prop)==6:
@@ -598,6 +599,8 @@ class NSMBWPathProperties:
     def toByteData(entranceData:list):
         byteData = b""
         for i_lis in entranceData:
+            if i_lis == []:
+                continue
             byteData += i_lis[0].to_bytes(1,"big")
             byteData += b"\x00"
             byteData += i_lis[1].to_bytes(2,"big")

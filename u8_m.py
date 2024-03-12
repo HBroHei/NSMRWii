@@ -277,7 +277,7 @@ def repackToBytes(u8List):
     return returnARC
 
 # function ONLY works for NSMBW level archives
-def constructArchiveFile_m(file_name, file_data, isDir = False):
+def constructArchiveFile_m(file_name, file_data, isDir = False, nextNode = 0):
     # Some proerties are missing due to the fact that they are not required for repacking them to an U8 Arc
     # TODO maybe I can make it compatible with other U8 archives in the future?
     return {
@@ -285,8 +285,8 @@ def constructArchiveFile_m(file_name, file_data, isDir = False):
         # No Offset
         # No Size
         "isFile" : not isDir,
-        # Skip parent directory
-        # Skip next node offset
+        "ParentDir" : 0,
+        "NextNode" : nextNode,
         "Data" : file_data
     }
 
