@@ -24,7 +24,6 @@ def main():
     inJson = convertToDict(json_orginal)
 
     # Test zone data is working:
-    print(inJson[levelToImport].keys())
     for areaNo in inJson[levelToImport].keys():
         #area = inJson[levelToImport][areaNo]
         area = inJson[levelToImport][areaNo]["0"] # Temp. replace ["0"] with the desired zone number
@@ -47,29 +46,35 @@ def main():
         # Write it to byte array
         u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + ".bin",nsmbw.writeDef(areaRawSettings)))
 
-        #print("KEYS",area.keys())
+        with open("course" + areaNo + ".bin", 'wb') as f:
+            #print("AREA",areaNo)
+            f.write(nsmbw.writeDef(areaRawSettings))
+
         # Add tiles data
         for i in range(0,2): # Loop through each areas
             if "bgdatL"+str(i) in area.keys():
-                #print("in area")
                 for tiles in area["bgdatL" + str(i)]:
                     tileData[i].append(tiles)
                 # Convert to byte data
                 u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + "_bgdatL" + str(i) + ".bin",nsmbw.NSMBWbgDat.toByteData(tileData[i])))
         # TODO Output the file as a U8 archive
+                if isDebug:
+                    with open("course" + areaNo + "_bgdatL" + str(i) + ".bin", 'wb') as f:
+                        f.write(nsmbw.NSMBWbgDat.toByteData(tileData[i]))
                 
     # Create "course" folder
-    u8_files_dir = u8_m.constructArchiveFile_m("course",b"",True,len(u8_files_list))
-    u8_dict = u8_m.constructFromScratch(len(inJson[levelToImport].keys()),[u8_files_dir] + u8_files_list)
-    #print(u8_dict)
+    u8_files_dir = u8_m.constructArchiveFile_m("course",b"",True,len(u8_files_list)+2) # +2 for itself + root folder
+    # Create u8_m dict for repacking
+    u8_dict = u8_m.constructFromScratch(len(inJson[levelToImport].keys())-1,[u8_files_dir] + u8_files_list)
+
     returnARC = u8_m.repackToBytes(u8_dict)
-    with open('test_json.arc', 'wb') as f:
+    with open("Stage/test_json.arc", 'wb') as f:
         f.write(returnARC)
 
-    if isDebug:
-        de_f = u8_m.openFile("test_json.arc")
-        de_f["Raw Data"] = b""
-        print(de_f["File Name List"])
+    # if isDebug:
+    #     de_f = u8_m.openFile("test_json.arc")
+    #     de_f["Raw Data"] = b""
+    #     print(de_f["File Name List"])
         
     pass
 

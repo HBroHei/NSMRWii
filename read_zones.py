@@ -81,34 +81,34 @@ def readAllSettings(raw_setting):
 
     # DEBUG
     if isDebug:
-        print(tileset)
-        print(areaSetting)
-        # print(zoneBound)
-        # print(topBackground)
-        # print(zoneData)
-        # print(locData)
-        print(camProfile)
-        # print(pathProp)
-        # print(pathNode)
+        print("TILESET",tileset)
+        print("AREASET",areaSetting)
+        print("ZONEBND",zoneBound)
+        print("TOP  BG",topBackground)
+        print("ZONEDAT",zoneData)
+        print("LOCDATA",locData)
+        print("CAMPROF",camProfile)
+        print("PATHPRO",pathProp)
+        print("PATHNOD",pathNode)
         print("-----------------")
         raw_setting[0]["Data"] = nsmbw.NSMBWtileset.toByteData(tileset)
         raw_setting[1]["Data"] = nsmbw.NSMBWAreaProp.toByteData(areaSetting)
-        # raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
-        # raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
-        # raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
-        # raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
+        raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
+        raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
+        raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
+        raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
         raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
-        # raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
-        # raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
-        print(nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"]))
-        print(nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"]))
-        # print(nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
-        # print(nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
-        # print(nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
-        # print(nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
-        print(nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
-        # print(nsmbw.NSMBWPathProperties.phraseByteData(raw_setting[12]["Data"]))
-        # print(nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"]))
+        raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
+        raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
+        print("TILESET",nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"]))
+        print("AREASET",nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"]))
+        print("ZONEBND",nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
+        print("TOP  BG",nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
+        print("ZONEDAT",nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
+        print("LOCDATA",nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
+        print("CAMPROF",nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
+        print("PATHPRO",nsmbw.NSMBWPathProperties.phraseByteData(raw_setting[12]["Data"]))
+        print("PATHNOD",nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"]))
 
 def main():
     global lvlSetting_arr
@@ -121,7 +121,7 @@ def main():
             continue
         outJson[filename] = {}
         if isDebug:
-            if filename!="01-01.arc":
+            if filename!="test_json.arc":
                 continue
         print(filename)
         u8list = u8_m.openFile("Stage/" + filename)
@@ -136,12 +136,14 @@ def main():
 
         #Loop through every area
         for i in range(1,areaNo+1):
+            print("Area",i)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
             outJson[filename][i] = {}
             # add zone to the output json
+            print("zone data",zoneData)
             for zone in zoneData:
-                #print(zone)
+                print("ZONR",zone)
                 outJson[filename][i][zone[6]] = {
                     "tileset" : tileset,
                     "AreaSetting" : areaSetting,
@@ -186,6 +188,6 @@ def main():
             json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
-    isDebug = False
+    isDebug = True
     jsonBeauty = False
     main()
