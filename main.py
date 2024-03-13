@@ -104,6 +104,8 @@ def readRandoRule():
 
 
 def editArcFile(istr,newName):
+    if istr=="test_json.arc":
+        return
     #print(istr)
     globalVars.tileData = [[],[],[]]
 
@@ -162,7 +164,7 @@ def readAndrandomise(i,istr,_u8list):
 
     return u8list
     
-
+printed = 0
 
 ########### MAIN ############
 def main():

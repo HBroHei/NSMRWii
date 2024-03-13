@@ -1,5 +1,5 @@
 import Util
-
+from math import floor
 nodesList = []
 
 # NOTE: This file is modified to work with the randomizer
@@ -140,7 +140,7 @@ def openFile(ARCfileName,orginalFileName=""):
     # They are usually in the multple of 8, i.e.16,32,8
     # Divide the number by 8, you will get the number of area(s) of that level.
     x00Num = offsetFileData-(offsetFirstNode+sizeAllNodes)
-    noAreas = x00Num//8
+    noAreas = floor(x00Num/8)
     #print(offsetFileData,(offsetFirstNode+sizeAllNodes))
 
     # For Root: loop through each dir/files
@@ -242,16 +242,12 @@ def repackToBytes(u8List):
         nodeDetails = [b"\x00",b"",b"",b""]
         
         if not u8List[istr]["isFile"]: # It is a directory
+            #print("hvfguyihgyvc")
             nodeDetails[0] = b"\x01"
             nodeDetails[2] = u8List[istr]["ParentDir"].to_bytes(4,"big")
             #print("DIR:",istr,u8List[istr]["NextNode"])
             nodeDetails[3] = u8List[istr]["NextNode"].to_bytes(4,"big")
         else:
-            
-            #if _1byte:# Also offsetted by 0x01
-            #    nodeDetails[2] = (pFileDataOffset+1).to_bytes(4,"big")
-            #else:
-            #    nodeDetails[2] = (pFileDataOffset).to_bytes(4,"big")
             nodeDetails[2] = (pFileDataOffset).to_bytes(4,"big") # Offset to first data.
             # pFileDataOffset will be changed below
             nodeDetails[3] = len(u8List[istr]["Data"]).to_bytes(4,"big")
@@ -268,8 +264,8 @@ def repackToBytes(u8List):
 
         # Add all the files data
         fileDatas += u8List[istr]["Data"]
-        # File data offset now have incremented
-        pFileDataOffset += len(u8List[istr]["Data"])
+        # File data ENDS offset now have incremented
+        # pFileDataOffset += len(u8List[istr]["Data"])
     
     headSize = (len(nodes)+1+len(byteNames))
     # Check whether Expected head size == Observed head size
@@ -277,14 +273,14 @@ def repackToBytes(u8List):
     fileNodeOffset = (headSize + 32).to_bytes(4,"big") #32 = Offset to first node
     #           Size of All Nodes             file offset                         (reserved)
     byteHead += pHeadSize.to_bytes(4,"big") + pFileDataOffset.to_bytes(4,"big") + b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" #\x00 for 16
-
     returnARC += byteHead + nodes + b"\x00" + byteNames
     #print("Before",byteNames)
     # Insert the \x00 for the number of areas
     #returnARC += genx00(u8List["Number of area"]*8) OBSOLUTED
     returnARC += b"\x00" * 8 * u8List["Number of area"]
-    if u8List["Number of area"]*8!=0:
-        returnARC += b"\x00"
+    print(b"\x00" * 8 * u8List["Number of area"])
+    # if u8List["Number of area"]*8!=0:
+    #     returnARC += b"\x00"
     # Insert File Data
     returnARC += fileDatas
 

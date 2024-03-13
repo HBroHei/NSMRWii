@@ -58,11 +58,14 @@ def writeDef(binList):
     offsets = 112   #112 = Header size
     for lis_i in binList:
         #TODO MAKE COMPACTABLE WITH REGGIE LEVEL DESCRIPTION (ON TODO LIST)
+        # Add header offset info
         bytearr_h += offsets.to_bytes(4,"big") + (len(lis_i["Data"])).to_bytes(4,"big")
+        # Add the actual data
         bytearr_c += lis_i["Data"]
         offsets += (len(lis_i["Data"]))
 
-    bytearr = bytearr_h + bytearr_c
+    #bytearr = bytearr_h + bytearr_c
+    bytearr = bytearr_h.ljust(111,b"\x00") + bytearr_c
     return bytearr
 
 ### Sprites Limit check ###
@@ -131,10 +134,12 @@ class NSMBWtileset:
             if byteData[0+i:2+i] != b"":
                 returnList.append(byteData[0+i:32+i].strip(b"\x00"))
             i+=32
+        assert len(returnList) == 4, str(returnList) + " is not length in 4" # Length must be 4
         return returnList
     
     def toByteData(tilesetData):
         byteArray = b""
+        assert len(tilesetData)==4
         for tilesetName in tilesetData:
             tilesetName = tilesetName.ljust(32, b"\x00")
             byteArray += tilesetName

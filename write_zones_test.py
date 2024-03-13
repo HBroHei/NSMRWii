@@ -24,7 +24,9 @@ def main():
     inJson = convertToDict(json_orginal)
 
     # Test zone data is working:
+    
     for areaNo in inJson[levelToImport].keys():
+        print("AREA",areaNo)
         #area = inJson[levelToImport][areaNo]
         area = inJson[levelToImport][areaNo]["0"] # Temp. replace ["0"] with the desired zone number
         areaRawSettings = []
@@ -32,8 +34,8 @@ def main():
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(area["tileset"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(area["AreaSetting"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBound.toByteData(area["ZoneBound"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(area["topBackground"])))
         areaRawSettings.append(nsmbw.generateSectionDef(area["AreaSetting2"]))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(area["topBackground"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(area["bottomBackground"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(area["entrance"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWsprite.toByteData(area["sprites"])))
@@ -45,6 +47,7 @@ def main():
         
         # Write it to byte array
         u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + ".bin",nsmbw.writeDef(areaRawSettings)))
+        print(u8_files_list[-1])
 
         with open("course" + areaNo + ".bin", 'wb') as f:
             #print("AREA",areaNo)

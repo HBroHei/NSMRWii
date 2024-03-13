@@ -81,7 +81,8 @@ def readAllSettings(raw_setting):
 
     # DEBUG
     if isDebug:
-        print("TILESET",tileset)
+        print("============================")
+        print("TILESET",len(tileset))
         print("AREASET",areaSetting)
         print("ZONEBND",zoneBound)
         print("TOP  BG",topBackground)
@@ -100,6 +101,7 @@ def readAllSettings(raw_setting):
         raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
         raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
         raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
+        raw_setting = nsmbw.readDef(nsmbw.writeDef(raw_setting))
         print("TILESET",nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"]))
         print("AREASET",nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"]))
         print("ZONEBND",nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
@@ -127,6 +129,7 @@ def main():
         u8list = u8_m.openFile("Stage/" + filename)
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
+        print(areaNo)
         areaNo %= 4
         if areaNo==0:
             areaNo = 4
@@ -184,7 +187,7 @@ def main():
     with open('out.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)
-        else:
+        elif not isDebug:
             json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
