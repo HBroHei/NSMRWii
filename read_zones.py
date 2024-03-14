@@ -65,11 +65,9 @@ def readAllSettings(raw_setting):
     # Phrase Entrance Info (Section 6)
     entrances = nsmbw.NSMBWEntrances.phraseByteData(raw_setting[6]["Data"])
     # Sprite Handling (Section 7,8)
-    # "Decode" to Python array
     spriteData = nsmbw.NSMBWsprite.phraseByteData(raw_setting[7]["Data"])
     sprLoadData = nsmbw.NSMBWLoadSprite.phraseByteData(raw_setting[8]["Data"])
     # Section 9
-    print(raw_setting[9]["Offset"],raw_setting[9]["Data"])
     zoneData = nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"])
     # Section 10
     locData = nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"])
@@ -131,7 +129,6 @@ def main():
         u8list = u8_m.openFile("Stage/" + filename)
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
-        print(areaNo)
         areaNo %= 4
         if areaNo==0:
             areaNo = 4
@@ -141,13 +138,11 @@ def main():
 
         #Loop through every area
         for i in range(1,areaNo+1):
-            print("Area",i)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
-                print("ZONR",zone)
                 outJson[filename][i][zone[6]] = {
                     "tileset" : tileset,
                     "AreaSetting" : areaSetting,
@@ -156,7 +151,7 @@ def main():
                     "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
                     "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
                     "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
-                    "sprites" : [ent for ent in spriteData if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
+                    "sprites" : [spr for spr in spriteData if checkPosInSpecificZone(zone,(spr[1],spr[2]))],
                     "zone" : zone,
                     "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
                     "cameraProfile" : camProfile,

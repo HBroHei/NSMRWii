@@ -371,6 +371,7 @@ class NSMBWLoadSprite:
 
     # Generate Load Sprite List based on sprites list
     def addLoadSprites(sprData):
+        sprLoadList = []
         sprLoadList = [spr[0] for spr in sprData if spr[0] not in sprLoadList]
         return sprLoadList
             
@@ -640,7 +641,7 @@ class NSMBWPathNode: #TODO Untested
     def toByteData(entranceData):
         byteData = b""
         for i_lis in entranceData:
-            print(i_lis)
+            #print(i_lis)
             byteData += pack(">HHffhxx",*i_lis)
 
         return byteData

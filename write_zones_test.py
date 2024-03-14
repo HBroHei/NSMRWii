@@ -32,6 +32,7 @@ def main():
         areaRawSettings = []
         # Prepare for Sprite loading list
         loadSprList = nsmbw.NSMBWLoadSprite.addLoadSprites(area["sprites"])
+        print(loadSprList)
         # Import settings one-by-one, in order from Section 0
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(area["tileset"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(area["AreaSetting"])))
