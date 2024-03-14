@@ -97,7 +97,7 @@ def readAllSettings(raw_setting):
         print("-----------------")
         raw_setting[0]["Data"] = nsmbw.NSMBWtileset.toByteData(tileset)
         raw_setting[1]["Data"] = nsmbw.NSMBWAreaProp.toByteData(areaSetting)
-        raw_setting[2]["Data"] = nsmbw.NSMBWZoneBound.toByteData(zoneBound)
+        raw_setting[2]["Data"] = raw_setting[2]["Data"]
         raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
         raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
         raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
