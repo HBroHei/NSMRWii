@@ -196,33 +196,27 @@ class NSMBWZoneBound:
         returnList = []
         while i<len(byteData):
             #print(byteData[0+i:2+i])
-            returnList.append(
-                [int.from_bytes(byteData[0+i:4+i],"big"), # Cam Upper Bound
-                int.from_bytes(byteData[4+i:8+i],"big"),  # Cam Lower Bound
-                int.from_bytes(byteData[8+i:12+i],"big"),  # Cam Cloud Upper Bound
-                int.from_bytes(byteData[12+i:16+i],"big"),  # Cam Cloud Lower Bound
+            returnList.append(unpack(">4lHHhh",byteData[i:i+24]))
+            # returnList.append(
+            #     [int.from_bytes(byteData[0+i:4+i],"big"), # Cam Upper Bound
+            #     int.from_bytes(byteData[4+i:8+i],"big"),  # Cam Lower Bound
+            #     int.from_bytes(byteData[8+i:12+i],"big"),  # Cam Cloud Upper Bound
+            #     int.from_bytes(byteData[12+i:16+i],"big"),  # Cam Cloud Lower Bound
 
-                int.from_bytes(byteData[16+i:18+i],"big"),  # Entry ID
-                int.from_bytes(byteData[18+i:20+i],"big"),  # Map Camera Zoom adjust
-                int.from_bytes(byteData[20+i:22+i],"big"),  # Multiplayer Upper Bound
-                int.from_bytes(byteData[22+i:24+i],"big"),  # Multiplayer Lower Bound
-                ]
-            )
+            #     int.from_bytes(byteData[16+i:18+i],"big"),  # Entry ID
+            #     int.from_bytes(byteData[18+i:20+i],"big"),  # Map Camera Zoom adjust
+            #     int.from_bytes(byteData[20+i:22+i],"big"),  # Multiplayer Upper Bound
+            #     int.from_bytes(byteData[22+i:24+i],"big"),  # Multiplayer Lower Bound
+            #     ]
+            # )
             i+=24 #Entry length
 
         return returnList
     
-    def toByteData(entranceData):
+    def toByteData(zoneBndData):
         byteData = b""
-        for i_lis in entranceData:
-            byteData += i_lis[0].to_bytes(4,"big")
-            byteData += i_lis[1].to_bytes(4,"big")
-            byteData += i_lis[2].to_bytes(4,"big")
-            byteData += i_lis[3].to_bytes(4,"big")
-            byteData += i_lis[4].to_bytes(2,"big")
-            byteData += i_lis[5].to_bytes(2,"big")
-            byteData += i_lis[6].to_bytes(2,"big")
-            byteData += i_lis[7].to_bytes(2,"big")
+        for i_lis in zoneBndData:
+            byteData += pack(">4lHHhh",*i_lis)
 
         return byteData# + b"\xff\xff"
     

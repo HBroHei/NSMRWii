@@ -1,5 +1,5 @@
 import Util
-from math import floor
+from math import ceil
 nodesList = []
 
 # NOTE: This file is modified to work with the randomizer
@@ -140,7 +140,7 @@ def openFile(ARCfileName,orginalFileName=""):
     # They are usually in the multple of 8, i.e.16,32,8
     # Divide the number by 8, you will get the number of area(s) of that level.
     x00Num = offsetFileData-(offsetFirstNode+sizeAllNodes)
-    noAreas = floor(x00Num/8)
+    noAreas = ceil(x00Num/8)
     #print(offsetFileData,(offsetFirstNode+sizeAllNodes))
 
     # For Root: loop through each dir/files

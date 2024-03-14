@@ -1,3 +1,5 @@
+##### FILE FOR TESTING ONLY. NEW FILE WILL BE CREATED FOR ACTUAL USE #####
+
 import json
 from os import listdir
 
@@ -58,6 +60,7 @@ def readAllSettings(raw_setting):
     areaSetting = nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"])
     # Section 2
     zoneBound = nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"])
+    # zoneBound = raw_setting[2]["Data"] # Apperantly Python struct don't like long val stored in JSON sooo... Raw data it is
     # Section 4
     topBackground = nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"])
     # Section 5
@@ -123,12 +126,13 @@ def main():
             continue
         outJson[filename] = {}
         if isDebug:
-            if filename!="test_json.arc":
+            if filename!="01-01.arc":
                 continue
         print(filename)
         u8list = u8_m.openFile("Stage/" + filename)
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
+        #print("AREANO",areaNo)
         areaNo %= 4
         if areaNo==0:
             areaNo = 4
@@ -138,15 +142,19 @@ def main():
 
         #Loop through every area
         for i in range(1,areaNo+1):
+            #print("\nREADING AREA",i,"of",areaNo)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
+                #print("ZONE NUMBER",zone[6],zone)
+                # Preprocess zone bound due to llong val
+                zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
                 outJson[filename][i][zone[6]] = {
                     "tileset" : tileset,
                     "AreaSetting" : areaSetting,
-                    "ZoneBound" : [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]],
+                    "ZoneBound" : nsmbw.NSMBWZoneBound.toByteData(zoneBound),
                     "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[7]],
                     "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
                     "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
@@ -179,6 +187,8 @@ def main():
                             if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
                             outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
+            #print("END OF AREA")
+    
     #print(outJson["01-01.arc"][1][0]["bgdatL1"])
     if isDebug:
         return
