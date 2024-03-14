@@ -24,12 +24,14 @@ def main():
     inJson = convertToDict(json_orginal)
 
     # Test zone data is working:
-    
+    print(inJson[levelToImport].keys())
     for areaNo in inJson[levelToImport].keys():
         print("AREA",areaNo)
         #area = inJson[levelToImport][areaNo]
         area = inJson[levelToImport][areaNo]["0"] # Temp. replace ["0"] with the desired zone number
         areaRawSettings = []
+        # Prepare for Sprite loading list
+        loadSprList = nsmbw.NSMBWLoadSprite.addLoadSprites(area["sprites"])
         # Import settings one-by-one, in order from Section 0
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(area["tileset"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(area["AreaSetting"])))
@@ -39,6 +41,7 @@ def main():
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(area["bottomBackground"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(area["entrance"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWsprite.toByteData(area["sprites"])))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLoadSprite.toByteData(loadSprList)))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZones.toByteData([area["zone"]])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLocations.toByteData(area["location"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWCamProfile.toByteData(area["cameraProfile"])))
@@ -47,7 +50,6 @@ def main():
         
         # Write it to byte array
         u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + ".bin",nsmbw.writeDef(areaRawSettings)))
-        print(u8_files_list[-1])
 
         with open("course" + areaNo + ".bin", 'wb') as f:
             #print("AREA",areaNo)
@@ -60,7 +62,8 @@ def main():
                     tileData[i].append(tiles)
                 # Convert to byte data
                 u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + "_bgdatL" + str(i) + ".bin",nsmbw.NSMBWbgDat.toByteData(tileData[i])))
-        # TODO Output the file as a U8 archive
+                #print(nsmbw.NSMBWbgDat.phraseByteData(u8_files_list[-1]["Data"]))
+                # TODO Output the file as a U8 archive
                 if isDebug:
                     with open("course" + areaNo + "_bgdatL" + str(i) + ".bin", 'wb') as f:
                         f.write(nsmbw.NSMBWbgDat.toByteData(tileData[i]))

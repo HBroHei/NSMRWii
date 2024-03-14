@@ -230,6 +230,7 @@ def repackToBytes(u8List):
     pHeadSize = (len(u8List["File Name List"]))*12 +         12 + 1 + (len("0".join(u8List["File Name List"]))) + 1 
     # The start of the file data
     pFileDataOffset = 32 + pHeadSize + u8List["Number of area"]*8
+    firstFileDataOffset = pFileDataOffset
     for istr in u8List["File Name List"]:
         # 1. Node type: defaults to file
         # 2. Offset for the file name relative to the start of string pool
@@ -265,20 +266,20 @@ def repackToBytes(u8List):
         # Add all the files data
         fileDatas += u8List[istr]["Data"]
         # File data ENDS offset now have incremented
-        # pFileDataOffset += len(u8List[istr]["Data"])
+        pFileDataOffset += len(u8List[istr]["Data"])
     
     headSize = (len(nodes)+1+len(byteNames))
     # Check whether Expected head size == Observed head size
     assert pHeadSize==headSize, "Head Size not match" 
     fileNodeOffset = (headSize + 32).to_bytes(4,"big") #32 = Offset to first node
-    #           Size of All Nodes             file offset                         (reserved)
-    byteHead += pHeadSize.to_bytes(4,"big") + pFileDataOffset.to_bytes(4,"big") + b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" #\x00 for 16
+    #           Size of All Nodes             file offset                             (reserved)
+    byteHead += pHeadSize.to_bytes(4,"big") + firstFileDataOffset.to_bytes(4,"big") + b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" #\x00 for 16
     returnARC += byteHead + nodes + b"\x00" + byteNames
     #print("Before",byteNames)
     # Insert the \x00 for the number of areas
     #returnARC += genx00(u8List["Number of area"]*8) OBSOLUTED
     returnARC += b"\x00" * 8 * u8List["Number of area"]
-    print(b"\x00" * 8 * u8List["Number of area"])
+    #print(b"\x00" * 8 * u8List["Number of area"])
     # if u8List["Number of area"]*8!=0:
     #     returnARC += b"\x00"
     # Insert File Data

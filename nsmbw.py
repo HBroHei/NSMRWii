@@ -59,10 +59,13 @@ def writeDef(binList):
     for lis_i in binList:
         #TODO MAKE COMPACTABLE WITH REGGIE LEVEL DESCRIPTION (ON TODO LIST)
         # Add header offset info
+        #            Data section offsets        Data section size
         bytearr_h += offsets.to_bytes(4,"big") + (len(lis_i["Data"])).to_bytes(4,"big")
+        #print(i,offsets,(len(lis_i["Data"])))
         # Add the actual data
         bytearr_c += lis_i["Data"]
         offsets += (len(lis_i["Data"]))
+        i+=1
 
     #bytearr = bytearr_h + bytearr_c
     bytearr = bytearr_h.ljust(111,b"\x00") + bytearr_c
@@ -263,6 +266,7 @@ class NSMBWZoneBG:
             byteData += i_lis[7].to_bytes(2,"big")
             byteData += b"\x00\x00\x00"
             byteData += i_lis[8].to_bytes(1,"big")
+            byteData += b"\x00\x00\x00\x00"
 
         return byteData# + b"\xff\xff"
 
@@ -365,7 +369,13 @@ class NSMBWLoadSprite:
             i+=4
         return returnList
 
-    def toByteData(sprList,orgLen):
+    # Generate Load Sprite List based on sprites list
+    def addLoadSprites(sprData):
+        sprLoadList = [spr[0] for spr in sprData if spr[0] not in sprLoadList]
+        return sprLoadList
+            
+
+    def toByteData(sprList):
         i = 0
         returnByte = b""
         for ID in sprList:
@@ -484,7 +494,7 @@ class NSMBWZones:
                 int.from_bytes(byteData[18+i:19+i],"big"),  #Top background (ref section 3)
                 int.from_bytes(byteData[19+i:20+i],"big"),  #Bottom background (ref section 4)
                 int.from_bytes(byteData[20+i:21+i],"big"),  #Autoscroll track path ID
-                # 2 padding bytes
+                # 1 padding byte
                 int.from_bytes(byteData[23+i:24+i],"big"),  #Music ID
                 int.from_bytes(byteData[24+i:25+i],"big"),  #Sound effects
                 ]
@@ -505,12 +515,12 @@ class NSMBWZones:
             byteData += i_lis[7].to_bytes(1,"big")
             byteData += i_lis[8].to_bytes(1,"big")
             byteData += i_lis[9].to_bytes(1,"big")
-            # 1 padding byte
+            byteData += b"\x00"
             byteData += i_lis[10].to_bytes(1,"big")
             byteData += i_lis[11].to_bytes(1,"big")
             byteData += i_lis[12].to_bytes(1,"big")
             byteData += i_lis[13].to_bytes(1,"big")
-            # 2 padding bytes
+            byteData += b"\x00"
             byteData += i_lis[14].to_bytes(1,"big")
             byteData += i_lis[15].to_bytes(1,"big")
 

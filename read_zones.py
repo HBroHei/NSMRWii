@@ -69,6 +69,7 @@ def readAllSettings(raw_setting):
     spriteData = nsmbw.NSMBWsprite.phraseByteData(raw_setting[7]["Data"])
     sprLoadData = nsmbw.NSMBWLoadSprite.phraseByteData(raw_setting[8]["Data"])
     # Section 9
+    print(raw_setting[9]["Offset"],raw_setting[9]["Data"])
     zoneData = nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"])
     # Section 10
     locData = nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"])
@@ -86,6 +87,7 @@ def readAllSettings(raw_setting):
         print("AREASET",areaSetting)
         print("ZONEBND",zoneBound)
         print("TOP  BG",topBackground)
+        print("ENTDATA",entrances)
         print("ZONEDAT",zoneData)
         print("LOCDATA",locData)
         print("CAMPROF",camProfile)
@@ -144,7 +146,6 @@ def main():
             readAllSettings(lvlSetting_raw)
             outJson[filename][i] = {}
             # add zone to the output json
-            print("zone data",zoneData)
             for zone in zoneData:
                 print("ZONR",zone)
                 outJson[filename][i][zone[6]] = {
@@ -184,13 +185,15 @@ def main():
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
                             outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
     #print(outJson["01-01.arc"][1][0]["bgdatL1"])
+    if isDebug:
+        return
     with open('out.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)
-        elif not isDebug:
+        else:
             json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
-    isDebug = True
-    jsonBeauty = False
+    isDebug = False
+    jsonBeauty = True
     main()
