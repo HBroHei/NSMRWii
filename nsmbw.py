@@ -160,7 +160,7 @@ class NSMBWAreaProp:
                 int.from_bytes(byteData[4+i:8+i],"big"),  # Event B
                 int.from_bytes(byteData[8+i:10+i],"big"),  # Wrap Byte
                 int.from_bytes(byteData[10+i:12+i],"big"),  # Time Limit
-                bool(byteData[12+i:13+i]),  # is Credit?
+                bool(int.from_bytes(byteData[12+i:13+i],"big")),  # is Credit?
                 int.from_bytes(byteData[13+i:14+i],"big"),  # unknown
                 # 2 padding bytes
                 int.from_bytes(byteData[16+i:17+i],"big"),  # Spawn Entrance ID
