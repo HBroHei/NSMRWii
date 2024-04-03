@@ -51,7 +51,7 @@ FILE STRUCTUIRE
             0x0C    _Bool        Bool          Credit Flag
             0x0D    Unsign Char  Integer       UNKNOWN
             0x0E    PaddingByte     /          -From 0E to 0F       
-            0x10    Unsign Char  Integer       Level spawn (Entrance)
+            0x10    Unsign Char  Integer       Level spawn (Entrance) ID
             0x11    _Bool        Bool          Ambush flag
             0x12    Unsign Char  Integer       Toad Hse Flag
             0x13    PaddingByte     /          -Only 1 byte

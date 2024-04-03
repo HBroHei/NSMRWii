@@ -26,7 +26,7 @@ pathProp = []
 pathNode = []
 
 # DEBUG FLAG TOGGLE
-isDebug = True
+isDebug = False
 # Format output JSON file?
 jsonBeauty = False
 
@@ -81,45 +81,8 @@ def readAllSettings(raw_setting):
     # Section 13
     pathNode = nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"])
 
-    # DEBUG
-    if isDebug:
-        print("============================")
-        print("TILESET",len(tileset))
-        print("AREASET",areaSetting)
-        print("ZONEBND",zoneBound)
-        print("TOP  BG",topBackground)
-        print("ENTDATA",entrances)
-        print("ZONEDAT",zoneData)
-        print("LOCDATA",locData)
-        print("CAMPROF",camProfile)
-        print("PATHPRO",pathProp)
-        print("PATHNOD",pathNode)
-        print("-----------------")
-        raw_setting[0]["Data"] = nsmbw.NSMBWtileset.toByteData(tileset)
-        raw_setting[1]["Data"] = nsmbw.NSMBWAreaProp.toByteData(areaSetting)
-        raw_setting[2]["Data"] = raw_setting[2]["Data"]
-        raw_setting[4]["Data"] = nsmbw.NSMBWZoneBG.toByteData(topBackground)
-        raw_setting[9]["Data"] = nsmbw.NSMBWZones.toByteData(zoneData)
-        raw_setting[10]["Data"] = nsmbw.NSMBWLocations.toByteData(locData)
-        raw_setting[11]["Data"] = nsmbw.NSMBWCamProfile.toByteData(camProfile)
-        raw_setting[12]["Data"] = nsmbw.NSMBWPathProperties.toByteData(pathProp)
-        raw_setting[13]["Data"] = nsmbw.NSMBWPathNode.toByteData(pathNode)
-        raw_setting = nsmbw.readDef(nsmbw.writeDef(raw_setting))
-        print("TILESET",nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"]))
-        print("AREASET",nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"]))
-        print("ZONEBND",nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"]))
-        print("TOP  BG",nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"]))
-        print("ZONEDAT",nsmbw.NSMBWZones.phraseByteData(raw_setting[9]["Data"]))
-        print("LOCDATA",nsmbw.NSMBWLocations.phraseByteData(raw_setting[10]["Data"]))
-        print("CAMPROF",nsmbw.NSMBWCamProfile.phraseByteData(raw_setting[11]["Data"]))
-        print("PATHPRO",nsmbw.NSMBWPathProperties.phraseByteData(raw_setting[12]["Data"]))
-        print("PATHNOD",nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"]))
-
 def main():
     global lvlSetting_arr
-    # rf = open("config.json")
-    # rulesDict = json.loads(rf.read())
-    # rf.close()
 
     for filename in listdir("./Stage"):
         if filename=="Texture":
@@ -138,7 +101,6 @@ def main():
             areaNo = 4
         
         lvlSetting_arr = []
-        #print(u8list["course1.bin"],u8list["File Name List"])
 
         #Loop through every area
         for i in range(1,areaNo+1):
@@ -148,7 +110,6 @@ def main():
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
-                #print("ZONE NUMBER",zone[6],zone)
                 # Preprocess zone bound due to llong val
                 zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
                 outJson[filename][i][zone[6]] = {
@@ -171,27 +132,17 @@ def main():
 
             # Read tiles
             for j in range(0,2): #Loop through every layers
-                #print(u8list.keys(),"course"+ str(i) +"_bgdatL" + str(j) + ".bin")
-                #print("course"+ str(i) +"_bgdatL" + str(j) + ".bin")
                 if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list.keys(): # if layer (j) exist
                     # Get tiles info
                     globalVars.tilesData[j] = nsmbw.NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
-                    #print(globalVars.tilesData[j])
                     for tile in globalVars.tilesData[j]:
                         # Zones are in sprite coordinate system
-                        #print(tile,tilePosToObjPos((tile[1],tile[2])),zoneData)
                         zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
-                        #print(zoneNo)
                         if zoneNo!=-1:
-                            #print(i,j,outJson[filename][i].keys())
                             if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
                             outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
-            #print("END OF AREA")
-    
-    #print(outJson["01-01.arc"][1][0]["bgdatL1"])
-    if isDebug:
-        return
+
     with open('out.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)
@@ -199,6 +150,4 @@ def main():
             json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
-    isDebug = False
-    jsonBeauty = True
     main()
