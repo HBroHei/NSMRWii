@@ -126,7 +126,7 @@ def main():
             continue
         outJson[filename] = {}
         if isDebug:
-            if filename!="01-01.arc":
+            if filename!="01-02.arc":
                 continue
         print(filename)
         u8list = u8_m.openFile("Stage/" + filename)
@@ -142,13 +142,13 @@ def main():
 
         #Loop through every area
         for i in range(1,areaNo+1):
-            #print("\nREADING AREA",i,"of",areaNo)
+            print("\nREADING AREA",i,"of",areaNo)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
-                #print("ZONE NUMBER",zone[6],zone)
+                print("ZONE NUMBER",zone[6],zone)
                 # Preprocess zone bound due to llong val
                 zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
                 outJson[filename][i][zone[6]] = {
@@ -190,15 +190,14 @@ def main():
             #print("END OF AREA")
     
     #print(outJson["01-01.arc"][1][0]["bgdatL1"])
-    if isDebug:
-        return
-    with open('out.json', 'w', encoding='utf-8') as f:
+    
+    with open('out_debug.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)
         else:
             json.dump(convertToJson(outJson), f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":
-    isDebug = False
+    isDebug = True
     jsonBeauty = True
     main()
