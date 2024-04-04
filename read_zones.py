@@ -44,8 +44,8 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
     # for every zone, Check X pos, then Y pos
     #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
     #              Min X                       Max X = min x + width
-    return sprPos[0]+width>=(zoneDat[0]-16) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+16)\
-        or sprPos[1]+height>=(zoneDat[1]-16) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+16)
+    return sprPos[0]+width>=(zoneDat[0]-(16**2)) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+(16**2))\
+        and sprPos[1]+height>=(zoneDat[1]-(16**2)) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+(16**2))
 
 
 def readAllSettings(raw_setting):
@@ -84,8 +84,10 @@ def readAllSettings(raw_setting):
 def main():
     global lvlSetting_arr
 
+    SKIP_LIST = ["Texture","01-41.arc","01-42.arc"]
+
     for filename in listdir("./Stage"):
-        if filename=="Texture":
+        if filename in SKIP_LIST:
             continue
         outJson[filename] = {}
         if isDebug:
@@ -116,9 +118,9 @@ def main():
                     "tileset" : tileset,
                     "AreaSetting" : areaSetting,
                     "ZoneBound" : nsmbw.NSMBWZoneBound.toByteData(zoneBound),
-                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[7]],
+                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[11]],
                     "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
-                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
+                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[12]],
                     "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
                     "sprites" : [spr for spr in spriteData if checkPosInSpecificZone(zone,(spr[1],spr[2]))],
                     "zone" : zone,
@@ -128,7 +130,7 @@ def main():
                     "pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
                 }
                 # Path
-                outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]],
+                outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]]
 
             # Read tiles
             for j in range(0,2): #Loop through every layers

@@ -14,4 +14,5 @@ U8N.txt
 U8O.txt
 log.txt
 out.json
+out_debug.json
 *.bin

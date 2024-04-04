@@ -112,7 +112,7 @@ class NSMBWbgDat:
     
     def toByteData(tilesData):
         byteData = b""
-        for i_lis in tilesData[:-1]:
+        for i_lis in tilesData:
             for int_val in i_lis:
                 byteData += int_val.to_bytes(2,"big")
 
@@ -490,11 +490,11 @@ class NSMBWZones:
                 int.from_bytes(byteData[19+i:20+i],"big"),  #Bottom background (ref section 4)
                 int.from_bytes(byteData[20+i:21+i],"big"),  #Autoscroll track path ID
                 # 1 padding byte
-                int.from_bytes(byteData[23+i:24+i],"big"),  #Music ID
-                int.from_bytes(byteData[24+i:25+i],"big"),  #Sound effects
+                int.from_bytes(byteData[22+i:23+i],"big"),  #Music ID
+                int.from_bytes(byteData[23+i:24+i],"big"),  #Sound effects
                 ]
             )
-            i+=25 #Entry length
+            i+=24 #Entry length
 
         return returnList
     def toByteData(entranceData):
@@ -529,12 +529,11 @@ class NSMBWLocations:
             #print(byteData[0+i:2+i])
             returnList.append(
                 [
-                # 1 padding byte
-                int.from_bytes(byteData[1+i:2+i],"big"),  # X
-                int.from_bytes(byteData[2+i:3+i],"big"),  # Y
-                int.from_bytes(byteData[3+i:4+i],"big"),  # Width
-                int.from_bytes(byteData[4+i:5+i],"big"),  # Height
-                int.from_bytes(byteData[5+i:6+i],"big"),  # ID
+                int.from_bytes(byteData[0+i:2+i],"big"),  # X
+                int.from_bytes(byteData[2+i:4+i],"big"),  # Y
+                int.from_bytes(byteData[4+i:6+i],"big"),  # Width
+                int.from_bytes(byteData[6+i:8+i],"big"),  # Height
+                int.from_bytes(byteData[8+i:9+i],"big"),  # ID
                 # 3 Padding byte
                 ]
             )
@@ -545,12 +544,11 @@ class NSMBWLocations:
     def toByteData(entranceData):
         byteData = b""
         for i_lis in entranceData:
-            byteData += b"\x00"
             byteData += i_lis[0].to_bytes(2,"big")
             byteData += i_lis[1].to_bytes(2,"big")
             byteData += i_lis[2].to_bytes(2,"big")
             byteData += i_lis[3].to_bytes(2,"big")
-            byteData += i_lis[4].to_bytes(2,"big")
+            byteData += i_lis[4].to_bytes(1,"big")
             byteData += b"\x00\x00\x00"
 
         return byteData

@@ -10,8 +10,9 @@ def convertNULL(char):
 def tilePosToObjPos(tilePos):
     return [tilePos[0]*16,tilePos[1]*16]
 
+from math import ceil
 def objPosToTilePos(objPos):
-    return [objPos[0]//16,objPos[1]//16]
+    return [ceil(objPos[0]/16),ceil(objPos[1]/16)]
 
 import base64
 # Thanks OpenAI

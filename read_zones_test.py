@@ -45,7 +45,7 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
     #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
     #              Min X                       Max X = min x + width
     return sprPos[0]+width>=(zoneDat[0]-16) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+16)\
-        or sprPos[1]+height>=(zoneDat[1]-16) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+16)
+        and sprPos[1]+height>=(zoneDat[1]-16) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+16)
 
 
 def readAllSettings(raw_setting):
@@ -121,73 +121,68 @@ def main():
     # rulesDict = json.loads(rf.read())
     # rf.close()
 
-    for filename in listdir("./Stage"):
-        if filename=="Texture":
-            continue
-        outJson[filename] = {}
-        if isDebug:
-            if filename!="01-02.arc":
-                continue
-        print(filename)
-        u8list = u8_m.openFile("Stage/" + filename)
-        u8FileList = u8list["File Name List"]
-        areaNo = u8list["Number of area"]
-        #print("AREANO",areaNo)
-        areaNo %= 4
-        if areaNo==0:
-            areaNo = 4
-        
-        lvlSetting_arr = []
-        #print(u8list["course1.bin"],u8list["File Name List"])
-
-        #Loop through every area
-        for i in range(1,areaNo+1):
-            print("\nREADING AREA",i,"of",areaNo)
-            lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
-            readAllSettings(lvlSetting_raw)
-            outJson[filename][i] = {}
-            # add zone to the output json
-            for zone in zoneData:
-                print("ZONE NUMBER",zone[6],zone)
-                # Preprocess zone bound due to llong val
-                zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
-                outJson[filename][i][zone[6]] = {
-                    "tileset" : tileset,
-                    "AreaSetting" : areaSetting,
-                    "ZoneBound" : nsmbw.NSMBWZoneBound.toByteData(zoneBound),
-                    "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[7]],
-                    "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
-                    "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[7]],
-                    "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
-                    "sprites" : [spr for spr in spriteData if checkPosInSpecificZone(zone,(spr[1],spr[2]))],
-                    "zone" : zone,
-                    "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
-                    "cameraProfile" : camProfile,
-                    #"path" : [path for path in pathProp if checkPosInSpecificZone(zone,(node[0],node[1]))],
-                    "pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
-                }
-                # Path
-                outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]],
-
-            # Read tiles
-            for j in range(0,2): #Loop through every layers
-                #print(u8list.keys(),"course"+ str(i) +"_bgdatL" + str(j) + ".bin")
-                #print("course"+ str(i) +"_bgdatL" + str(j) + ".bin")
-                if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list.keys(): # if layer (j) exist
-                    # Get tiles info
-                    globalVars.tilesData[j] = nsmbw.NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
-                    #print(globalVars.tilesData[j])
-                    for tile in globalVars.tilesData[j]:
-                        # Zones are in sprite coordinate system
-                        #print(tile,tilePosToObjPos((tile[1],tile[2])),zoneData)
-                        zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
-                        #print(zoneNo)
-                        if zoneNo!=-1:
-                            #print(i,j,outJson[filename][i].keys())
-                            if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
-                                outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
-                            outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
-            #print("END OF AREA")
+    filename = "Stage/02-04.arc"
+    outJson[filename] = {}
+    
+    print(filename)
+    u8list = u8_m.openFile(filename)
+    u8FileList = u8list["File Name List"]
+    areaNo = u8list["Number of area"]
+    #print("AREANO",areaNo)
+    areaNo %= 4
+    if areaNo==0:
+        areaNo = 4
+    
+    lvlSetting_arr = []
+    #print(u8list["course1.bin"],u8list["File Name List"])
+    #Loop through every area
+    for i in range(1,areaNo+1):
+        print("\nREADING AREA",i,"of",areaNo)
+        lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
+        readAllSettings(lvlSetting_raw)
+        outJson[filename][i] = {}
+        # add zone to the output json
+        for zone in zoneData:
+            print("ZONE NUMBER",zone[6],zone)
+            # Preprocess zone bound due to llong val
+            zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
+            outJson[filename][i][zone[6]] = {
+                "tileset" : tileset,
+                "AreaSetting" : areaSetting,
+                "ZoneBound" : nsmbw.NSMBWZoneBound.toByteData(zoneBound),
+                "topBackground" : [topBg for topBg in topBackground if topBg[0] == zone[11]],
+                "AreaSetting2" : lvlSetting_raw[3]["Data"], # They aren't that useful atm so I will leave them just as is
+                "bottomBackground" : [bottomBg for bottomBg in bottomBackground if bottomBg[0] == zone[12]],
+                "entrance" : [ent for ent in entrances if checkPosInSpecificZone(zone,(ent[0],ent[1]))],
+                "sprites" : [spr for spr in spriteData if checkPosInSpecificZone(zone,(spr[1],spr[2]))],
+                "zone" : zone,
+                "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
+                "cameraProfile" : camProfile,
+                #"path" : [path for path in pathProp if checkPosInSpecificZone(zone,(node[0],node[1]))],
+                "pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
+            }
+            # Path
+            outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]]
+            # print(outJson[filename][i][zone[6]]["path"])
+        # Read tiles
+        for j in range(0,2): #Loop through every layers
+            #print(u8list.keys(),"course"+ str(i) +"_bgdatL" + str(j) + ".bin")
+            #print("course"+ str(i) +"_bgdatL" + str(j) + ".bin")
+            if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list.keys(): # if layer (j) exist
+                # Get tiles info
+                globalVars.tilesData[j] = nsmbw.NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
+                #print(globalVars.tilesData[j])
+                for tile in globalVars.tilesData[j]:
+                    # Zones are in sprite coordinate system
+                    #print(tile,tilePosToObjPos((tile[1],tile[2])),zoneData)
+                    zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
+                    #print(zoneNo)
+                    if zoneNo!=-1:
+                        #print(i,j,outJson[filename][i].keys())
+                        if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
+                            outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
+                        outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
+        #print("END OF AREA")
     
     #print(outJson["01-01.arc"][1][0]["bgdatL1"])
     

@@ -10,7 +10,7 @@ import globalVars
 from Util import tilePosToObjPos, convertToDict
 
 inJson = {}
-levelToImport = "01-01.arc"
+levelToImport = "test_json_area2.arc"
 
 tileData = [[],[],[]]
 u8_files_list = []
@@ -19,7 +19,7 @@ isDebug = False
 
 def main():
     global inJson
-    with open('out.json', 'r') as f:
+    with open('out_debug.json', 'r') as f:
         json_orginal = json.load(f)
     inJson = convertToDict(json_orginal)
 
@@ -28,6 +28,7 @@ def main():
         print("AREA",areaNo)
         #area = inJson[levelToImport][areaNo]
         for zoneNo in inJson[levelToImport][areaNo].keys():
+            print("Zone",zoneNo)
             area = inJson[levelToImport][areaNo][zoneNo] # NOTE Temp. replace ["0"] with the desired zone number
             areaRawSettings = []
             # Prepare for Sprite loading list
@@ -70,7 +71,7 @@ def main():
     u8_dict = u8_m.constructFromScratch(len(inJson[levelToImport].keys()),[u8_files_dir] + u8_files_list)
 
     returnARC = u8_m.repackToBytes(u8_dict)
-    with open("Stage/test_json.arc", 'wb') as f:
+    with open("test_de_json.arc", 'wb') as f:
         f.write(returnARC)
 
     # if isDebug:
