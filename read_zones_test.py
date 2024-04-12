@@ -121,7 +121,8 @@ def main():
     # rulesDict = json.loads(rf.read())
     # rf.close()
 
-    filename = "Stage/02-04.arc"
+    filename = "Stage/05-36.arc"
+    # filename = "test_json.arc"
     outJson[filename] = {}
     
     print(filename)

@@ -197,18 +197,6 @@ class NSMBWZoneBound:
         while i<len(byteData):
             #print(byteData[0+i:2+i])
             returnList.append(unpack(">4lHHhh",byteData[i:i+24]))
-            # returnList.append(
-            #     [int.from_bytes(byteData[0+i:4+i],"big"), # Cam Upper Bound
-            #     int.from_bytes(byteData[4+i:8+i],"big"),  # Cam Lower Bound
-            #     int.from_bytes(byteData[8+i:12+i],"big"),  # Cam Cloud Upper Bound
-            #     int.from_bytes(byteData[12+i:16+i],"big"),  # Cam Cloud Lower Bound
-
-            #     int.from_bytes(byteData[16+i:18+i],"big"),  # Entry ID
-            #     int.from_bytes(byteData[18+i:20+i],"big"),  # Map Camera Zoom adjust
-            #     int.from_bytes(byteData[20+i:22+i],"big"),  # Multiplayer Upper Bound
-            #     int.from_bytes(byteData[22+i:24+i],"big"),  # Multiplayer Lower Bound
-            #     ]
-            # )
             i+=24 #Entry length
 
         return returnList
@@ -226,22 +214,7 @@ class NSMBWZoneBG:
         i = 0
         returnList = []
         while i<len(byteData):
-            returnList.append(
-                [
-                # 1 padding byte
-                int.from_bytes(byteData[1+i:2+i],"big"),  # ID
-                int.from_bytes(byteData[2+i:4+i],"big"),  # X Scroll rate
-                int.from_bytes(byteData[4+i:6+i],"big"),  # Y Scroll rate
-                int.from_bytes(byteData[6+i:8+i],"big"),  # Default Image Scroll Y Pos (inverted?)
-                int.from_bytes(byteData[8+i:10+i],"big"),  # Default Image Scroll X Pos
-                int.from_bytes(byteData[10+i:12+i],"big"),  # First background
-                int.from_bytes(byteData[12+i:14+i],"big"),  # Middle background
-                int.from_bytes(byteData[14+i:16+i],"big"),  # Last background
-                # 3 Padding byte
-                int.from_bytes(byteData[19+i:20+i],"big"),  # Zoom levels
-                # 4 padding bytes
-                ]
-            )
+            returnList.append(unpack(">xBhhhhHHHxxxBxxxx",byteData[i:i+24]))
             i+=24 #Entry length
 
         return returnList
@@ -249,18 +222,7 @@ class NSMBWZoneBG:
     def toByteData(entranceData):
         byteData = b""
         for i_lis in entranceData:
-            byteData += b"\x00"
-            byteData += i_lis[0].to_bytes(1,"big")
-            byteData += i_lis[1].to_bytes(2,"big")
-            byteData += i_lis[2].to_bytes(2,"big")
-            byteData += i_lis[3].to_bytes(2,"big")
-            byteData += i_lis[4].to_bytes(2,"big")
-            byteData += i_lis[5].to_bytes(2,"big")
-            byteData += i_lis[6].to_bytes(2,"big")
-            byteData += i_lis[7].to_bytes(2,"big")
-            byteData += b"\x00\x00\x00"
-            byteData += i_lis[8].to_bytes(1,"big")
-            byteData += b"\x00\x00\x00\x00"
+            byteData += pack(">xBhhhhHHHxxxBxxxx",*i_lis)
 
         return byteData# + b"\xff\xff"
 
