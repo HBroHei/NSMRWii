@@ -13,3 +13,5 @@ config.json
 U8N.txt
 U8O.txt
 log.txt
+*.bin
+*.json
