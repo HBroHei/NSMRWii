@@ -127,7 +127,7 @@ FILE STRUCTUIRE
             0x02    UnsignShort  Integer       X Position {2}
             0x04    UnsignShort  Integer       Y Position {2}
             0x06    Char[6]      Bytes[6]      Raw Data (Properties) {3}
-            0x0B    Char[1]      Byte          Zone ID to be loaded
+            0x0B    Char[1]      Byte          Zone ID to be loaded in
             0x0C    ???             /          TODO check what it is
             0x0D    PaddingByte     /          -from 0D to 0E
 

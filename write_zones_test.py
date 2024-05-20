@@ -10,7 +10,8 @@ import globalVars
 from Util import tilePosToObjPos, convertToDict
 
 inJson = {}
-levelToImport = "test_json_area2.arc"
+# levelToImport = "Stage/05-36.arc"
+levelToImport = "test_json.arc"
 
 tileData = [[],[],[]]
 u8_files_list = []

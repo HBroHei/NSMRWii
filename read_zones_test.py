@@ -121,8 +121,8 @@ def main():
     # rulesDict = json.loads(rf.read())
     # rf.close()
 
-    filename = "Stage/05-36.arc"
-    # filename = "test_json.arc"
+    # filename = "Stage/05-36.arc"
+    filename = "test_json.arc"
     outJson[filename] = {}
     
     print(filename)
@@ -145,7 +145,7 @@ def main():
         # add zone to the output json
         for zone in zoneData:
             print("ZONE NUMBER",zone[6],zone)
-            # Preprocess zone bound due to llong val
+            # Preprocess zone bound due to long val
             zoneBnd = [zoneB for zoneB in zoneBound if zoneB[4] == zone[7]]
             outJson[filename][i][zone[6]] = {
                 "tileset" : tileset,

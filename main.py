@@ -159,7 +159,7 @@ def readAndrandomise(i,istr,_u8list):
         lvlSetting[6]["Data"] = NSMBWEntrances.toByteData(entrances)
     #print("ENT_RAW ",lvlSetting[6]["Data"])
     lvlSetting[7]["Data"] = NSMBWsprite.toByteData(spriteData,lvlSetting[7]["Size"])
-    lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData,lvlSetting[8]["Size"])
+    lvlSetting[8]["Data"] = NSMBWLoadSprite.toByteData(sprLoadData)
     u8list["course"+ str(i) +".bin"]["Data"] = writeDef(lvlSetting)
 
     return u8list

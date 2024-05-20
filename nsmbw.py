@@ -113,6 +113,7 @@ class NSMBWbgDat:
     def toByteData(tilesData):
         byteData = b""
         for i_lis in tilesData:
+            if i_lis[0]>60000: continue
             for int_val in i_lis:
                 byteData += int_val.to_bytes(2,"big")
 
