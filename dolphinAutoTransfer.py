@@ -2,12 +2,21 @@
 import os
 import shutil
 from json import loads
-rf = open("config_autoCopy.json")
-config = loads(rf.read())
-rf.close()
+
+config = {
+    "enable_auto_copy":False,
+    "riivolution_folder":""
+}
+
 class dolphinAutoTransfer:
     def __init__(self):
         pass
+
+    def readAutoCopyConfig():
+        global config
+        rf = open("config_autoCopy.json")
+        config = loads(rf.read())
+        rf.close()
     
     def verify_autotransfer_status():
         if "enable_auto_copy" in config and (config["enable_auto_copy"]):

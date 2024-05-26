@@ -40,6 +40,8 @@ def copyStageFolder():
     shutil.copytree("Stage",STG_OLD)
 
 def autoCopyDolphin():
+    dolphinAutoTransfer.readAutoCopyConfig()
+
     # Starting Transfer to dolphin
     if dolphinAutoTransfer.verify_autotransfer_status(): 
         print("Auto Copying : Beginning transfer setting verification")
