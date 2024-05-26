@@ -16,3 +16,5 @@ log.txt
 *.bin
 *.json
 config_autoCopy.json
+config.json
+config_autoCopy.json
