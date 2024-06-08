@@ -312,7 +312,7 @@ class NSMBWsprite:
                         enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
 
             #Randomize enemy variation
-            if str(enemyData[0]) in globalVars.enemyVarList:
+            if str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
 
