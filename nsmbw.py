@@ -292,6 +292,8 @@ class NSMBWsprite:
         #print("=========== " + lvName)
 
         for enemyData in reData:
+            # if enemyData[0]==408:
+            #     print(lvName,enemyData)
             randomised = False
             #Randomize enemy
             for eLis in globalVars.enemyList:
@@ -317,7 +319,9 @@ class NSMBWsprite:
             # Add to load sprite list
             relData.add(enemyData[0])
             
-        del reData[-1] # This is the most hacky way to fix a bug but it works.
+        #print(reData[-1])
+
+        #del reData[-1] # This is the most hacky way to fix a bug but it works.
 
         return reData,relData,len(reData)*16
 

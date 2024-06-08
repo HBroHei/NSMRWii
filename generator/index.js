@@ -41,8 +41,9 @@ function openWin(ele){
 }
 
 function toJson(){
-    lvList_skip = ["Texture","02-24.arc","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
-    
+    lvList_skip = ["Texture","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
+    lvList_same = []
+
     //Set seed
     try{
         var seeds = Number(document.getElementById("seed").value)
@@ -51,13 +52,40 @@ function toJson(){
         var seeds = document.getElementById("seed").value
     }
 
+    /* LEGACY CODES
     if(document.getElementById("S08-24").checked){
         lvList_skip.push("08-24.arc");
+    }*/
+    // Get skipping special levels
+    for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_06-24","map_08-03","map_08-24"]){
+        if(document.getElementById(lvl_skip_item).checked){
+            const skipLvlName = lvl_skip_item.replace("map_","") + ".arc";
+            lvList_skip.push(skipLvlName)
+            // Check if item is in lvlJson_n and remove them if exist
+            for(const items of Object.keys(lvlJson_n)){
+                const lvlPosInArr = lvlJson_n[items].indexOf(skipLvlName);
+                if(lvlPosInArr!=-1){
+                    console.log("Removed " + skipLvlName)
+                    lvlJson_n[items].splice(lvlPosInArr,1);
+                }
+            }
+        }
     }
+
     //Set skipping list for levels
-    getSkipOption("Secret",document.getElementById("SSE"))
-    getSkipOption("Cannon",document.getElementById("SCannon"))
-    getSkipOption("Toad",document.getElementById("SToadHse"))
+    //document.querySelector('input[name="rate"]:checked')
+    // getSkipOption("Secret",document.getElementById("SSE"))
+    // getSkipOption("Cannon",document.getElementById("SCannon"))
+    // getSkipOption("Toad",document.getElementById("SToadHse"))
+    getGroupOption("secret");
+    getGroupOption("castle");
+    getGroupOption("tower");
+    getGroupOption("airship");
+    getGroupOption("ambush");
+    getGroupOption("cannon");
+    getGroupOption("toads");
+
+    console.log(lvList_same)
 
     //Set tile raandomization
     let includeTilesList = []
@@ -180,7 +208,8 @@ function toJson(){
 function genJson(){
     //console.log(JSON.stringify(toJson()))
     //document.getElementById("jsonCode").innerHTML = JSON.stringify(toJson())
-    var downBlob = new Blob([JSON.stringify(toJson())])
+    const outJSonText = document.getElementById("gen_beauty").checked ? [JSON.stringify(toJson(),null,4)] : [JSON.stringify(toJson())]
+    var downBlob = new Blob(outJSonText)
     //document.getElementById("fileGen").innerHTML = '<button>Generate</button>'
     document.getElementById("downFrame").src = window.URL.createObjectURL(downBlob)
 

@@ -83,6 +83,14 @@ button{
     width:100%;
     height:100%;
     font-size: larger;
+
+    cursor: pointer;
+}
+.tabs td:hover{
+    background-color: #bbf6ff;
+}
+.tabs_btn{
+    cursor: pointer;
 }
 
 label{
@@ -95,6 +103,9 @@ label{
     font-weight: 450;
     text-decoration: none;
 }
+.lbl_bold{
+    font-weight: bold;
+}
 
 .tab_win_default_hidden{
     display:none;
@@ -105,5 +116,21 @@ label{
 }
 
 .tab_chosen{
-    background-color: #c9f8ff;
+    background-color: #bbf6ff;
+}
+
+#win_map table{
+    width:100%;
+}
+#win_map table, #win_map td, #win_map tr, #win_map th{
+    border-collapse: collapse;
+    border-color: black;
+    border-radius: 5%;
+    border-style: solid;
+    padding:1%;
+    text-align: center;
+}
+
+#fileGen button{
+    cursor: pointer;
 }
