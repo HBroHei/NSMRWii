@@ -6,6 +6,7 @@ test1.arc
 Stage_Shuffled/
 __pycache__/
 *.pyc
+*.json
 U8/
 Skip List.txt
 config.json
@@ -14,7 +15,3 @@ U8N.txt
 U8O.txt
 log.txt
 *.bin
-*.json
-config_autoCopy.json
-config.json
-config_autoCopy.json
