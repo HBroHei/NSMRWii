@@ -1,5 +1,8 @@
 <br>LATEST CHANGES<br>
-[FIX] Fix a bug which prevents sprites loading in their respective zones<br>
-[EXPERIMENTAL] Added Entrance Randomisation<br>
-[GENERATOR] Added options for 1up Blast and Star House<br>
+[GENERATOR] Added options for Castle, Tower, Airship and enemy ambush levels in the "Map" section<br>
+[GENERATOR] Added hardcoded level skipping options in the "Map" section<br>
+[FIX] Load sprite list missing sprites, cause the game to crash<br>
+[FIX] Some sprite would gone missing for some level<br>
+[FIX] Same seed should generate same results regardless of config_autoCopy.json<br>
+[GENERATOR] Defaults "Reduce Lag" to false, as it is only really useful in vanilla 9-7 and custom levels.<br>
 <br>
