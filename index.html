@@ -6,73 +6,105 @@
         <meta name="viewport" content="width=device-width">
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
+        <link rel="stylesheet" href="./index.css">
+        <link rel="stylesheet" href="./navbar.css">
     </head>
-    <style>
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: skyblue;
-            padding: 0%;
-            margin: 0%;
-        }
-        button{
-            padding: 1%;
-            background-color: yellow;
-        }
-        #padd{
-            padding: 1%;
-            margin: 1%;
-        }
-    </style>
     <body>
         <div id="topbar" style="width:100%"></div>
-        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
-        <div style="height: 5vh;"></div>
+        <div id="top_nav">
+            <a href="https://hbrohei.github.io" class="top_nav_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <a href="https://hbrohei.github.io/MiniStarCenter" class="top_nav_btn hidden_narrow">Mini Star Center</a>
+            <a href="https://hbrohei.github.io/NSMRWii" class="top_nav_btn hidden_narrow">NSMBW Randomiser</a>
+        </div>
+        <div style="height: 5vh;"></div> <!--Spacer-->
         <div id="padd">
-            <div style="width:99%;text-align: center; border-style: dashed; background-image: url('big_title.jpg'); background-position: center;">
+            <div id="title_box">
                 <br>
                 <span style="font-size: 3.5em; font-weight: bold;">New Super Mario Randomizer Wii</span><br>
-                <span style="font-size: 2.5em;">A New Super Mario Bros Wii Randomizer</span>
-                <br>
+                <span style="font-size: 2.5em; text-shadow: 2px 2px black, -2px -2px black, -2px 2px black, 2px -2px black;">A New Super Mario Bros Wii Randomiser</span>
                 <br>
             </div>
-            <p>
-                A randomizer that can currently raandomize levels and enemies for New Super Mario Bros Wii<br>
-                It brings fresh air to the base game by remixing the current existing 135 levels<br>
-            </p>
+            <hr>
             <div style="text-align: center;">
-                <a href="generator/tut.html"><button>Get started!</button></a>
-                <a href="https://github.com/HBroHei/NSMRWii/releases"><button>Download</button></a>
-                <a href="generator/index.html"><button>Config.json Generator</button></a>
+                <h2>Quick Links</h2>
+                <a class="a_btn" href="generator/tut.html">Get started!</a>
+                <a class="a_btn" href="https://github.com/HBroHei/NSMRWii/releases">Download</a>
+                <a class="a_btn" href="generator/index.html">Config.json Generator</a>
             </div>
+            <br>
             <hr>
-            <h1>135 Remixed Levels</h1>
-            <p>
-                Experience the 135 levels in a new but familar way.<br>
-                All levels have been altered randomly to create a new experience for the player
-            </p>
-            <hr>
-            <h1>Randomizer Customization</h1>
-            <p>
-                Customize the randomizer to your heart's content<br>
-                Feeling chaos? Or you just wanted to relax a bit?<br>
-                You can <a href="generator/index.html">Customize it in the Configuration file generator</a> or <a href="generator/tut_config.html">Make a complex ruleset by yourself</a>!
-            </p>
-            <hr>
-            <h1>Continous Updates</h1>
-            <p>
-                This project iss currently in active developments.<br>
-                Many more features is planned or in development. Stay tuned for more updates to this!
-            </p>
-            <hr>
-            <h1>Open Source</h1>
-            <p>
-                This project is available under the GPL-3.0 License<br>
-                <a href="https://github.com/hbrohei/nsmrwii"><button>View Project on GitHub</button></a>
-            </p>
+            
+            
+        </div>
+
+        <div id="div_rando" class="big_banner">
+            <div>
+                <h3>Randomiser for levels, items and enemies</h3><br>
+                <span>Breathes fresh air to the base game by remixing the current existing 135 levels!</span>
+                <br><br>
+                <a class="a_btn" href="generator/tut.html">Get started!</a>
+                <a class="a_btn" href="https://github.com/HBroHei/NSMRWii/releases">Download Now!</a>
+            </div>
+        </div>
+        <div id="div_135remix" class="big_banner">
+            <div>
+                <h3>135 Remixed Levels</h3><br>
+                <span>
+                    All 135 levels have been altered randomly to create a new yet familar experience for you
+                </span>
+            </div>
+        </div>
+        <div id="div_custom" class="big_banner">
+            <div>
+                <h3>Highly Customisable Randomisation</h3><br>
+                <span>
+                    Want a chaotic ride? Or you want to relax and play the game?<br>
+                    The randomiser can be configured to generate a layout that suits you the best.
+                </span>
+                <br><br>
+                <a class="a_btn" href="generator/index.html">Config.json Generator</a>
+                <a class="a_btn" href="generator/tut_config.html">Advanced: Config.json Documentation</a>
+            </div>
         </div>
         
+        <div style="text-align: center;">
+            <h1>Wanted to contribute?</h1>
+            <p>
+                Help this project grow by contributing, or report issues on GitHub!<br><br>
+                <a class="a_btn" href="https://github.com/hbrohei/nsmrwii">View Project on GitHub</a>
+            </p>
+        </div>
+        <div id="bot_nav">
+            <span class="lbl_pad">Find more on YouTube:</span>
+            <a href="https://hbrohei.github.io" class="bot_nav_btn" id="yt_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <br class="show_narrow">
+            <a href="https://hbrohei.github.io" class="bot_nav_btn" id="yt2_btn"><img src="https://yt3.googleusercontent.com/ytc/AIdro_kKTVJaNi_WEg96csnm5cwRb-DF_tvF8WDKM7ulrQ=s176-c-k-c0x00ffffff-no-rj"> Hacked Bro Hei</a>
+            <hr>
+            <table>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/" class="hidden_narrow">Main Page</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/NSMRWii" class="hidden_narrow">NSMBW Randomiser</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/MiniStarCenter" class="hidden_narrow">Mini Star Center</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/MP9/" class="hidden_narrow">MP9 Custom Board</a>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <h3>HBroHei.github.io</h3>   
+            <a id="git_source_a" href="https:/www.github.com/HBroHei/hbrohei.github.io">Source</a>
+        </div>
+        <!--
         <div id="bottomNav" style="width:95%">
             <script src="https://hbrohei.github.io/Nav/bottom.js"></script>
-        </div>
+        </div>-->
     </body>
 </html>
