@@ -2,6 +2,7 @@
 
 import json
 from os import listdir
+from copy import deepcopy
 
 import u8_m
 import nsmbw
@@ -131,6 +132,16 @@ def main():
                 }
                 # Path
                 outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]]
+                # Special case where entrance for 179 is not in zone:
+                _sprData = deepcopy(outJson[filename][i][zone[6]]["sprites"]) # Only need the added sprites
+                ent_179_lst = []
+                for spr in _sprData:
+                    if spr[0]==179:
+                        ent_179_lst.append(int((spr[3][3] & 0xF0) | (spr[3][5] & 0x0F)))
+                for ent in entrances: # Needs all the entrances 
+                    if ent[2] in ent_179_lst:
+                        outJson[filename][i][zone[6]]["entrance"].append(ent)
+                        print("Far away entrance detetcted: ent",ent)
 
             # Read tiles
             for j in range(0,2): #Loop through every layers

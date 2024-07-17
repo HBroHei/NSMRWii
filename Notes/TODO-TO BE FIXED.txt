@@ -1,8 +1,6 @@
 Sprites
 -Reduce unnessary load sprites
 -Bob-omb spawner in 3-Castle
--Prevent Door / Goal pole disappearing
--- Confirmed side effect of resetting sprite varient NSMBWSprite.processSprites()
 -Prevent sprie before pipe
 
 Entrances

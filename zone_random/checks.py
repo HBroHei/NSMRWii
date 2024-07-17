@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
     for spr in zone["sprites"]:
@@ -22,11 +24,26 @@ def checkEntSpawn(zone):
 def checkOnlyOneEnt(zone):
     return len(zone)==1
 
+# Find all the enterables and non-enterables
 def findExitEnt(zone):
-    ret_pos = []
-    ret_pos_noExit = []
+    ret_pos = [] # Enterable
+    ret_pos_noExit = [] # Non-enterable
+    ent_179 = [] # Entrance IDs related to sprite 179
+    # First, check for sprite 179
+    spr_list = deepcopy(zone["sprites"])
+    for spr in spr_list:
+        if spr[0]==179: # Special Exit Controller
+            # Get the 4th([3]) char, 1st digit and 6th([5]) char, 2nd digit
+            ent_179.append(int((spr[3][3] & 0xF0) | (spr[3][5] & 0x0F)))
+
     for i in range(0,len(zone["entrance"])):
-        if (zone["entrance"][i][9]&128)==0 or (zone["entrance"][i][3]!=0 and zone["entrance"][i][4]!=0):
+        # TODO Find if "Normal" Entrances have sprites associated with them
+        #   Marked "enterable", Orginal Dest Area & ID!=0, Area Entrance Type can be entered
+        print("Finding exit:",zone["entrance"][i][9]&128,zone["entrance"][i][5] in (27,3,4,5,6,16,17,18,19),zone["entrance"][i][5])
+        if ((zone["entrance"][i][9]&128)==0 and\
+            #((zone["entrance"][i][3]!=0 and zone["entrance"][i][4]!=0) and\
+            zone["entrance"][i][5] in (27,2,3,4,5,6,16,17,18,19)) or\
+            (zone["entrance"][i][2] in ent_179):
             ret_pos.append(i)
         else:
             ret_pos_noExit.append(i)

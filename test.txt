@@ -1,0 +1,19 @@
+            """"exit_tileset = getRandomTileset(tilesetList)
+            # Prevent area without exit
+            while len(groupTilesetJson[exit_tileset]["exit"])==0 and len(groupTilesetJson[exit_tileset]["full"])==0 and len(groupTilesetJson[exit_tileset]["boss"])==0:
+                exit_tileset = getRandomTileset(tilesetList)
+            # Check for only 1 specific entrance zone type
+            if len(groupTilesetJson[exit_tileset]["full"])==0:
+                zone_ent_type = "exit"
+            elif len(groupTilesetJson[exit_tileset]["exit"])==0:
+                zone_ent_type = "full"
+            else:
+                zone_ent_type = "full" if randint(0,4)==0 else "exit" # Entrance only / Entranbce + exit
+
+            ### DEBUGGING
+            # zone_ent_type = "full"
+            # exit_tileset = "Pa0_jyotyuPa2_sora"
+
+            # Gets the random zone
+            exit_zone = getRandomZone(exit_tileset,zone_ent_type)
+            exit_zone["type"] = "exit"""""

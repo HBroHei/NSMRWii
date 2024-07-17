@@ -17,6 +17,18 @@ ID_REF_LOOKUP = {
 
 used_ids = [{},{},{}]
 
+DOOR_TYPE_3X2 = 0
+DOOR_TYPE_BOSS = 1
+# Check if the door sprite and door entrance match
+def isEntranceDoorMatch(doorType:int, doorSpr:list, doorEnt:list):
+    if doorType==0: # Normal
+        doorRange = (range(doorSpr[1]-8,doorSpr[1]+8 ),range(doorSpr[2]+24,doorSpr[2]+40)) # +0, +32
+    elif doorType==1: # Boss
+        doorRange = (range(doorSpr[2]+0,doorSpr[2]+16),range(doorSpr[2]+24,doorSpr[2]+40)) # +8, +32
+    else: # Unknown? This should not be called
+        doorRange = (0,0)
+    return doorEnt[0] in doorRange[0] and doorEnt[1] in doorRange[1]
+
 def alignToPos(zone,x,y):
     # Assuming x and y are > 16
 
@@ -31,16 +43,16 @@ def alignToPos(zone,x,y):
     zone["zone"][0] = x
     zone["zone"][1] = y
 
-    
-
+    door_lists = []
     # Iterate through every section to convert them to be relative to x, y
     # Only section 6, 7, 9, 10, 13 only actually. But still, works, and for loops.
-    for i in range(len(zone["entrance"])):
-        zone["entrance"][i][0] -= diffx
-        zone["entrance"][i][1] -= diffy
     for i in range(len(zone["sprites"])):
         zone["sprites"][i][1] -= diffx
         zone["sprites"][i][2] -= diffy
+        # Check if sprite is door
+        if zone["sprites"][i][0] in [182, 259, 276, 277, 278, 452]:
+            door_lists.append(i)
+
     # Zones covered above
     for i in range(len(zone["location"])):
         zone["location"][i][0] -= diffx
@@ -58,6 +70,42 @@ def alignToPos(zone,x,y):
         for i in range(len(zone[curLayerStr])):
             zone[curLayerStr][i][1] -= diffx_tiles
             zone[curLayerStr][i][2] -= diffy_tiles
+
+    # SPECIAL: need to align entrances to specific pos
+    # Boss doors: half a tile
+    # Everything else (unless I missed sth): full tile
+    for i in range(len(zone["entrance"])):
+        zone["entrance"][i][0] -= diffx
+        zone["entrance"][i][1] -= diffy
+        # Check entrance type:
+        #  - Door - get door sprite behind,
+        #    - Boss : door pos x + 8, door pos y + 32
+        #    - Ghost / Normal: door x + 0, door y + 32
+        #    - Bowser: door x + 8, door y + 32
+        #  - Pipe: Check if divisible by 16: -8 if no
+        if zone["entrance"][i][5] in (27,2): # Type == door
+            # Gets the door behind that ent
+            for j in door_lists:
+                print("Checking ", j, ":", zone["sprites"][j])
+                """if isEntranceDoorMatch(1,zone["sprites"][j],zone["entrance"][i]): # Boss door
+                    # Correct x pos?
+                    if (zone["entrance"][i][0]-zone["sprites"][j][0]+8)!=0:
+                        zone["entrance"][i][0] = zone["sprites"][j][0]+8
+                    # Correct y pos?
+                    if (zone["entrance"][i][1]-zone["sprites"][j][1]+32)!=0:
+                        zone["entrance"][i][1] = zone["sprites"][j][1]+32
+                elif isEntranceDoorMatch(0,zone["sprites"][j],zone["entrance"][i]): # Normal door
+                    # Correct x pos?
+                    if zone["entrance"][i][0]!=zone["sprites"][j][0]:
+                        zone["entrance"][i][0] = zone["sprites"][j][0]
+                    # Correct y pos?
+                    if (zone["entrance"][i][1]-zone["sprites"][j][1]+32)!=0:
+                        zone["entrance"][i][1] = zone["sprites"][j][1]+32"""
+        elif zone["entrance"][i][5] in (3,4,5,6,16,17,18,19): # Type==pipe
+            if zone["entrance"][i][0]%16 != 0:
+                zone["entrance"][i][0] -= 8
+            if zone["entrance"][i][1]%16 != 0:
+                zone["entrance"][i][1] -= 8
 
     return zone
 
