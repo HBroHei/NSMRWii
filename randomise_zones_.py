@@ -7,7 +7,7 @@ import u8_m
 import nsmbw
 import globalVars
 from Util import tilePosToObjPos, convertToDict, objPosToTilePos
-from zone_random import checks,corrections
+from zone_random import checks,corrections, read_config
 
 from random import randint, shuffle, choice
 from copy import deepcopy
@@ -38,6 +38,7 @@ isDebug = False
 def writeArea():
     pass
 
+# Add data to the list of enterables / nonenterables
 def addEntranceData(areaNo : int, zoneToFind:list):
     assert type(zoneToFind)==list or type(zoneToFind)==dict
     allEnt, allNonEnt = checks.findExitEnt(zoneToFind)
@@ -108,11 +109,19 @@ def addRandomZone(tilesetList:list,types:list):
 
         return 2, gen_zone_tileset, gen_zone_type
     else: # Esort to Area 4 I guess
-        generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((32,32)))
+        overlap_zone_no = checks.checkPosInZone(area_zone[3], *generated_zone[0:4])
+        if overlap_zone_no!=-1:
+            overlap_zone = area_zone[overlap_zone_no]
+            if (overlap_zone[0]+overlap_zone[2]+64+generated_zone[2])>16000: # Should be a horizontal zone
+                new_y = overlap_zone[1]+overlap_zone[3]+64
+            if (overlap_zone[1]+overlap_zone[3]+64+generated_zone[3])>7800: # Should be a vertical zone
+                # Both if statement needs to run in case of full area (To be implemented)
+                new_x = overlap_zone[0]+overlap_zone[2]+64
+            generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
+        # Check and correct duplicated zones
+        generated_zone = corrections.corrDupID(generated_zone)
         generated_zone = corrections.corrSprZone(generated_zone)
         area_zone[3].append(generated_zone)
-        area_tileset[3] = gen_zone_tileset
-        area_len+=1
 
         return 3, gen_zone_tileset, gen_zone_type
         # All that is done, back out from the if statement.
@@ -152,8 +161,11 @@ def genZone(tilesetList:list,types:list):
     cur_tileset = getRandomTileset(tilesetList)
     #area_tileset[0] = "Pa0_jyotyuPa1_daishizen" ### DEBUG
 
-    # Prevent area without an entrance
-    while checkDictListEmpty(groupTilesetJson[cur_tileset],types):
+    # Prevent:
+    # - area without an entrance
+    # - no suitable place to place the zone
+    while checkDictListEmpty(groupTilesetJson[cur_tileset],types) or\
+        (cur_tileset not in area_tileset and "" not in area_tileset):
         cur_tileset = getRandomTileset(tilesetList)
     
     # Check for only 1 specific entrance zone type
@@ -185,7 +197,7 @@ def genZone(tilesetList:list,types:list):
     # Return: zone, tileset, type
     return ret_zone, cur_tileset, ret_zone["type"]
 
-def D_writeToFile(lvlData:list, areaNo = 1):
+def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     no_of_areas = 0
     # List always starts with 0, so +1 needed
     for area_i in range(1,areaNo+1):
@@ -261,7 +273,7 @@ def D_writeToFile(lvlData:list, areaNo = 1):
     #print(u8_dict)
 
     returnARC = u8_m.repackToBytes(u8_dict)
-    with open("test_json.arc", 'wb') as f:
+    with open("./Stage_output/" + lvlName, 'wb') as f:
         f.write(returnARC)
 
 def main():
@@ -351,7 +363,11 @@ def main():
     totNoNonEnt = 0 # Total number of non-enterables
     # copy dict template for addedZone
     addedZone = deepcopy(groupTilesetJson)
-    while notFinished:
+    for stg_name in read_config.listdir("./Stage_temp/"):
+        print("Processing",stg_name)
+        if stg_name=="Texture":
+            continue # Skip that folder
+
         entrance_list = [[],[],[],[]] # entrance_list[area_no][zone_no]["enterable"|"nonenterable"], no need to complicated things
         area_zone = [[],[],[],[]]
         area_zone_size = [[],[],[],[]]
@@ -473,8 +489,13 @@ def main():
             only_main = True # This, however, is to mark which entrance will be prioritised to be randomised
         
         #### END OF ADDING THE NECESSARY ZONES ####
-        ### Check if new zones is needed to be added
+        ### Check if new zones is needed to be added - for:
+        # - Entrances > exit number
+        # - have secret exit
         # I believe there is a better wauy to do this, but this will do for now
+        have_secret = stg_name in read_config.secret_exit
+        secret_generated = False
+        ent_pipes_cand = []
         for area_no in range(0,4):
             # GEts a list of non-enterables excluding the current one
             lst_nonent_wo_myself = deepcopy(area_nonenterable_count)
@@ -483,9 +504,42 @@ def main():
             # if the sum of non-enterables < enterable, new zone needed
             if sum(lst_nonent_wo_myself)<area_enterable_count[area_no]:
                 print("NEW ZONE NEEDED, PLEASE ADD CODE HERE")
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["full"])
+                # If there is an secret exit in this level, set type to "exit", "full" otherwise
+                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
                 print("Extra:",added_area_no)
-                print("Extra:",area_zone[added_area_no][-1]["zone"],)
+                print("Extra:",area_zone[added_area_no][-1]["zone"])
+                addEntranceData(area_no,area_zone[added_area_no][-1])
+
+                secret_generated = True
+            # Checks for static pipes that is candidate for new enterable
+            for zone_check in area_zone[area_no]:
+                for tile in zone_check["bgdatL1"]:
+                    if tile[0] in [65,73,79]:
+                        ent_pipes_cand.append((area_no,tile))
+                # I believe this is the right opportunity to do tile randomisation
+                # Layer 1 matters the most
+                zone_check["bgdatL1"] = nsmbw.NSMBWbgDat.processTiles(zone_check["bgdatL1"])
+        # Check if have secret exit
+        if have_secret and not secret_generated:
+            # Option 1: have pipe candidate(s), only 1 new zone needed
+            if len(ent_pipes_cand)!=0:
+                print("1 ZONE NEEDED FOR SECRET, PLEASE ADD CODE HERE")
+                ent_pipe = choice(ent_pipes_cand)
+                # TODO add entrance
+                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
+                print("Extra:",added_area_no)
+                print("Extra:",area_zone[added_area_no][-1]["zone"])
+                addEntranceData(area_no,area_zone[added_area_no][-1])
+            # Option 2: Generate 2 exita zones (Last resort)
+            else:
+                print("2 ZONES NEEDED FOR SECRET, PLEASE ADD CODE HERE")
+                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
+                print("Extra 1:",added_area_no)
+                print("Extra 1:",area_zone[added_area_no][-1]["zone"])
+                addEntranceData(area_no,area_zone[added_area_no][-1])
+                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
+                print("Extra 2:",added_area_no)
+                print("Extra 2:",area_zone[added_area_no][-1]["zone"])
                 addEntranceData(area_no,area_zone[added_area_no][-1])
 
         print("Nonenterable list",area_nonenterable_count)
@@ -593,286 +647,10 @@ def main():
                                 area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id
                                 area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
                                     choice(area_zone[dest_area_id][0]["entrance"])[2]
-            ### OLD CODES
-            """# While not all enterable processed and exit area nonenterable linked
-            while processed_ent_count < sum(area_enterable_count)-1 or not processed_normal_exit_zone:
-                # Starts randoming
-                # Get the Dest Area
-                cur_dest_area = randint(0,3)
-                #print("Decided init dest area id",cur_dest_area)
-                # Avoid area without enterable, and same area
-                # We can safely assume every zone have at least 1 non-enterable entrance
-                while cur_dest_area==cur_start_area or area_nonenterable_count[cur_dest_area]==0:
-                    cur_dest_area = randint(0,3)
-                print("Decided dest area id",cur_dest_area)
-                # Get the dest zone
-                cur_dest_zone = randint(0,len(entrance_list[cur_dest_area])-1)
-                # Get the Dest Entrance POSITION in entrance_list
-                # Preferrably Non-Enterable
-                print("Dest zone",cur_dest_zone,entrance_list[cur_dest_area])
-                cur_dest_ent_pos = choice(entrance_list[cur_dest_area][cur_dest_zone]["nonenterable"])
-                # Assign them to the current processing enterable
-                area_zone[cur_start_area][cur_start_zone]["entrance"][cur_start_ent_pos][3] = cur_dest_area+1
-                area_zone[cur_start_area][cur_start_zone]["entrance"][cur_start_ent_pos][4] =\
-                    area_zone[cur_dest_area][cur_dest_zone]["entrance"][cur_dest_ent_pos][2]
-                # Add to enterable processed list
-                processed_enterable_id[cur_start_area][cur_start_zone].append(cur_start_ent_pos)
-                if cur_dest_area==normal_exit_area_id and cur_dest_zone==normal_exit_zone_id:
-                    processed_normal_exit_zone = True
-                prev_start_area = cur_start_area; prev_start_zone = cur_start_zone
-                # Get a random enterable from the zone
-                # If none, esort to other zone in area, then other area
-                cur_start_area = cur_dest_area
-                cur_start_zone = cur_dest_zone
-                # Gets the random enterable
-                if len(entrance_list[cur_start_area][cur_start_zone]["enterable"])!=0:
-                    cur_start_ent_pos_i = randint(0,len(entrance_list[cur_start_area][cur_start_zone]["enterable"])-1)
-                    cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][cur_start_ent_pos_i]
-                else:
-                    cur_start_ent_pos = -1
-                    cur_start_ent_pos_i = 0
-                while (prev_start_area==cur_dest_area and prev_start_zone==cur_dest_zone)\
-                    or cur_start_zone>len(entrance_list[cur_start_area])-1\
-                    or cur_start_ent_pos_i>len(entrance_list[cur_start_area][cur_start_zone]["enterable"])-1\
-                    or cur_start_ent_pos in processed_enterable_id[cur_start_area][cur_start_zone]\
-                    or cur_start_ent_pos==-1:
-                    print("area=",cur_start_area,"zone=",cur_start_zone)
-                    print("var =",cur_start_ent_pos, processed_enterable_id[cur_start_area])
-                    print("0.",(prev_start_area==cur_dest_area and prev_start_zone==cur_dest_zone))
-                    print("1.",cur_start_zone>len(entrance_list[cur_start_area])-1)
-                    try:
-                        print("2.",cur_start_ent_pos_i>len(entrance_list[cur_start_area][cur_start_zone]["enterable"])-1)
-                        print("3,4.",cur_start_ent_pos in processed_enterable_id[cur_start_area][cur_start_zone],cur_start_ent_pos==-1)
-                    except IndexError:
-                        pass
-
-                    # Zone oob: area+1
-                    if cur_start_zone>=len(entrance_list[cur_start_area]):
-                        print("Adding area number", cur_start_area)
-                        cur_start_area += 1
-                        if cur_start_area>=4: cur_start_area = 0
-                        cur_start_zone = 0
-                        cur_start_ent_pos_i = 0
-                    # Add zone no
-                    elif (prev_start_area==cur_dest_area and prev_start_zone==cur_dest_zone)\
-                        or cur_start_ent_pos_i>=len(entrance_list[cur_start_area][cur_start_zone]["enterable"]):
-                        print("Adding zone number", cur_start_zone)
-                        cur_start_zone+=1
-                        cur_start_ent_pos_i = 0
-                    else:
-                        # Add entrance pos number
-                        cur_start_ent_pos_i+=1
-                        print("Adding ent pos i",cur_start_ent_pos_i)
-                    # Ent processed - add ent no (NOT NECESARY as we have already added i above)
-                    if cur_start_ent_pos in processed_enterable_id[cur_start_area][cur_start_zone]:
-                        cur_start_ent_pos_i+=1
-                        # Do not set cur_start_ent_pos yet as it may produce IndexError
-                    print("Trying to set var")
-                    # Now, try setting cur_dest_ent_pos
-                    try:
-                        cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][cur_start_ent_pos_i]
-                    except IndexError as e: # Something is wrong, continue looping
-                        print("Something went wrong, continue loop:",traceback.format_exc())
-                        cur_start_ent_pos = -1
-                        input("")
-            ### OLDER CODES BELOW
-
-                
-                # While:
-                #   1. zone has no enterable, or
-                #   2. enterable has been processed, or
-                #   3. same area, same zone, or
-                #   4. enterable_i is oob for list entrance_list[cur_start_area][cur_start_zone]["enterable"], or
-                #   5. cur_start_ent_pos is None
-                while len(entrance_list[cur_start_area][cur_start_zone]["enterable"])==0\
-                    or cur_start_ent_pos in processed_enterable_id[cur_start_area][cur_start_zone]\
-                    or (prev_start_area==cur_start_area and prev_start_zone==cur_start_zone)\
-                    or cur_start_ent_pos_i>=len(entrance_list[cur_start_area][cur_start_zone]["enterable"])\
-                    or cur_start_ent_pos==None:
-                    # Order: other ent -> other zone -> other area
-                    # TODO while loop unfinished
-                    # is enterable processed? / i oob? / no enterable in zone?
-                    if cur_start_ent_pos in processed_enterable_id[cur_start_area][cur_start_zone]\
-                        or len(entrance_list[cur_start_area][cur_start_zone]["enterable"])==0\
-                        or cur_start_ent_pos_i>=len(entrance_list[cur_start_area][cur_start_zone]["enterable"]): # This is here so that it will go to next zone
-                        cur_start_ent_pos_i += 1
-                        print("Next entrance pls")
-                        # Is enterable oob? / no enterable in zone?
-                        if cur_start_ent_pos==None\
-                            or (cur_start_ent_pos_i>len(entrance_list[cur_start_area][cur_start_zone]["enterable"])-1):
-                            cur_start_zone += 1 # Go to next zone
-                            print("Next zone pls")
-                            # If no more zone, go to next area
-                            if cur_start_zone>len(entrance_list[cur_start_area])-1:
-                                print("Next area pls")
-                                cur_start_area+=1
-                                cur_start_zone = 0
-                                if cur_start_area>=4: # reset to area 1
-                                    print("area 1 pls")
-                                    cur_start_area = 0
-                                if cur_start_area==cur_dest_area:
-                                    print("what this should be impossible")
-                                    exit()
-                    else:
-                        cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][cur_start_ent_pos_i]
-
-                # End of inner loop
-                
-                
-                processed_ent_count+=1 # Processed an enterable
-                print("Entering",processed_ent_count,"loop")
-            # End of outer loop
-        # End of "these codes"
-
-        ### EVEN OLDER CODES BELOW \/ \/ \/
-
-        for area_no in range(0,4):
-            # If area does not contain enterable, skip pls
-            if area_enterable_count[area_no]==0:
-                continue
-            print("Randomising Area",area_no)
-            # Gets the entrance list of the level
-            for area_zone_list_i in range(0,len(entrance_list[area_no])):
-                # Gets the number of enterables and non-enterables 
-                zone_ent_no = len(entrance_list[area_no][area_zone_list_i]["enterable"])
-                zone_nonent_no = len(entrance_list[area_no][area_zone_list_i]["nonenterable"])
-                print("LIST Com",len(entrance_list[area_no]),len(area_zone[area_no]))
-                print("For",area_zone_list_i,": Enterable=",zone_ent_no,", nonEnt=",zone_nonent_no)
-                for zone_enterable_i in entrance_list[area_no][area_zone_list_i]["enterable"]:
-                    # zone_enterable_i = entrance_list[area_no][area_zone_list_i]["enterable"][i]
-                    print("Randomising:",area_zone[area_no][area_zone_list_i]["entrance"][zone_enterable_i])
-                    # Starts randoming
-                    # Get the Dest Area
-                    dest_area_id = randint(0,3)
-                    #print("Decided init dest area id",dest_area_id)
-                    # Avoid area without enterable, and same area
-                    # We can safely assume every zone have at least 1 non-enterable entrance
-                    while dest_area_id==area_no or area_nonenterable_count[dest_area_id]==0:
-                        dest_area_id = randint(0,3)
-                    print("Decided dest area id",dest_area_id)
-                    # Get the dest zone
-                    dest_zone_id = randint(0,len(entrance_list[dest_area_id])-1)
-                    # Get the Dest Entrance ID
-                    # Preferrably Non-Enterable
-                    print("Dest zone",dest_zone_id,entrance_list[dest_area_id])
-                    dest_ent_id_pos = choice(entrance_list[dest_area_id][dest_zone_id]["nonenterable"])
-                    # Assign them to the current processing enterable
-                    area_zone[area_no][area_zone_list_i]["entrance"][zone_enterable_i][3] = dest_area_id+1
-                    area_zone[area_no][area_zone_list_i]["entrance"][zone_enterable_i][4] =\
-                        area_zone[dest_area_id][dest_zone_id]["entrance"][dest_ent_id_pos][2]
-                    # TODO After this, pick one enterable from dest area + zone id to be randomised,
-                    # avoid going back to the prev. area to minimise circular loop"""
-
-        ### THE CODE BELOW ARE THE OLDEST, TOO MESSY AND TOO COMPLICATED ###
-        """# TODO Next step: link all zones tgt + gen deadends for extra exit / entrances
-        # Get lists of enterable and non-enterable entrance
-        area_ent = [] # Each area 1 new list
-        # Structure: area_ent [Area No] [Exit=1 | Entrance=0] [Zone No] [0=AreaNo | 1=ZoneNo | 2=EntranceIDs]
-        CONST_EXIT = 1; CONST_ENT = 0 # For viewing sake
-        CONST_AREANO = 0; CONST_ZONENO = 1; CONST_ENTIDS = 2
-        area_totExit = 0 # No. of exits
-        for i in range(0,len(area_zone)):
-            area_zone_ent = []
-            area_zone_onlyEnt = []
-            # Get list of zones in area_zone
-            for j in range(0,len(area_zone[i])):
-                ent_exits, ent_onlyEnt = checks.findExitEnt(area_zone[i][j]) # get entrancess in zone
-                if len(ent_exits)!=0: # Only add if list is not empty
-                    area_totExit += len(ent_exits) # TODO check len, it shouldn't only have 1
-                    area_zone_ent.append((i,j,ent_exits)) # add to list
-                if len(ent_onlyEnt)!=0: # Only add if list is not empty
-                    area_zone_onlyEnt.append((i,j,ent_onlyEnt))
-            # Shuffle list to achieve randomness since it will be processes as a *queue* below
-            shuffle(area_zone_ent)
-            shuffle(area_zone_onlyEnt)
-            area_ent.append([area_zone_ent,area_zone_onlyEnt])
-        # Randomise and pair entrances
-        exit_idx = [0 for _ in range(0,len(area_zone))]
-        print("Loop count:",area_totExit)
-        # while not all enterables have a dest
-        while area_totExit>0: # TODO area_totExit is 0???
-            print("############ Looping:",area_totExit,"left ############")
-            # Get a random area
-            cur_process_area = randint(0,len(area_ent)-1)
-            init_val = cur_process_area
-            # while the area id hasnt loopback, has available enterable ent and no new zone needed
-            while zoneAddedNo!=1 and (len(area_ent[cur_process_area][CONST_ENT])==0 or len(area_ent[cur_process_area][CONST_ENT][0][CONST_ENTIDS])==0):
-                cur_process_area+=1 # Add if the chosen area does not have an enterable
-                if cur_process_area>len(area_ent)-1: cur_process_area=0 # Resets if exceed limit
-            # Generate new room if only 1 zone for extra enterable pipes
-            if zoneAddedNo==1:
-                # TODO Add zone
-                # TODO This step needs to be done BEFORE we are in the random entrance process
-                print("New zone needed, please interrupt")
-                print("New zone needed, please interrupt")
-                print("New zone needed, please interrupt")
-                print("New zone needed, please interrupt")
-                print("New zone needed, processing")
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["full"])
-                print("Extra:",added_area_no)
-                print("Extra:",area_zone[added_area_no][-1]["zone"],)
-                # exit()
-                pass
-            
-            print("Entrance Area:",cur_process_area)
-            # Get the exit area id
-            print("Randomising range",0,len(area_ent)-1)
-            cur_p_exit_area_no = randint(0,len(area_ent)-1)
-            init_val = cur_p_exit_area_no
-            print("[D] Exit area ID =", init_val)
-            #while there is no ent in the current area (No zone that contain ent)
-            while len(area_ent[cur_p_exit_area_no][CONST_EXIT])==0 or cur_p_exit_area_no==cur_process_area:
-                print("exit",cur_p_exit_area_no,area_ent[cur_p_exit_area_no][CONST_EXIT])
-                cur_p_exit_area_no+=1 # Add if the chosen area does not have an enterable
-                if cur_p_exit_area_no>len(area_ent)-1: cur_p_exit_area_no=0
-                if cur_p_exit_area_no==init_val:
-                    # No exit?
-                    print("WARNING: NO EXIT, Exiting")
-                    exit()
-                    pass
-            print("Decided: final exit area id =",cur_p_exit_area_no)
-            # Get the exit ent pos (randomise)
-            cur_p_exit_zone_no = randint(0,len(area_ent[cur_p_exit_area_no][CONST_EXIT])-1)
-            init_val = cur_p_exit_zone_no
-            # Repeat until it is not empty
-            # TODO If onlyExit list are all empty, get a new room (or pull of an existing enterable entrance)
-            determinedExit = False
-            while len(area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ENTIDS])==0:
-                cur_p_exit_zone_no+=1 # Add if the chosen zone does not have an entrance
-                if cur_p_exit_zone_no>len(area_ent[cur_p_exit_area_no][CONST_EXIT])-1: cur_p_exit_zone_no=0
-                if cur_p_exit_zone_no==init_val: # All list empty
-                    determinedExit = True
-                    dest_entData = getRandomEntrance(area_zone) # Gets random entrance (ignore used entrance)
-                    break
-            # Gets the random Entrance's ID
-            if not determinedExit: # Random entrance was not set
-                cur_process_exit_ent = randint(0,len(area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ENTIDS])-1)
-                cur_p_exit_area_zID = area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ZONENO] # Unnecessary?
-                dest_entData = area_zone[cur_p_exit_area_no][cur_p_exit_area_zID]["entrance"][area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ENTIDS][cur_process_exit_ent]] # Gets the destination ent data
-                # Waxed Lightly Weathered Cut Copper Stairs
-            
-            # Get their zone IDs as they are shuffled so they are not in order?
-            cur_p_ent_area_zID = int(area_ent[cur_process_area][CONST_ENT][0][CONST_ZONENO]) # Unnecessary?
-            # print("1",area_ent[cur_process_area][CONST_ENT][0])
-            exit_entData = area_zone[cur_process_area][cur_p_ent_area_zID]["entrance"][int(area_ent[cur_process_area][CONST_ENT][0][CONST_ENTIDS][0])] # Gets the enterable entrance data
-            
-            #print("2",area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ENTIDS],cur_process_exit_ent)
-            
-            #print("[D]", cur_process_area, exit_entData, "->", cur_p_exit_area_no,dest_entData)
-            exit_entData[3] = cur_p_exit_area_no+1 # Set area
-            print("Setting area id",cur_p_exit_area_no)
-            exit_entData[4] = dest_entData[2] # Set ID
-            area_zone[cur_process_area][cur_p_ent_area_zID]["entrance"][int(area_ent[cur_process_area][CONST_ENT][0][CONST_ENTIDS][0])] = exit_entData
-            if not determinedExit: # Not an extra entrance
-                del area_ent[cur_p_exit_area_no][CONST_EXIT][cur_p_exit_zone_no][CONST_ENTIDS][cur_process_exit_ent] # Remove from list
-            del area_ent[cur_process_area][CONST_ENT][0][CONST_ENTIDS][0] # remove from list
-
-            exit_idx[cur_process_area] += 1
-            area_totExit-=1 # Countdown to 0"""
             
 
         print("Area len",area_len)
-        D_writeToFile(area_zone,area_len)
+        writeToFile(stg_name,area_zone,area_len)
         exit() ######## TEMP ########
 
 

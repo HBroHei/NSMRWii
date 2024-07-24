@@ -49,7 +49,43 @@ def findExitEnt(zone):
             ret_pos_noExit.append(i)
     return ret_pos,ret_pos_noExit
 
+def findOpenArea(tiles, width=4, height=4):
+    """
+    Finds an open area of the specified width and height in a list of tiles.
 
+    Args:
+        tiles: A list of tiles, each represented as [id, x, y, width, height].
+        width: The desired width of the open area.
+        height: The desired height of the open area.
+
+    Returns:
+        A tuple containing the x and y coordinates of the top-left corner of the open area,
+        or None if no such area is found.
+    
+    By Gemini
+    """
+
+    for y in range(0, max([tile[2] + tile[4] for tile in tiles])):
+        for x in range(0, max([tile[1] + tile[3] for tile in tiles])):
+            # Check if the current position is within any tile
+            if any(
+                x >= tile[1] and x < tile[1] + tile[3] and y >= tile[2] and y < tile[2] + tile[4]
+                for tile in tiles
+            ):
+                continue
+
+            # Check if the area is open
+            if all(
+                any(
+                    x + w >= tile[1] and x < tile[1] + tile[3] and y + h >= tile[2] and y < tile[2] + tile[4]
+                    for tile in tiles
+                )
+                for w in range(width)
+                for h in range(height)
+            ):
+                return x, y
+
+    return None
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos
