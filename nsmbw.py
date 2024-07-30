@@ -255,22 +255,25 @@ class NSMBWEntrances:
         return returnList
     def toByteData(entranceData):
         byteData = b""
-        for i_lis in entranceData:
-            byteData += i_lis[0].to_bytes(2,"big")
-            byteData += i_lis[1].to_bytes(2,"big")
-            byteData += b"\x00\x00\x00\x00"
-            byteData += i_lis[2].to_bytes(1,"big")
-            byteData += i_lis[3].to_bytes(1,"big")
-            byteData += i_lis[4].to_bytes(1,"big")
-            byteData += i_lis[5].to_bytes(1,"big")
-            byteData += b"\x00"
-            byteData += i_lis[6].to_bytes(1,"big")
-            byteData += i_lis[7].to_bytes(1,"big")
-            byteData += i_lis[8].to_bytes(1,"big")
-            byteData += i_lis[9].to_bytes(2,"big")
-            byteData += i_lis[10].to_bytes(1,"big")
-            byteData += i_lis[11].to_bytes(1,"big")
-
+        try:
+            for i_lis in entranceData:
+                byteData += i_lis[0].to_bytes(2,"big")
+                byteData += i_lis[1].to_bytes(2,"big")
+                byteData += b"\x00\x00\x00\x00"
+                byteData += i_lis[2].to_bytes(1,"big")
+                byteData += i_lis[3].to_bytes(1,"big")
+                byteData += i_lis[4].to_bytes(1,"big")
+                byteData += i_lis[5].to_bytes(1,"big")
+                byteData += b"\x00"
+                byteData += i_lis[6].to_bytes(1,"big")
+                byteData += i_lis[7].to_bytes(1,"big")
+                byteData += i_lis[8].to_bytes(1,"big")
+                byteData += i_lis[9].to_bytes(2,"big")
+                byteData += i_lis[10].to_bytes(1,"big")
+                byteData += i_lis[11].to_bytes(1,"big")
+        except OverflowError:
+            print("ERROR: OVERFLOW FOR LIST",entranceData)
+            exit()
         return byteData# + b"\xff\xff"
     
     ############### RANDO #################

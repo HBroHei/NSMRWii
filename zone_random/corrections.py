@@ -52,14 +52,23 @@ def alignToPos(zone,x,y):
         # Check if sprite is door
         if zone["sprites"][i][0] in [182, 259, 276, 277, 278, 452]:
             door_lists.append(i)
+        if zone["sprites"][i][1]<0 or zone["sprites"][i][2]<0:
+            redo_align = ("spr","x",zone["sprites"][i][1]) if zone["sprites"][i][0]<0\
+                else ("spr","y",zone["sprites"][i][2])
 
     # Zones covered above
     for i in range(len(zone["location"])):
         zone["location"][i][0] -= diffx
         zone["location"][i][1] -= diffy
+        if zone["location"][i][0]<0 or zone["location"][i][1]<0:
+            redo_align = ("loc","x",zone["location"][i][0])\
+                if zone["location"][i][1]<0 else ("loc","y",zone["location"][i][1])
     for i in range(len(zone["pathNode"])):
         zone["pathNode"][i][0] -= diffx
         zone["pathNode"][i][1] -= diffy
+        if zone["pathNode"][i][0]<0 or zone["pathNode"][i][1]<0:
+            redo_align = ("pathNode","x",zone["pathNode"][i][0])\
+                if zone["pathNode"][i][0]<0 else ("pathNode","y",zone["pathNode"][i][1])
 
     # Tiles section
     diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
@@ -70,6 +79,8 @@ def alignToPos(zone,x,y):
         for i in range(len(zone[curLayerStr])):
             zone[curLayerStr][i][1] -= diffx_tiles
             zone[curLayerStr][i][2] -= diffy_tiles
+
+    redo_align = tuple()
 
     # SPECIAL: need to align entrances to specific pos
     # Boss doors: half a tile
@@ -107,7 +118,21 @@ def alignToPos(zone,x,y):
             if zone["entrance"][i][1]%16 != 0:
                 zone["entrance"][i][1] -= 8
 
-    return zone
+        # Final check: check negative positions
+        if zone["entrance"][i][0]<0 or zone["entrance"][i][1]<0:
+            print("OOB ALIGN", zone["entrance"][i][0], zone["entrance"][i][1])
+            redo_align = ("entrance","x",zone["entrance"][i][0]) if zone["entrance"][i][0]<0\
+                else ("entrance","y",zone["entrance"][i][1])
+    # Redo aligning if negative value
+    if len(redo_align)!=0:
+        if redo_align[1]=="x":
+            print("Realigning X",redo_align,(redo_align[2]*-2))
+            return alignToPos(zone,x+(redo_align[2]*-2),y) # Realign x pos
+        else:
+            print("Realigning Y",redo_align,(redo_align[2]*-2))
+            return alignToPos(zone,x,y+(redo_align[2]*-2)) # Realign y pos
+    else:
+        return zone
 
 # Correct incorrect sprite zone id
 ### USE AFTER corrDupID as it relies on zone ID ###
@@ -130,9 +155,13 @@ def generate_unique_id(used_ids):
 
 def update_references(data_list, position, old_id, new_id):
     #item[position] = (new_id for item in data_list if item[position] == old_id else item[position])
-    for item in data_list:
-        if item[position] == old_id:
-            item[position] = new_id
+    if isinstance(data_list[0],list):
+        for item in data_list:
+            if item[position] == old_id:
+                item[position] = new_id
+    else:
+        if data_list[position] == old_id:
+            data_list[position] = new_id
 
 def corrDupID(areaNo,zone):
     re_zone = zone
@@ -170,10 +199,13 @@ def corrDupID(areaNo,zone):
             except KeyError:
                 # No id needed to replace - skip
                 continue
+            references = tuple()
             try:
                 references = ID_REF_LOOKUP[key_prop]
+                print("Reference Found:",references)
             except KeyError:
                 # May not have ref
+                print("Info: Cannot find ref",key_prop)
                 pass
             if not isinstance(zone_prop_lst[0],list): # Should be "zone"
                 cur_id = zone_prop_lst[6]
@@ -181,7 +213,7 @@ def corrDupID(areaNo,zone):
                     # Check in duplicated list
                     if cur_id in used_ids[areaNo][key_prop]:
                         print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
-                        new_id = generate_unique_id(used_ids)
+                        new_id = generate_unique_id(used_ids[areaNo][key_prop])
                         zone_prop[id_position] = new_id
                         for ref_key, ref_pos in references:
                             if ref_key in re_zone:
@@ -201,9 +233,11 @@ def corrDupID(areaNo,zone):
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
                             print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
-                            new_id = generate_unique_id(used_ids)
+                            new_id = generate_unique_id(used_ids[areaNo][key_prop])
                             zone_prop[id_position] = new_id
-                            for ref_key, ref_pos in references:
+                            if references!=tuple():
+                                print("Reference",references,re_zone[references[0]])
+                                ref_key, ref_pos = references
                                 if ref_key in re_zone:
                                     update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
                     except KeyError:

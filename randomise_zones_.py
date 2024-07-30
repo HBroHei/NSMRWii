@@ -72,15 +72,16 @@ def addRandomZone(tilesetList:list,types:list):
         # TODO Alright the statements below are repeated, but I am not bothering with it now.
         overlap_zone_no = checks.checkPosInZone(area_zone[0], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
-            overlap_zone = area_zone[overlap_zone_no]
+            overlap_zone = area_zone[0][overlap_zone_no]["zone"]
             new_x = 512
             new_y = 512
-            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
-            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            y_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            x_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
             if x_tot > y_tot: # Horizontal zone
                 new_y = overlap_zone[1]+overlap_zone[3]+480
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
+            print("Is X , Y",x_tot,y_tot)
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
         generated_zone = corrections.corrDupID(0,generated_zone)
@@ -94,15 +95,16 @@ def addRandomZone(tilesetList:list,types:list):
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
             if overlap_zone_no!=-1:
-                overlap_zone = area_zone[overlap_zone_no]
+                overlap_zone = area_zone[1][overlap_zone_no]["zone"]
                 new_x = 512
                 new_y = 512
-                x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
-                y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+                y_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+                x_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
                 if x_tot > y_tot: # Horizontal zone
                     new_y = overlap_zone[1]+overlap_zone[3]+480
                 if x_tot < y_tot: # Vertical zone
                     new_x = overlap_zone[0]+overlap_zone[2]+480
+                print("Is X , Y",x_tot,y_tot)
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
         try:
@@ -118,15 +120,16 @@ def addRandomZone(tilesetList:list,types:list):
     elif gen_zone_tileset==area_tileset[2]: # Area 3
         overlap_zone_no = checks.checkPosInZone(area_zone[2], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
-            overlap_zone = area_zone[overlap_zone_no]
+            overlap_zone = area_zone[2][overlap_zone_no]["zone"]
             new_x = 512
             new_y = 512
-            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
-            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            y_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            x_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
             if x_tot > y_tot: # Horizontal zone
                 new_y = overlap_zone[1]+overlap_zone[3]+480
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
+            print("Is X , Y",x_tot,y_tot)
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
         try:
@@ -142,15 +145,16 @@ def addRandomZone(tilesetList:list,types:list):
     else: # Esort to Area 4 I guess
         overlap_zone_no = checks.checkPosInZone(area_zone[3], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
-            overlap_zone = area_zone[overlap_zone_no]
+            overlap_zone = area_zone[3][overlap_zone_no]["zone"]
             new_x = 512
             new_y = 512
-            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
-            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            y_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            x_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
             if x_tot > y_tot: # Horizontal zone
                 new_y = overlap_zone[1]+overlap_zone[3]+480
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
+            print("Is X , Y",x_tot,y_tot)
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
         try:
@@ -172,7 +176,7 @@ def getRandomZone(tilesetName:str, zone_type:str) -> dict:
     # zone_json_idx = 0
     # print(len(groupTilesetJson[area1_tileset][zone_ent_type]))
     return_zone = groupTilesetJson[tilesetName][zone_type][zone_json_idx]
-    del groupTilesetJson[tilesetName][zone_type][zone_json_idx] # Remove added zone
+    #del groupTilesetJson[tilesetName][zone_type][zone_json_idx] # Remove added zone
     return return_zone
 
 def getRandomTileset(tilesetList:list):
@@ -349,6 +353,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     returnARC = u8_m.repackToBytes(u8_dict)
     with open("./Stage_output/" + lvlName, 'wb') as f:
         f.write(returnARC)
+    print("============= Processed",lvlName,"=================")
 
 def main():
     global inJson, zoneAddedNo, area_zone, entrance_list, area_enterable_count, area_nonenterable_count
@@ -426,7 +431,7 @@ def main():
     stg_i = 0
     while stg_i<len(stg_lst):
         stg_name = stg_lst[stg_i]
-        print("Processing",stg_name)
+        print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture":
             continue # Skip that folder
 
@@ -464,6 +469,11 @@ def main():
 
             exit_zone = deepcopy(generated_exit_zone)
             print("[D] Exit zone =",exit_zone["zone"])
+            # Change Flagpole type to normal
+            exit_spr,exit_spr_pos = checks.checkExitSprite(exit_zone)
+            if exit_spr[0]==113:
+                exit_zone["sprites"][exit_spr_pos][3] = b"\x00\x00\x00\x00\x00\x00"
+                print("Changed Flagpole")
             exit_tileset = deepcopy(gen_exit_zone_tileset)
             # Check for overlap with zones
             if exit_tileset==area_tileset[0]:
@@ -472,12 +482,13 @@ def main():
                     overlap_zone = area_zone[0][overlap_zone_no]["zone"]
                     new_x = 512
                     new_y = 512
-                    x_tot = overlap_zone[1]+overlap_zone[3]+64+exit_zone["zone"][3]
-                    y_tot = overlap_zone[0]+overlap_zone[2]+64+exit_zone["zone"][2]
+                    y_tot = overlap_zone[1]+overlap_zone[3]+64+exit_zone["zone"][3]
+                    x_tot = overlap_zone[0]+overlap_zone[2]+64+exit_zone["zone"][2]
                     if x_tot > y_tot: # Horizontal zone
                         new_y = overlap_zone[1]+overlap_zone[3]+480
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
+                    print("Is X , Y",x_tot,y_tot)
 
                     exit_zone = corrections.alignToPos(exit_zone,new_x,new_y)
                 # Check and correct duplicated zones
@@ -525,17 +536,18 @@ def main():
             # Check for overlap with zones
             if main_tileset==area_tileset[0]:
                 # TODO Alright the statements below are repeated, but I am not bothering with it now.
-                overlap_zone_no = checks.checkPosInZone(area_zone[0], main_zone["zone"][1:3], *main_zone["zone"][3:5])
+                overlap_zone_no = checks.checkPosInZone(area_zone[0], main_zone["zone"][0:2], *main_zone["zone"][2:4])
                 if overlap_zone_no!=-1:
                     overlap_zone = area_zone[0][overlap_zone_no]["zone"]
                     new_x = 512
                     new_y = 512
-                    x_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
-                    y_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
+                    y_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
+                    x_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
                     if x_tot > y_tot: # Horizontal zone
                         new_y = overlap_zone[1]+overlap_zone[3]+480
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
+                    print("Is X , Y",x_tot,y_tot)
                     main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(0,main_zone)
@@ -545,17 +557,18 @@ def main():
                 # Add entrances in zone to list of entrances
                 addEntranceData(0,main_zone)
             elif main_tileset==area_tileset[1]:
-                overlap_zone_no = checks.checkPosInZone(area_zone[1], *main_zone["zone"][0:4])
+                overlap_zone_no = checks.checkPosInZone(area_zone[1], main_zone["zone"][0:2],*main_zone["zone"][2:4])
                 if overlap_zone_no!=-1:
                     overlap_zone = area_zone[0][overlap_zone_no]["zone"]
                     new_x = 512
                     new_y = 512
-                    x_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
-                    y_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
+                    y_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
+                    x_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
                     if x_tot > y_tot: # Horizontal zone
                         new_y = overlap_zone[1]+overlap_zone[3]+480
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
+                    print("Is X , Y",x_tot,y_tot)
                     main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(1,main_zone)
@@ -658,7 +671,13 @@ def main():
             start_over = False
             continue
         
+        #############################################
+        ### END OF GENERATING ZONE FOR THIS LEVEL ###
+        #############################################
 
+        #############################################
+        ######## START RANDOMISING ENTRANCES ########
+        #############################################
 
         print("Nonenterable list",area_nonenterable_count)
         print("   enterable list",area_enterable_count)
@@ -668,7 +687,7 @@ def main():
             # First is Area 1 (0), which is always the spawn of the level
             cur_start_area = 0
             cur_start_zone = 0
-            cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][-1]
+            #cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][-1]
             processed_enterable_id = [
                 [[] for _ in range(len(entrance_list[0]))],
                 [[] for _ in range(len(entrance_list[1]))],
@@ -771,9 +790,10 @@ def main():
         # Well, I wasted my time I guess
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
-        exit() ######## TEMP ########
+        print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
+        #exit() ######## TEMP ########
 
-
+    exit()
     ################# OLD CODES ###################
     for areaNo in inJson[levelToImport].keys():
         for zoneNo in inJson[levelToImport][areaNo].keys():
