@@ -138,8 +138,8 @@ def corrDupID(areaNo,zone):
     re_zone = zone
 
     # for cur_dict in area:
-    for key, value in re_zone.items():
-        if isinstance(value, list) and len(value) > 0:
+    for key_prop, zone_prop_lst in re_zone.items():
+        if isinstance(zone_prop_lst, list) and len(zone_prop_lst) > 0:
             """
                 if key == "bound":
                     id_position = 4
@@ -166,38 +166,58 @@ def corrDupID(areaNo,zone):
                     continue
                 """
             try:
-                id_position = ID_POS_LOOKUP[key]
+                id_position = ID_POS_LOOKUP[key_prop]
             except KeyError:
                 # No id needed to replace - skip
                 continue
             try:
-                references = ID_REF_LOOKUP[key]
+                references = ID_REF_LOOKUP[key_prop]
             except KeyError:
                 # May not have ref
                 pass
-            for item in value:
-                cur_id = item[id_position]
+            if not isinstance(zone_prop_lst[0],list): # Should be "zone"
+                cur_id = zone_prop_lst[6]
                 try:
                     # Check in duplicated list
-                    if cur_id in used_ids[areaNo][key]:
-                        print("duplicated",key,cur_id,used_ids[areaNo][key])
+                    if cur_id in used_ids[areaNo][key_prop]:
+                        print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
                         new_id = generate_unique_id(used_ids)
-                        item[id_position] = new_id
+                        zone_prop[id_position] = new_id
                         for ref_key, ref_pos in references:
                             if ref_key in re_zone:
                                 update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
                 except KeyError:
                     # No set found - no duplicates
-                    used_ids[areaNo][key] = set()
-                addID(key,value)
+                    used_ids[areaNo][key_prop] = set()
+                try:
+                    used_ids[areaNo][key_prop].add(cur_id)
+                except KeyError:
+                    used_ids[areaNo][key_prop] = set()
+                    used_ids[areaNo][key_prop].add(cur_id)
+            else: # Anything other than "zone" prop
+                for zone_prop in zone_prop_lst:
+                    cur_id = zone_prop[id_position]
+                    try:
+                        # Check in duplicated list
+                        if cur_id in used_ids[areaNo][key_prop]:
+                            print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
+                            new_id = generate_unique_id(used_ids)
+                            zone_prop[id_position] = new_id
+                            for ref_key, ref_pos in references:
+                                if ref_key in re_zone:
+                                    update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
+                    except KeyError:
+                        # No set found - no duplicates
+                        used_ids[areaNo][key_prop] = set()
+                    addID(areaNo,key_prop,zone_prop_lst)
 
     return re_zone
 
 # Alright but these are written by myself okay?
 # Add the IDs to the list of repeated IDs
-def addID(areaNo,key,item):
+def addID(areaNo,key,zone_prop_lst):
     id_position = ID_POS_LOOKUP[key]
-    for item in item:
+    for item in zone_prop_lst:
         cur_id = item[id_position]
         try:
             used_ids[areaNo][key].add(cur_id)

@@ -46,8 +46,14 @@ def addEntranceData(areaNo : int, zoneToFind:list):
         "enterable" : allEnt,
         "nonenterable" : allNonEnt
     })
+    # print("2. Area",areaNo,"Enterables:",area_enterable_count[areaNo])
+    # print("2. Area",areaNo,"Nonenterables:",area_nonenterable_count[areaNo])
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
+    # print("1. Area",areaNo,"Enterables:",allEnt)
+    # print("1. Area",areaNo,"Nonenterables:",allNonEnt)
+    # print("2. Area",areaNo,"Enterables:",area_enterable_count[areaNo])
+    # print("2. Area",areaNo,"Nonenterables:",area_nonenterable_count[areaNo])
 
 # Adds a zone to the level
 def addRandomZone(tilesetList:list,types:list):
@@ -55,72 +61,105 @@ def addRandomZone(tilesetList:list,types:list):
     print("Determine extra")
     # Need an exit zone, and a "main" zone
     generated_zone, gen_zone_tileset, gen_zone_type = genZone(tilesetList,types)
+    if generated_zone==None:
+        print("Cannot find suitable zone")
+        return None,None,None
     print("[D] Extra zone =",generated_zone["zone"])
     zoneAddedNo += 1
+    gen_zone_prop = generated_zone["zone"]
     # Check for overlap with zones
     if gen_zone_tileset==area_tileset[0]:
         # TODO Alright the statements below are repeated, but I am not bothering with it now.
-        overlap_zone_no = checks.checkPosInZone(area_zone[0], *generated_zone[0:4])
+        overlap_zone_no = checks.checkPosInZone(area_zone[0], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
-            if (overlap_zone[0]+overlap_zone[2]+64+generated_zone[2])>16000: # Should be a horizontal zone
-                new_y = overlap_zone[1]+overlap_zone[3]+64
-            if (overlap_zone[1]+overlap_zone[3]+64+generated_zone[3])>7800: # Should be a vertical zone
-                # Both if statement needs to run in case of full area (To be implemented)
-                new_x = overlap_zone[0]+overlap_zone[2]+64
+            new_x = 512
+            new_y = 512
+            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            if x_tot > y_tot: # Horizontal zone
+                new_y = overlap_zone[1]+overlap_zone[3]+480
+            if x_tot < y_tot: # Vertical zone
+                new_x = overlap_zone[0]+overlap_zone[2]+480
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
-        generated_zone = corrections.corrDupID(generated_zone)
+        generated_zone = corrections.corrDupID(0,generated_zone)
         generated_zone = corrections.corrSprZone(generated_zone)
         generated_zone["type"] = "main"
         area_zone[0].append(generated_zone)
 
         return 0, gen_zone_tileset, gen_zone_type
     elif gen_zone_tileset==area_tileset[1]:
-        overlap_zone_no = checks.checkPosInZone(area_zone[1], *generated_zone[0:4])
+        overlap_zone_no = checks.checkPosInZone(area_zone[1], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
-            if (overlap_zone[0]+overlap_zone[2]+64+generated_zone[2])>16000: # Should be a horizontal zone
-                new_y = overlap_zone[1]+overlap_zone[3]+64
-            if (overlap_zone[1]+overlap_zone[3]+64+generated_zone[3])>7800: # Should be a vertical zone
-                # Both if statement needs to run in case of full area (To be implemented)
-                new_x = overlap_zone[0]+overlap_zone[2]+64
+            if overlap_zone_no!=-1:
+                overlap_zone = area_zone[overlap_zone_no]
+                new_x = 512
+                new_y = 512
+                x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+                y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+                if x_tot > y_tot: # Horizontal zone
+                    new_y = overlap_zone[1]+overlap_zone[3]+480
+                if x_tot < y_tot: # Vertical zone
+                    new_x = overlap_zone[0]+overlap_zone[2]+480
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
-        generated_zone = corrections.corrDupID(generated_zone)
-        generated_zone = corrections.corrSprZone(generated_zone)
+        try:
+            generated_zone = corrections.corrDupID(1,generated_zone)
+            generated_zone = corrections.corrSprZone(generated_zone)
+        except IndexError:
+            # May be newly geneerated area, pass
+            area_len+=1
+            pass
         area_zone[1].append(generated_zone)
 
         return 1, gen_zone_tileset, gen_zone_type
     elif gen_zone_tileset==area_tileset[2]: # Area 3
-        overlap_zone_no = checks.checkPosInZone(area_zone[2], *generated_zone[0:4])
+        overlap_zone_no = checks.checkPosInZone(area_zone[2], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
-            if (overlap_zone[0]+overlap_zone[2]+64+generated_zone[2])>16000: # Should be a horizontal zone
-                new_y = overlap_zone[1]+overlap_zone[3]+64
-            if (overlap_zone[1]+overlap_zone[3]+64+generated_zone[3])>7800: # Should be a vertical zone
-                # Both if statement needs to run in case of full area (To be implemented)
-                new_x = overlap_zone[0]+overlap_zone[2]+64
+            new_x = 512
+            new_y = 512
+            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            if x_tot > y_tot: # Horizontal zone
+                new_y = overlap_zone[1]+overlap_zone[3]+480
+            if x_tot < y_tot: # Vertical zone
+                new_x = overlap_zone[0]+overlap_zone[2]+480
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
-        generated_zone = corrections.corrDupID(generated_zone)
-        generated_zone = corrections.corrSprZone(generated_zone)
+        try:
+            generated_zone = corrections.corrDupID(2,generated_zone)
+            generated_zone = corrections.corrSprZone(generated_zone)
+        except IndexError:
+            # May be newly geneerated area, pass
+            area_len+=1
+            pass
         area_zone[2].append(generated_zone)
 
         return 2, gen_zone_tileset, gen_zone_type
     else: # Esort to Area 4 I guess
-        overlap_zone_no = checks.checkPosInZone(area_zone[3], *generated_zone[0:4])
+        overlap_zone_no = checks.checkPosInZone(area_zone[3], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
-            if (overlap_zone[0]+overlap_zone[2]+64+generated_zone[2])>16000: # Should be a horizontal zone
-                new_y = overlap_zone[1]+overlap_zone[3]+64
-            if (overlap_zone[1]+overlap_zone[3]+64+generated_zone[3])>7800: # Should be a vertical zone
-                # Both if statement needs to run in case of full area (To be implemented)
-                new_x = overlap_zone[0]+overlap_zone[2]+64
+            new_x = 512
+            new_y = 512
+            x_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
+            y_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
+            if x_tot > y_tot: # Horizontal zone
+                new_y = overlap_zone[1]+overlap_zone[3]+480
+            if x_tot < y_tot: # Vertical zone
+                new_x = overlap_zone[0]+overlap_zone[2]+480
             generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
         # Check and correct duplicated zones
-        generated_zone = corrections.corrDupID(generated_zone)
-        generated_zone = corrections.corrSprZone(generated_zone)
+        try:
+            generated_zone = corrections.corrDupID(3,generated_zone)
+            generated_zone = corrections.corrSprZone(generated_zone)
+        except IndexError:
+            # May be newly geneerated area, pass
+            area_len+=1
+            pass
         area_zone[3].append(generated_zone)
 
         return 3, gen_zone_tileset, gen_zone_type
@@ -160,13 +199,19 @@ def checkDictListEmpty(d:dict,lst:list):
 def genZone(tilesetList:list,types:list):
     cur_tileset = getRandomTileset(tilesetList)
     #area_tileset[0] = "Pa0_jyotyuPa1_daishizen" ### DEBUG
+    rep_counts = 0
 
     # Prevent:
     # - area without an entrance
     # - no suitable place to place the zone
-    while checkDictListEmpty(groupTilesetJson[cur_tileset],types) or\
-        (cur_tileset not in area_tileset and "" not in area_tileset):
+    while (checkDictListEmpty(groupTilesetJson[cur_tileset],types) or\
+        (cur_tileset not in area_tileset and "" not in area_tileset)) and\
+        rep_counts <= 100: # Failsafe, a hacky one
         cur_tileset = getRandomTileset(tilesetList)
+        rep_counts+=1
+    
+    if rep_counts>100:
+        return None,None,None
     
     # Check for only 1 specific entrance zone type
     # TODO Below unfinished
@@ -207,13 +252,42 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         areaRawSettings = []
         tileData = [[],[],[]]
         loadSprList = []
+
+        # A bunch of config
+        zone_bound = b""
+        top_bg = []
+        bot_bg = []
+        ent_lst = []
+        spr_lst = []
+        zone_lst = []
+        loc_lst = []
+        cam_lst = []
+        path_node_lst = []
+        path_lst = []
+
         for zoneNo in range(0,len(areaData)):
             print("[D] outputting area",area_i,"zone",zoneNo)
             cur_zone = areaData[zoneNo]
+            loadSprList += nsmbw.NSMBWLoadSprite.addLoadSprites(cur_zone["sprites"])
             if areaRawSettings==[]: # Area First-timer, add configs
-                loadSprList += nsmbw.NSMBWLoadSprite.addLoadSprites(cur_zone["sprites"])
+                print("[D] Adding configs")
+                
                 pass
             ## finished adding config
+            # Add properties
+            zone_bound += cur_zone["ZoneBound"]
+            top_bg += cur_zone["topBackground"]
+            bot_bg += cur_zone["bottomBackground"]
+            ent_lst += cur_zone["entrance"]
+            spr_lst += cur_zone["sprites"]
+            zone_lst.append(cur_zone["zone"])
+            loc_lst += cur_zone["location"]
+            if cur_zone["cameraProfile"]!=[]:
+                cam_lst.append(cur_zone["cameraProfile"])
+            # path_node_lst += cur_zone["pathNode"]
+            # path_lst += cur_zone["path"]
+            # TODO Add them to file
+
             # Add tiles data
             for i in range(0,2): # Loop through each layer
                 if "bgdatL"+str(i) in cur_zone.keys():
@@ -231,16 +305,16 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         #print(cur_zone["tileset"])
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(cur_zone["tileset"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(cur_zone["AreaSetting"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(cur_zone["ZoneBound"])) # TODO Convert this to list if needed
+        areaRawSettings.append(nsmbw.generateSectionDef(zone_bound)) # TODO Convert this to list if needed
         areaRawSettings.append(nsmbw.generateSectionDef(cur_zone["AreaSetting2"]))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(cur_zone["topBackground"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(cur_zone["bottomBackground"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(cur_zone["entrance"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWsprite.toByteData(cur_zone["sprites"])))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(top_bg)))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(bot_bg)))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(ent_lst)))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWsprite.toByteData(spr_lst)))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLoadSprite.toByteData(loadSprList)))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZones.toByteData([cur_zone["zone"]])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLocations.toByteData(cur_zone["location"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWCamProfile.toByteData(cur_zone["cameraProfile"])))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZones.toByteData(zone_lst)))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLocations.toByteData(loc_lst)))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWCamProfile.toByteData(cam_lst)))
         # areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathProperties.toByteData(cur_zone["path"])))
         # areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathNode.toByteData(cur_zone["pathNode"])))
         # Path: Special processing
@@ -277,7 +351,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         f.write(returnARC)
 
 def main():
-    global inJson, zoneAddedNo, area_zone, entrance_list
+    global inJson, zoneAddedNo, area_zone, entrance_list, area_enterable_count, area_nonenterable_count
     with open('out.json', 'r') as f:
         json_orginal = json.load(f)
     inJson = convertToDict(json_orginal)
@@ -303,24 +377,9 @@ def main():
                 groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
 
                 # Check zone has exit / entrances
-                """
-                    Sprite IDs:
-                    203 Chest
-                    113 Goal Pole
-                    434 World Cannon
-                    412 1UP Ballon Toad Hse
-                    428 Panel Toad Hse
-                    211 BJr 1st fight
-                    363 Tower Boss
-                    383 Kamek
-                    405 BJr 2nd fight
-                    406 BJr 3rd fight
-                    407 Castle Boss
-                    479 Final switch
-                """
-                exit_flag = checks.checkExitSprite(cur_zone)
+                exit_flag,_dum = checks.checkExitSprite(cur_zone)
                 ent_flag = checks.checkEntSpawn(cur_zone)
-                boss_flag = checks.checkBossSprite(cur_zone)
+                boss_flag,_dum = checks.checkBossSprite(cur_zone)
                 oneent_flag = checks.checkOnlyOneEnt(cur_zone)
                 # Add the zone to its category
                 if boss_flag==-1:
@@ -363,21 +422,32 @@ def main():
     totNoNonEnt = 0 # Total number of non-enterables
     # copy dict template for addedZone
     addedZone = deepcopy(groupTilesetJson)
-    for stg_name in read_config.listdir("./Stage_temp/"):
+    stg_lst = read_config.listdir("./Stage_temp/")
+    stg_i = 0
+    while stg_i<len(stg_lst):
+        stg_name = stg_lst[stg_i]
         print("Processing",stg_name)
         if stg_name=="Texture":
             continue # Skip that folder
 
         entrance_list = [[],[],[],[]] # entrance_list[area_no][zone_no]["enterable"|"nonenterable"], no need to complicated things
+        area_enterable_count = [0,0,0,0]
+        area_nonenterable_count = [0,0,0,0] 
         area_zone = [[],[],[],[]]
         area_zone_size = [[],[],[],[]]
         area_tileset = ["","","",""]
         area_len = 1
         only_main = False
+        have_secret = stg_name in read_config.secret_exit
 
         # Generate the entrance zone
         generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(tilesetList,["full","entrance"])
-        spawn_zone = deepcopy(generated_ent_zone)    
+        #genZone(tilesetList,["full","entrance"])
+        if have_secret and gen_ent_zone_type=="full": # If have secret and type full, check whether spawn zone has 2 or more enterables
+            while len(checks.findExitEnt(generated_ent_zone)[0])<1:
+                generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(tilesetList,["full","entrance"])
+        
+        spawn_zone = deepcopy(generated_ent_zone)
         
         print("[D] Entrance Data",spawn_zone["entrance"])
 
@@ -397,23 +467,29 @@ def main():
             exit_tileset = deepcopy(gen_exit_zone_tileset)
             # Check for overlap with zones
             if exit_tileset==area_tileset[0]:
-                overlap_zone_no = checks.checkPosInZone(area_zone[0], *exit_zone[0:4])
+                overlap_zone_no = checks.checkPosInZone(area_zone[0], exit_zone["zone"][1:3], *exit_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
-                    overlap_zone = area_zone[overlap_zone_no]
-                    if (overlap_zone[0]+overlap_zone[2]+64+exit_zone[2])>16000: # Should be a horizontal zone
-                        new_y = overlap_zone[1]+overlap_zone[3]+64
-                    if (overlap_zone[1]+overlap_zone[3]+64+exit_zone[3])>7800: # Should be a vertical zone
-                        # Both if statement needs to run in case of full area (To be implemented)
-                        new_x = overlap_zone[0]+overlap_zone[2]+64
-                    exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((new_x,new_y)))
+                    overlap_zone = area_zone[0][overlap_zone_no]["zone"]
+                    new_x = 512
+                    new_y = 512
+                    x_tot = overlap_zone[1]+overlap_zone[3]+64+exit_zone["zone"][3]
+                    y_tot = overlap_zone[0]+overlap_zone[2]+64+exit_zone["zone"][2]
+                    if x_tot > y_tot: # Horizontal zone
+                        new_y = overlap_zone[1]+overlap_zone[3]+480
+                    if x_tot < y_tot: # Vertical zone
+                        new_x = overlap_zone[0]+overlap_zone[2]+480
+
+                    exit_zone = corrections.alignToPos(exit_zone,new_x,new_y)
                 # Check and correct duplicated zones
-                exit_zone = corrections.corrDupID(exit_zone)
+                exit_zone = corrections.corrDupID(0,exit_zone)
                 exit_zone = corrections.corrSprZone(exit_zone)
                 area_zone[0].append(exit_zone)
                 # Add entrances of this zone to known entrances list
                 addEntranceData(0,exit_zone)
                 normal_exit_area_id = 0
                 normal_exit_zone_id = len(area_zone[0])-1
+                print("AREA ZONE 0",area_zone[0][0]["zone"])
+                print("AREA ZONE 0",exit_zone["zone"])
             else:
                 exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((32,32)))
                 area_zone[1].append(exit_zone)
@@ -437,38 +513,52 @@ def main():
 
             # Gets the random zone
             main_zone = getRandomZone(main_tileset,"normal")
+            if have_secret: # If have secret, check whether main_zone has 2 or more enterables
+                while len(checks.findExitEnt(main_zone)[0])<2:
+                    main_tileset = getRandomTileset(tilesetList)
+                    # Prevent area without exit
+                    while len(groupTilesetJson[main_tileset]["normal"])==0:
+                        main_tileset = getRandomTileset(tilesetList)
+                    main_zone = getRandomZone(main_tileset,"normal")
+                
             print("[D] Main zone =",main_zone["zone"])
             # Check for overlap with zones
             if main_tileset==area_tileset[0]:
                 # TODO Alright the statements below are repeated, but I am not bothering with it now.
-                overlap_zone_no = checks.checkPosInZone(area_zone[0], *main_zone[0:4])
+                overlap_zone_no = checks.checkPosInZone(area_zone[0], main_zone["zone"][1:3], *main_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
-                    overlap_zone = area_zone[overlap_zone_no]
-                    if (overlap_zone[0]+overlap_zone[2]+64+main_zone[2])>16000: # Should be a horizontal zone
-                        new_y = overlap_zone[1]+overlap_zone[3]+64
-                    if (overlap_zone[1]+overlap_zone[3]+64+exit_zone[3])>7800: # Should be a vertical zone
-                        # Both if statement needs to run in case of full area (To be implemented)
-                        new_x = overlap_zone[0]+overlap_zone[2]+64
+                    overlap_zone = area_zone[0][overlap_zone_no]["zone"]
+                    new_x = 512
+                    new_y = 512
+                    x_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
+                    y_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
+                    if x_tot > y_tot: # Horizontal zone
+                        new_y = overlap_zone[1]+overlap_zone[3]+480
+                    if x_tot < y_tot: # Vertical zone
+                        new_x = overlap_zone[0]+overlap_zone[2]+480
                     main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
                 # Check and correct duplicated zones
-                main_zone = corrections.corrDupID(main_zone)
+                main_zone = corrections.corrDupID(0,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
                 main_zone["type"] = "main"
                 area_zone[0].append(main_zone)
                 # Add entrances in zone to list of entrances
                 addEntranceData(0,main_zone)
             elif main_tileset==area_tileset[1]:
-                overlap_zone_no = checks.checkPosInZone(area_zone[1], *main_zone[0:4])
+                overlap_zone_no = checks.checkPosInZone(area_zone[1], *main_zone["zone"][0:4])
                 if overlap_zone_no!=-1:
-                    overlap_zone = area_zone[overlap_zone_no]
-                    if (overlap_zone[0]+overlap_zone[2]+64+main_zone[2])>16000: # Should be a horizontal zone
-                        new_y = overlap_zone[1]+overlap_zone[3]+64
-                    if (overlap_zone[1]+overlap_zone[3]+64+exit_zone[3])>7800: # Should be a vertical zone
-                        # Both if statement needs to run in case of full area (To be implemented)
-                        new_x = overlap_zone[0]+overlap_zone[2]+64
+                    overlap_zone = area_zone[0][overlap_zone_no]["zone"]
+                    new_x = 512
+                    new_y = 512
+                    x_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
+                    y_tot = overlap_zone[0]+overlap_zone[2]+64+main_zone["zone"][2]
+                    if x_tot > y_tot: # Horizontal zone
+                        new_y = overlap_zone[1]+overlap_zone[3]+480
+                    if x_tot < y_tot: # Vertical zone
+                        new_x = overlap_zone[0]+overlap_zone[2]+480
                     main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
                 # Check and correct duplicated zones
-                main_zone = corrections.corrDupID(main_zone)
+                main_zone = corrections.corrDupID(1,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
                 area_zone[1].append(main_zone)
                 # Add entrances in zone to list of entrances
@@ -493,54 +583,82 @@ def main():
         # - Entrances > exit number
         # - have secret exit
         # I believe there is a better wauy to do this, but this will do for now
-        have_secret = stg_name in read_config.secret_exit
+        
         secret_generated = False
         ent_pipes_cand = []
+        print("NONENT:",area_nonenterable_count)
+        print("   ENT:",area_enterable_count)
+        start_over = False
+        secret_generated = not have_secret
         for area_no in range(0,4):
             # GEts a list of non-enterables excluding the current one
             lst_nonent_wo_myself = deepcopy(area_nonenterable_count)
             del lst_nonent_wo_myself[area_no]
-            print("Checking new zone:",lst_nonent_wo_myself,area_enterable_count[area_no])
+            print(area_no,": Checking new zone:",lst_nonent_wo_myself,area_enterable_count[area_no])
             # if the sum of non-enterables < enterable, new zone needed
-            if sum(lst_nonent_wo_myself)<area_enterable_count[area_no]:
+            if sum(lst_nonent_wo_myself)<area_enterable_count[area_no] or\
+                not secret_generated: # Also: if secret exit needed
                 print("NEW ZONE NEEDED, PLEASE ADD CODE HERE")
-                # If there is an secret exit in this level, set type to "exit", "full" otherwise
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
+                print("Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
+                #input()
+                # If there is an secret exit in this level, set type to "exit", and "full" otherwise
+                added_area_no, added_tileset, added_type= addRandomZone(tilesetList,["exit"] if have_secret else ["full"])
+                # added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
+                if added_area_no==None:
+                    # Lets start over
+                    start_over = True
+                    break
+                if have_secret:
+                    # Check if exit type is goal pole
+                    exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1])
+                    if exit_spr[0]==113:
+                        area_zone[added_area_no][-1]["sprites"][exit_spr_pos][3] = b"\x00\x00\x10\x00\x00\x00"
+                        print("Changed Flagpole")
+                    else:
+                        # Delete old exit
+                        area_zone[added_area_no][-1]["sprites"].pop(exit_spr_pos)
+                        # Make a new flag pole
+                        zone_ent_x,zone_ent_y = area_zone[added_area_no][-1]["entrance"][0][0:2]
+                        new_pole = [
+                            113,
+                            zone_ent_x+16,
+                            zone_ent_y,
+                            b"\x00\x00\x10\x00\x00\x00",
+                            exit_spr[4],
+                            exit_spr[5]
+                        ]
+                        area_zone[added_area_no][-1]["sprites"].append(new_pole)
+                        print("ADDED New Flagpole")
                 print("Extra:",added_area_no)
                 print("Extra:",area_zone[added_area_no][-1]["zone"])
-                addEntranceData(area_no,area_zone[added_area_no][-1])
+                addEntranceData(added_area_no,area_zone[added_area_no][-1])
+                secret_exit_area_id = added_area_no
+                secret_exit_zone_id = len(area_zone[added_area_no])
+                print("NEW Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
+
+                # TODO Change pole flag to secret
 
                 secret_generated = True
-            # Checks for static pipes that is candidate for new enterable
-            for zone_check in area_zone[area_no]:
-                for tile in zone_check["bgdatL1"]:
-                    if tile[0] in [65,73,79]:
-                        ent_pipes_cand.append((area_no,tile))
-                # I believe this is the right opportunity to do tile randomisation
-                # Layer 1 matters the most
-                zone_check["bgdatL1"] = nsmbw.NSMBWbgDat.processTiles(zone_check["bgdatL1"])
-        # Check if have secret exit
-        if have_secret and not secret_generated:
-            # Option 1: have pipe candidate(s), only 1 new zone needed
-            if len(ent_pipes_cand)!=0:
-                print("1 ZONE NEEDED FOR SECRET, PLEASE ADD CODE HERE")
-                ent_pipe = choice(ent_pipes_cand)
-                # TODO add entrance
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
-                print("Extra:",added_area_no)
-                print("Extra:",area_zone[added_area_no][-1]["zone"])
-                addEntranceData(area_no,area_zone[added_area_no][-1])
-            # Option 2: Generate 2 exita zones (Last resort)
-            else:
-                print("2 ZONES NEEDED FOR SECRET, PLEASE ADD CODE HERE")
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
-                print("Extra 1:",added_area_no)
-                print("Extra 1:",area_zone[added_area_no][-1]["zone"])
-                addEntranceData(area_no,area_zone[added_area_no][-1])
-                added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
-                print("Extra 2:",added_area_no)
-                print("Extra 2:",area_zone[added_area_no][-1]["zone"])
-                addEntranceData(area_no,area_zone[added_area_no][-1])
+            # # Checks for static pipes that is candidate for new enterable
+            # for zone_check in area_zone[area_no]:
+            #     zone_ent_pos_lst = []
+            #     for zone_ent in zone_check["entrance"]: # Records entrances pos
+            #         zone_ent_pos_lst.append((zone_ent[1],zone_ent[2]))
+            #     for tile in zone_check["bgdatL1"]:
+            #         # Check is tile pipe and does not have entrance obj on it
+            #         # This ONLY Check for upward pipes
+            #         if tile[0] in [65,73,79] and\
+            #             tilePosToObjPos((tile[1],tile[2])) not in zone_ent_pos_lst:
+            #             ent_pipes_cand.append((area_no,tile))
+            #     # I believe this is the right opportunity to do tile randomisation
+            #     # Layer 1 matters the most
+            #     zone_check["bgdatL1"] = nsmbw.NSMBWbgDat.processTiles(zone_check["bgdatL1"])
+        if start_over:
+            print("Cannot find suitable area, starting over")
+            start_over = False
+            continue
+        
+
 
         print("Nonenterable list",area_nonenterable_count)
         print("   enterable list",area_enterable_count)
@@ -551,12 +669,6 @@ def main():
             cur_start_area = 0
             cur_start_zone = 0
             cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][-1]
-            cur_dest_area = -1
-            cur_dest_zone = -1
-            cur_dest_ent_pos = -1
-            prev_start_area = 0
-            prev_start_zone = 0
-            processed_ent_count = 0
             processed_enterable_id = [
                 [[] for _ in range(len(entrance_list[0]))],
                 [[] for _ in range(len(entrance_list[1]))],
@@ -572,17 +684,20 @@ def main():
 
             if only_main:
                 rando_priority_lst = []
+            elif have_secret:
+                rando_priority_lst = [2,1,secret_exit_area_id]
             else:
                 rando_priority_lst = [2,1]
 
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
-            for area_id in range(0,3):
+            for area_id in range(0,4):
+                print("NONENT AREA ID",area_id)
                 for zone_pos in range(0,len(entrance_list[area_id])):
                     nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
 
             # Assign entrances
-            for area_id in range(0,3):
+            for area_id in range(0,4):
                 for zone_pos in range(0,len(area_zone[area_id])):
                     #for zone_info in area_zone[area_id][zone_pos]:
                         for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
@@ -596,7 +711,7 @@ def main():
                             # find random area'
                             # Check if there are priority
                             if len(rando_priority_lst)==0:
-                                area_lists_choice = [0,1,2,3]
+                                area_lists_choice = (0,1,2,3)
                                 dest_area_id = choice(area_lists_choice)
                                 round_count = 0
                                 while dest_area_id==area_id or len(nonent_list[dest_area_id])==0:
@@ -622,16 +737,18 @@ def main():
                                 exit_found = True
                             # 3. Any Area (Last Resort)
                             if not exit_found:
-                                for _area_id in range(0,3):
-                                    if nonent_list[_area_id]:
+                                for _area_id in range(0,4):
+                                    if len(nonent_list[_area_id])!=0:
                                         exit_key = choice(nonent_list[_area_id])
                                         print("3. Area ID", _area_id)
                                         print("3. ENT key",ent_key)
                                         print("3. EXIT key",exit_key)
+                                        print("3. AREA LEN", len(area_zone[_area_id]))
                                         # Set value to exit_key
                                         area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = _area_id+1
                                         area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
                                             area_zone[_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                                        #             Area ID   Zone Pos                  Ent Pos
                                         
                                         nonent_list[_area_id].remove(exit_key)
                                         entrance_assign_list.append(ent_key)
@@ -643,12 +760,15 @@ def main():
                                 print(f"No suitable exit found for entrance: {ent_key}")
                                 # Esort to a random entrance at the exit area
                                 # TODO I wish there is a better way to handle this situation
-                                dest_area_id = 0 if only_main else 1
-                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id
+                                dest_area_id = 0
+                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
                                 area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
                                     choice(area_zone[dest_area_id][0]["entrance"])[2]
             
-
+        stg_i += 1
+        # Why keeping track of area_len when I can just do this?
+        area_len = len([area_add for area_add in area_zone if len(area_add)!=0])
+        # Well, I wasted my time I guess
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         exit() ######## TEMP ########

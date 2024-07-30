@@ -1,17 +1,45 @@
 from copy import deepcopy
 
+"""
+    Sprite IDs:
+    203 Chest
+    113 Goal Pole
+    434 World Cannon
+    412 1UP Ballon Toad Hse
+    428 Panel Toad Hse
+    211 BJr 1st fight
+    363 Tower Boss
+    383 Kamek
+    405 BJr 2nd fight
+    406 BJr 3rd fight
+    407 Castle Boss
+    479 Final switch
+    454 Ambush Controller
+"""
+
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
-    for spr in zone["sprites"]:
+    for i in range(len(zone["sprites"])):
+        spr = zone["sprites"][i]
         if spr[0] in EXIT_SPRITES:
-            return spr
-    return -1
+            return spr,i
+    return -1,-1
 
 def checkBossSprite(zone):
     EXIT_SPRITES = [211,363,383,405,406,407,479]
-    for spr in zone["sprites"]:
+    for i in range(len(zone["sprites"])):
+        spr = zone["sprites"][i]
         if spr[0] in EXIT_SPRITES:
-            return spr
+            return spr,i
+    return -1,-1
+
+# Check for koopalings
+def checkBossChar(zone):
+    BOSS_SPRITES = [189,192,336,337,340,341,344,347,348,349,364,365,372,375,381]
+    for i in len(zone["sprites"]):
+        spr = zone["sprites"][i]
+        if spr[0] in BOSS_SPRITES:
+            return spr,i
     return -1
 
 def checkEntSpawn(zone):
@@ -96,7 +124,7 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
 def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     # for every zone, Check X pos, then Y pos
     for i in range(0,len(zoneData)):
-        zoneDat = zoneData[i]
+        zoneDat = zoneData[i]["zone"]
         if checkPosInSpecificZone(zoneDat,sprPos,width,height):
             return zoneDat[6]
     return -1
