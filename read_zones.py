@@ -139,7 +139,7 @@ def main():
                     if spr[0]==179:
                         ent_179_lst.append(int((spr[3][3] & 0xF0) | (spr[3][5] & 0x0F)))
                 for ent in entrances: # Needs all the entrances 
-                    if ent[2] in ent_179_lst:
+                    if ent[2] in ent_179_lst and ent not in outJson[filename][i][zone[6]]["entrance"]:
                         outJson[filename][i][zone[6]]["entrance"].append(ent)
                         print("Far away entrance detetcted: ent",ent)
 
