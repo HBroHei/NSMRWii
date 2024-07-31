@@ -643,18 +643,21 @@ def main():
                         print("Changed Flagpole")
                     else:
                         # Delete old exit
-                        area_zone[added_area_no][-1]["sprites"].pop(exit_spr_pos)
+                        
                         # Make a new flag pole
                         zone_ent_x,zone_ent_y = area_zone[added_area_no][-1]["entrance"][0][0:2]
                         new_pole = [
                             113,
-                            zone_ent_x+16,
+                            zone_ent_x+40,
                             zone_ent_y,
                             b"\x00\x00\x10\x00\x00\x00",
                             exit_spr[4],
                             exit_spr[5]
                         ]
-                        area_zone[added_area_no][-1]["sprites"].append(new_pole)
+                        area_zone[added_area_no][-1]["sprites"][exit_spr_pos] = new_pole
+                        # Set entrance type to normal
+                        area_zone[added_area_no][-1]["entrance"][0][5] = 20
+                        area_zone[added_area_no][-1]["entrance"][0][1] += 32
                         print("ADDED New Flagpole")
                     # Randomise sprite
                     area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
