@@ -85,7 +85,11 @@ def readAllSettings(raw_setting):
 def main():
     global lvlSetting_arr
 
-    SKIP_LIST = ["Texture","01-41.arc","01-42.arc"]
+    rf = open("config.json")
+    rulesDict = json.loads(rf.read())
+    rf.close()
+
+    SKIP_LIST = rulesDict["Skip Level"]#["Texture","01-41.arc","01-42.arc"]
 
     for filename in listdir("./Stage"):
         if filename in SKIP_LIST:

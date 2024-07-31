@@ -19,7 +19,7 @@ from copy import deepcopy
 
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
-    for i in range(len(zone["sprites"])):
+    for i in range(0,len(zone["sprites"])):
         spr = zone["sprites"][i]
         if spr[0] in EXIT_SPRITES:
             return spr,i
@@ -70,7 +70,7 @@ def findExitEnt(zone):
         print("Finding exit:",zone["entrance"][i][9]&128,zone["entrance"][i][5] in (27,3,4,5,6,16,17,18,19),zone["entrance"][i][5])
         if ((zone["entrance"][i][9]&128)==0 and\
             #((zone["entrance"][i][3]!=0 and zone["entrance"][i][4]!=0) and\
-            zone["entrance"][i][5] in (27,2,3,4,5,6,16,17,18,19)) or\
+            zone["entrance"][i][5] in (27,2,3,4,5,6,15,16,17,18,19)) or\
             (zone["entrance"][i][2] in ent_179):
             ret_pos.append(i)
         else:
@@ -126,5 +126,5 @@ def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     for i in range(0,len(zoneData)):
         zoneDat = zoneData[i]["zone"]
         if checkPosInSpecificZone(zoneDat,sprPos,width,height):
-            return zoneDat[6]
+            return i
     return -1

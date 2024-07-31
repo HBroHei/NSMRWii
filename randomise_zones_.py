@@ -232,7 +232,7 @@ def genZone(tilesetList:list,types:list):
     #zone_ent_type = "full" ### DEBUG
 
     # Add the entrance zone
-    ret_zone = getRandomZone(cur_tileset, zone_ent_type)
+    ret_zone = deepcopy(getRandomZone(cur_tileset, zone_ent_type))
     #area_zone[0].append(ret_zone)
 
     # Adjust coordinates relative to the new level
@@ -248,6 +248,7 @@ def genZone(tilesetList:list,types:list):
 
 def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     no_of_areas = 0
+    u8_files_list = []
     # List always starts with 0, so +1 needed
     for area_i in range(1,areaNo+1):
         area_arr_i = area_i-1 # To be used in lists
@@ -365,7 +366,8 @@ def main():
     for key_lvl in inJson:
         for key_area in inJson[key_lvl]:
             for key_zone in inJson[key_lvl][key_area]:
-                cur_zone = inJson[key_lvl][key_area][key_zone]
+                cur_zone = deepcopy(inJson[key_lvl][key_area][key_zone])
+                cur_zone["orgLvl"] = key_lvl
                 cur_tileset_str = "".join([ba.decode() for ba in cur_zone["tileset"]]) # All tilesets
                 # Add key to dict if dict does not have the key
                 if cur_tileset_str not in groupTilesetJson.keys():
@@ -400,10 +402,13 @@ def main():
                         groupTilesetJson[cur_tileset_str]["normal"].append(cur_zone)
                 else:
                     groupTilesetJson[cur_tileset_str]["exit"].append(cur_zone)
+                    # if key_lvl=="01-24.arc":
+                    #         print("SPRITES",groupTilesetJson[cur_tileset_str]["exit"][-1]["sprites"])
+                    #         print("Get back this val by groupTilesetJson["\
+                    #               + cur_tileset_str + "][\"exit\"][" + str(len(groupTilesetJson[cur_tileset_str]["exit"])-1) + "][\"sprites\"]")
+                    #         input()
     # print(groupTilesetJson["Pa0_jyotyuPa1_noharaPa2_doukutu"]["full"][1])
     # These will always be area 1, with exit zone as zone 0 in the level
-    # TODO need to somehow equally divide each zones for all levels. Hoo boy
-
     """
         FOR EACH LEVEL
         1. Randomise and determine Area 1 tileset (will be Entrance and exit)
@@ -415,16 +420,10 @@ def main():
         7. Fill out rest of entrance / exit randomly (Create another area if necessary e.g. for tileset)
         7a. For each sub-area exit, find an entrance in the previous zone, with PRIORITY for unassigned entrances
     """
-    # TODO Set goal pole: normal / secret
-    notFinished = True  #Temp
     tilesetList = list(groupTilesetJson.keys())
     zoneAddedNo = 0
     normal_exit_area_id = -1
     secret_exit_area_id = -1
-    normal_exit_zone_id = -1
-    secret_exit_zone_id = -1
-    totNoEnt = 0 # Total number of enterables
-    totNoNonEnt = 0 # Total number of non-enterables
     # copy dict template for addedZone
     addedZone = deepcopy(groupTilesetJson)
     stg_lst = read_config.listdir("./Stage_temp/")
@@ -453,27 +452,37 @@ def main():
                 generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(tilesetList,["full","entrance"])
         
         spawn_zone = deepcopy(generated_ent_zone)
-        
-        print("[D] Entrance Data",spawn_zone["entrance"])
-
+        # Sprites randomisation
+        spawn_zone["sprites"],_dum,__dum =\
+            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],None,stg_name)
+        for lay_i in range(0,3):
+            if "bgdatL"+str(lay_i) in spawn_zone:
+                spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
         area_zone[0].append(spawn_zone)
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
-        print("[D] Ent zone =",area_zone[0][-1]["zone"])
+        print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
         addEntranceData(0,spawn_zone)
 
         if gen_ent_zone_type=="entrance":
             print("Determine exit")
             # Need an exit zone, and a "main" zone
             generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(tilesetList,["full","exit"])
-
+        
             exit_zone = deepcopy(generated_exit_zone)
-            print("[D] Exit zone =",exit_zone["zone"])
+            print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"])
             # Change Flagpole type to normal
             exit_spr,exit_spr_pos = checks.checkExitSprite(exit_zone)
+            # print("EXIT SPRITE",exit_spr,exit_zone["sprites"])
             if exit_spr[0]==113:
                 exit_zone["sprites"][exit_spr_pos][3] = b"\x00\x00\x00\x00\x00\x00"
                 print("Changed Flagpole")
+            # Sprites randomisation
+            exit_zone["sprites"],_dum,__dum =\
+                nsmbw.NSMBWsprite.processSprites(exit_zone["sprites"],None,stg_name)
+            for lay_i in range(0,3):
+                if "bgdatL"+str(lay_i) in exit_zone:
+                    exit_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(exit_zone["bgdatL"+str(lay_i)])
             exit_tileset = deepcopy(gen_exit_zone_tileset)
             # Check for overlap with zones
             if exit_tileset==area_tileset[0]:
@@ -488,7 +497,6 @@ def main():
                         new_y = overlap_zone[1]+overlap_zone[3]+480
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
-                    print("Is X , Y",x_tot,y_tot)
 
                     exit_zone = corrections.alignToPos(exit_zone,new_x,new_y)
                 # Check and correct duplicated zones
@@ -531,8 +539,13 @@ def main():
                     while len(groupTilesetJson[main_tileset]["normal"])==0:
                         main_tileset = getRandomTileset(tilesetList)
                     main_zone = getRandomZone(main_tileset,"normal")
-                
-            print("[D] Main zone =",main_zone["zone"])
+            # Sprites randomisation
+            main_zone["sprites"],_dum,__dum =\
+                nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],None,stg_name)
+            for lay_i in range(0,3):
+                if "bgdatL"+str(lay_i) in main_zone:
+                    main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
+            print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"])
             # Check for overlap with zones
             if main_tileset==area_tileset[0]:
                 # TODO Alright the statements below are repeated, but I am not bothering with it now.
@@ -559,7 +572,8 @@ def main():
             elif main_tileset==area_tileset[1]:
                 overlap_zone_no = checks.checkPosInZone(area_zone[1], main_zone["zone"][0:2],*main_zone["zone"][2:4])
                 if overlap_zone_no!=-1:
-                    overlap_zone = area_zone[0][overlap_zone_no]["zone"]
+                    print("Overlap with ZONE",overlap_zone_no,len(area_zone[1]))
+                    overlap_zone = area_zone[1][overlap_zone_no]["zone"]
                     new_x = 512
                     new_y = 512
                     y_tot = overlap_zone[1]+overlap_zone[3]+64+main_zone["zone"][3]
@@ -642,14 +656,20 @@ def main():
                         ]
                         area_zone[added_area_no][-1]["sprites"].append(new_pole)
                         print("ADDED New Flagpole")
-                print("Extra:",added_area_no)
-                print("Extra:",area_zone[added_area_no][-1]["zone"])
+                    # Randomise sprite
+                    area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
+                        nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],None,stg_name)
+                    for lay_i in range(0,3):
+                        if "bgdatL"+str(lay_i) in area_zone[added_area_no][-1]:
+                            area_zone[added_area_no][-1]["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(area_zone[added_area_no][-1]["bgdatL"+str(lay_i)])
+                print("Extra to Area:",added_area_no)
+                print("Extra from", area_zone[added_area_no][-1]["orgLvl"] , "data =",area_zone[added_area_no][-1]["zone"])
                 addEntranceData(added_area_no,area_zone[added_area_no][-1])
                 secret_exit_area_id = added_area_no
                 secret_exit_zone_id = len(area_zone[added_area_no])
                 print("NEW Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
 
-                # TODO Change pole flag to secret
+                # input()
 
                 secret_generated = True
             # # Checks for static pipes that is candidate for new enterable
@@ -711,9 +731,10 @@ def main():
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
             for area_id in range(0,4):
-                print("NONENT AREA ID",area_id)
                 for zone_pos in range(0,len(entrance_list[area_id])):
                     nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
+                    if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
+                        nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
 
             # Assign entrances
             for area_id in range(0,4):
@@ -794,54 +815,6 @@ def main():
         #exit() ######## TEMP ########
 
     exit()
-    ################# OLD CODES ###################
-    for areaNo in inJson[levelToImport].keys():
-        for zoneNo in inJson[levelToImport][areaNo].keys():
-            cur_zone = inJson[levelToImport][areaNo][zoneNo]
-            areaRawSettings = []
-            # Prepare for Sprite loading list
-            loadSprList = nsmbw.NSMBWLoadSprite.addLoadSprites(cur_zone["sprites"])
-            # Import settings one-by-one, in order from Section 0
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(cur_zone["tileset"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(cur_zone["AreaSetting"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(cur_zone["ZoneBound"])) # TODO Convert this to list if needed
-            areaRawSettings.append(nsmbw.generateSectionDef(cur_zone["AreaSetting2"]))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(cur_zone["topBackground"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(cur_zone["bottomBackground"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(cur_zone["entrance"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWsprite.toByteData(cur_zone["sprites"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLoadSprite.toByteData(loadSprList)))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZones.toByteData([cur_zone["zone"]])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWLocations.toByteData(cur_zone["location"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWCamProfile.toByteData(cur_zone["cameraProfile"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathProperties.toByteData(cur_zone["path"])))
-            areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathNode.toByteData(cur_zone["pathNode"])))
-            
-            # Write it to byte array
-            u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + ".bin",nsmbw.writeDef(areaRawSettings)))
-
-            # Add tiles data
-            for i in range(0,2): # Loop through each layer
-                if "bgdatL"+str(i) in cur_zone.keys():
-                    for tiles in cur_zone["bgdatL" + str(i)]:
-                        tileData[i].append(tiles)
-                    # Convert to byte data
-                    u8_files_list.append(u8_m.constructArchiveFile_m("course" + areaNo + "_bgdatL" + str(i) + ".bin",nsmbw.NSMBWbgDat.toByteData(tileData[i])))
-                    # TODO Output the file as a U8 archive
-                    if isDebug:
-                        with open("course" + areaNo + "_bgdatL" + str(i) + ".bin", 'wb') as f:
-                            f.write(nsmbw.NSMBWbgDat.toByteData(tileData[i]))
-                
-    # Create "course" folder
-    u8_files_dir = u8_m.constructArchiveFile_m("course",b"",True,len(u8_files_list)+2) # +2 for itself + root folder
-    # Create u8_m dict for repacking
-    u8_dict = u8_m.constructFromScratch(len(inJson[levelToImport].keys()),[u8_files_dir] + u8_files_list)
-
-    returnARC = u8_m.repackToBytes(u8_dict)
-    with open("test_json.arc", 'wb') as f:
-        f.write(returnARC)
-
-    pass
 
 if __name__=="__main__":
     main()

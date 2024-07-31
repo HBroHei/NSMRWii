@@ -3,6 +3,8 @@ from json import loads
 from os import listdir
 import shutil
 
+import globalVars
+
 log = ""
 
 enemyList = []
@@ -48,7 +50,7 @@ STG_OUT = "Stage_output"
 shutil.rmtree(STG_TEMP,True)
 shutil.rmtree(STG_OUT,True)
 shutil.copytree("Stage",STG_TEMP)
-skipLvl = rulesDict ["Skip Level"]
+skipLvl = rulesDict["Skip Level"]
 for istr in rulesDict["Skip Level"]:
     log += str("Processing [S]"+STG_TEMP + "/" + istr+"to"+STG_TEMP + "/" + istr + "\n")
     shutil.move(STG_TEMP + "/" + istr,STG_OUT + "/" + istr)
@@ -59,3 +61,9 @@ try:
 except KeyError:
     log += str("[i] 'Tile Group' not included" + "\n")
     pass
+
+# Add them all to the global vars list
+globalVars.enemyList = enemyList
+globalVars.enemyVarList = enemyVarList
+globalVars.reduceLag = reduceLag
+globalVars.tileGroup = tileGroup

@@ -8,6 +8,5 @@ Entrances
 --Autoscroll levels don't start mid-way
 --Sprite 179
 
-ZONE_EXPORTER
-- Duplicated entrance for some zones e.g. 01-05 bonus zone, some toad hse entrance area
-
+MIGHT NOT FIX
+- 06-03 star coin area - unreachable exit

@@ -397,6 +397,10 @@ class NSMBWsprite:
         relData = []#deepcopy(leData)
 
         posList = []
+
+        if len(eData)==0:
+            print("Info: No sprites for this list")
+            return reData,relData,len(reData)*16
         
         #print("=========== " + lvName)
 
