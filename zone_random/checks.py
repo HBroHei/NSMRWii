@@ -17,6 +17,13 @@ from copy import deepcopy
     454 Ambush Controller
 """
 
+def checkisCutsceneZone(zone):
+    for i in range(0,len(zone["sprites"])):
+        spr = zone["sprites"][i]
+        if spr[0]==408:
+            return True
+    return False
+
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
     for i in range(0,len(zone["sprites"])):
@@ -56,13 +63,23 @@ def checkOnlyOneEnt(zone):
 def findExitEnt(zone):
     ret_pos = [] # Enterable
     ret_pos_noExit = [] # Non-enterable
-    ent_179 = [] # Entrance IDs related to sprite 179
+    ent_179 = [] # Entrance IDs related to sprite 179 OR rolling hills
     # First, check for sprite 179
     spr_list = deepcopy(zone["sprites"])
     for spr in spr_list:
         if spr[0]==179: # Special Exit Controller
             # Get the 4th([3]) char, 1st digit and 6th([5]) char, 2nd digit
             ent_179.append(int((spr[3][3] & 0xF0) | (spr[3][5] & 0x0F)))
+            if (spr[3][2] & 4)!=0:  # Remove "wrap back to map" function
+                # print(spr[3])
+                # input("Needed to make change")
+                spr_pos = zone["sprites"].index(spr)
+                tmp_bytearr = bytearray(zone["sprites"][spr_pos][3])
+                tmp_bytearr[2] = 0x00
+                zone["sprites"][spr_pos][3] = bytes(tmp_bytearr)
+        elif spr[0]==355 or spr[0]==360: # Rolling hill pipes
+            # Gets the 5th byte (4th pos), seconf digit
+            ent_179.append(int((spr[3][4] & 0x0F)))
 
     for i in range(0,len(zone["entrance"])):
         # TODO Find if "Normal" Entrances have sprites associated with them
@@ -76,44 +93,6 @@ def findExitEnt(zone):
         else:
             ret_pos_noExit.append(i)
     return ret_pos,ret_pos_noExit
-
-def findOpenArea(tiles, width=4, height=4):
-    """
-    Finds an open area of the specified width and height in a list of tiles.
-
-    Args:
-        tiles: A list of tiles, each represented as [id, x, y, width, height].
-        width: The desired width of the open area.
-        height: The desired height of the open area.
-
-    Returns:
-        A tuple containing the x and y coordinates of the top-left corner of the open area,
-        or None if no such area is found.
-    
-    By Gemini
-    """
-
-    for y in range(0, max([tile[2] + tile[4] for tile in tiles])):
-        for x in range(0, max([tile[1] + tile[3] for tile in tiles])):
-            # Check if the current position is within any tile
-            if any(
-                x >= tile[1] and x < tile[1] + tile[3] and y >= tile[2] and y < tile[2] + tile[4]
-                for tile in tiles
-            ):
-                continue
-
-            # Check if the area is open
-            if all(
-                any(
-                    x + w >= tile[1] and x < tile[1] + tile[3] and y + h >= tile[2] and y < tile[2] + tile[4]
-                    for tile in tiles
-                )
-                for w in range(width)
-                for h in range(height)
-            ):
-                return x, y
-
-    return None
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos

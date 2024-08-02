@@ -68,7 +68,7 @@ def addRandomZone(tilesetList:list,types:list):
     zoneAddedNo += 1
     gen_zone_prop = generated_zone["zone"]
     # Check for overlap with zones
-    if gen_zone_tileset==area_tileset[0]:
+    if gen_zone_tileset==area_tileset[0] or area_tileset[0]=="":
         # TODO Alright the statements below are repeated, but I am not bothering with it now.
         overlap_zone_no = checks.checkPosInZone(area_zone[0], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
@@ -90,7 +90,7 @@ def addRandomZone(tilesetList:list,types:list):
         area_zone[0].append(generated_zone)
 
         return 0, gen_zone_tileset, gen_zone_type
-    elif gen_zone_tileset==area_tileset[1]:
+    elif gen_zone_tileset==area_tileset[1] or area_tileset[1]=="":
         overlap_zone_no = checks.checkPosInZone(area_zone[1], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[overlap_zone_no]
@@ -117,7 +117,7 @@ def addRandomZone(tilesetList:list,types:list):
         area_zone[1].append(generated_zone)
 
         return 1, gen_zone_tileset, gen_zone_type
-    elif gen_zone_tileset==area_tileset[2]: # Area 3
+    elif gen_zone_tileset==area_tileset[2] or area_tileset[2]=="": # Area 3
         overlap_zone_no = checks.checkPosInZone(area_zone[2], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[2][overlap_zone_no]["zone"]
@@ -254,6 +254,9 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         area_arr_i = area_i-1 # To be used in lists
         areaData = lvlData[area_arr_i]
         print("len",len(areaData))
+        # If list len==0, skip
+        if len(areaData)==0: continue
+
         areaRawSettings = []
         tileData = [[],[],[]]
         loadSprList = []
@@ -308,10 +311,10 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         loadSprList = tuple(set(loadSprList))
         # Import settings one-by-one, in order from Section 0
         #print(cur_zone["tileset"])
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(cur_zone["tileset"])))
-        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(cur_zone["AreaSetting"])))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(areaData[0]["tileset"])))
+        areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(areaData[0]["AreaSetting"])))
         areaRawSettings.append(nsmbw.generateSectionDef(zone_bound)) # TODO Convert this to list if needed
-        areaRawSettings.append(nsmbw.generateSectionDef(cur_zone["AreaSetting2"]))
+        areaRawSettings.append(nsmbw.generateSectionDef(areaData[0]["AreaSetting2"]))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(top_bg)))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWZoneBG.toByteData(bot_bg)))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWEntrances.toByteData(ent_lst)))
@@ -382,6 +385,9 @@ def main():
                     }
                 # Calculate number of zones for each tilesets
                 groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
+
+                if checks.checkisCutsceneZone(cur_zone):
+                    continue # Skip this zone
 
                 # Check zone has exit / entrances
                 exit_flag,_dum = checks.checkExitSprite(cur_zone)
@@ -675,20 +681,6 @@ def main():
                 # input()
 
                 secret_generated = True
-            # # Checks for static pipes that is candidate for new enterable
-            # for zone_check in area_zone[area_no]:
-            #     zone_ent_pos_lst = []
-            #     for zone_ent in zone_check["entrance"]: # Records entrances pos
-            #         zone_ent_pos_lst.append((zone_ent[1],zone_ent[2]))
-            #     for tile in zone_check["bgdatL1"]:
-            #         # Check is tile pipe and does not have entrance obj on it
-            #         # This ONLY Check for upward pipes
-            #         if tile[0] in [65,73,79] and\
-            #             tilePosToObjPos((tile[1],tile[2])) not in zone_ent_pos_lst:
-            #             ent_pipes_cand.append((area_no,tile))
-            #     # I believe this is the right opportunity to do tile randomisation
-            #     # Layer 1 matters the most
-            #     zone_check["bgdatL1"] = nsmbw.NSMBWbgDat.processTiles(zone_check["bgdatL1"])
         if start_over:
             print("Cannot find suitable area, starting over")
             start_over = False
@@ -741,6 +733,13 @@ def main():
 
             # Assign entrances
             for area_id in range(0,4):
+                # Set default level entrance
+                try:
+                    area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
+                    # Set ambush flag off
+                    area_zone[area_id][0]["AreaSetting"][0][7] = False
+                except IndexError:
+                    pass
                 for zone_pos in range(0,len(area_zone[area_id])):
                     #for zone_info in area_zone[area_id][zone_pos]:
                         for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
@@ -815,6 +814,7 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
+        if stg_name=="08-01.arc":input()
         #exit() ######## TEMP ########
 
     exit()
