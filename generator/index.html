@@ -7,10 +7,15 @@
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
         <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="../navbar.css">
     </head>
     <body>
         <div id="topbar" style="width:100%"></div>
-        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
+        <div id="top_nav">
+            <a href="https://hbrohei.github.io" class="top_nav_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <a href="https://hbrohei.github.io/MiniStarCenter" class="top_nav_btn hidden_narrow">Mini Star Center</a>
+            <a href="https://hbrohei.github.io/NSMRWii" class="top_nav_btn hidden_narrow">NSMBW Randomiser</a>
+        </div>
         <div id="mainContent">
             <br>
             <div id="title_box">
@@ -40,51 +45,162 @@
                 <div id="changelog_box"></div>
             </div>
 
-            <div id="win_map" class="tab_win_default_hidden tab_win">
+            <div id="win_map_o" class="tab_win_default_hidden tab_win">
                 <label>8-Castle: Skip randomizing</label><br>
                 <label for="#S08-24" class="no_label_style">Enable</label><input id="S08-24" type="checkbox" checked title="Skips 8-Castle, which is the final level of the base game. Having 8-Castle be randomized may have a chance for the game to end early (before World 8)" checked><br>
                 <br>
                 <label for="#SSE">Secret Exit Levels</label><br>
-                <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4.">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
-                    <option id="s_same" value="s_same" selected="selected">Randomize with other Secret Exit level</option>
-                    <option id="s_skip" value="s_skip">Skip randomization (Enemies will still be randomized)</option>
-                    <option id="s_skip_3-4" value="s_skip_3-4">Only skip 3-4 (To prevent the chance of not able to finish the game)</option>
-                </select><br><br>
+                <select id="SSE" title="Decide what to do for ALL Secret Exit levels, including 3-4." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
+                    <option id="s_same" value="s_same">Randomize with other Secret Exit level</option>
+                    <option id="s_skip" value="s_skip">Skip randomization</option>
+                    <option id="s_skip_3-4" value="s_skip_3-4" selected="selected">Only skip 3-4</option>
+                </select><br>
+                <div id="SSE_explain"></div><br><br>
+                <label for="#CastleTower">Castle, Tower and Airship Levels</label><br>
+                <select id="CastleTower" title="Decide what to do for ALL Secret Exit levels, including 3-4." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
+                    <option id="s_same" value="s_same">Randomize within the same group</option>
+                    <option id="s_skip" value="s_skip">Skip randomization</option>
+                    <option id="s_skip_3-4" value="s_skip_3-4" selected="selected">Only skip 3-4</option>
+                </select><br>
+                <div id="CastleTower_explain"></div>
+                <br><br>
                 <label for="#SCannon">Cannon Levels</label><br>
-                <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels).">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (May cause inaccessible levels)</option>
-                    <option id="s_same" value="s_same">Randomize with other Cannon level (The destination will still be the orginal, unrandomized world)</option>
-                    <option id="s_skip" value="s_skip" selected="selected">Skip randomization</option>
-                </select><br><br>
+                <select id="SCannon" title="Decide what to do for Cannon levels(World warpping cannon levels)." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
+                    <option id="s_same" value="s_same" selected="selected">Randomize with other Cannon level</option>
+                    <option id="s_skip" value="s_skip">Skip randomization</option>
+                </select><br>
+                <div id="SCannon_explain"></div>
+                <br><br>
                 <label for="#SToadHse">Toad Houses</label><br>
-                <select id="SToadHse" title="Decide what to do for Toad Houses.">
-                    <option id="s_all" value="s_all"  >Randomize with all other levels (Normal levels may become Toad House and vice versa)</option>
+                <select id="SToadHse" title="Decide what to do for Toad Houses." onchange="changeOpt(this)">
+                    <option id="s_all" value="s_all"  >Randomize with all other levels</option>
                     <option id="s_same" value="s_same" selected="selected">Randomize with other Toad Houses</option>
                     <option id="s_skip" value="s_skip">Skip randomization</option>
-                </select><br><br>
+                </select>
+                <br>
+                <div id="SToadHse_explain"></div><br><br>
+            </div>
+
+            <div id="win_map" class="tab_win_default_hidden tab_win">
+                <label>General Randomisation Group / Skip</label>
+                <table>
+                    <tr>
+                        <th></th>
+                        <th>Skip randomisation</th>
+                        <th>Same Group level</th>
+                        <th>All other levels</th>
+                        <th>Special</th>
+                    </tr>
+                    <tr>
+                        <th>Secret Exit Levels</th>
+                        <td><input type="radio" name="skip_secret" value="skip"></td>
+                        <td><input type="radio" name="skip_secret" value="same" checked></td>
+                        <td><input type="radio" name="skip_secret" value="none"></td>
+                        <td>
+                            <input type="radio" name="skip_secret" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Castle</th>
+                        <td><input type="radio" name="skip_castle" value="skip"></td>
+                        <td><input type="radio" name="skip_castle" value="same"></td>
+                        <td><input type="radio" name="skip_castle" value="none" checked></td>
+                        <td>
+                            <input type="radio" name="skip_castle" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tower</th>
+                        <td><input type="radio" name="skip_tower" value="skip"></td>
+                        <td><input type="radio" name="skip_tower" value="same"></td>
+                        <td><input type="radio" name="skip_tower" value="none" checked></td>
+                        <td>
+                            <input type="radio" name="skip_tower" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Airship</th>
+                        <td><input type="radio" name="skip_airship" value="skip"></td>
+                        <td><input type="radio" name="skip_airship" value="same"></td>
+                        <td><input type="radio" name="skip_airship" value="none" checked></td>
+                        <td>
+                            <input type="radio" name="skip_airship" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Enemy Ambush</th>
+                        <td><input type="radio" name="skip_ambush" value="skip"></td>
+                        <td><input type="radio" name="skip_ambush" value="same" checked></td>
+                        <td><input type="radio" name="skip_ambush" value="none"></td>
+                        <td>
+                            <input type="radio" name="skip_ambush" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Toad House</th>
+                        <td><input type="radio" name="skip_toads" value="skip"></td>
+                        <td><input type="radio" name="skip_toads" value="same" checked></td>
+                        <td><input type="radio" name="skip_toads" value="none"></td>
+                        <td>
+                            <input type="radio" name="skip_toads" value="spec" disabled>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Cannon Levels</th>
+                        <td><input type="radio" name="skip_cannon" value="skip"></td>
+                        <td>
+                            <input type="radio" name="skip_cannon" value="same" checked><br>
+                            Note: Visuals only
+                        </td>
+                        <td><input type="radio" name="skip_cannon" value="none"></td>
+                        <td>
+                            <input type="radio" name="skip_cannon" value="spec" disabled>
+                        </td>
+                    </tr>
+                </table>
+                <br>
+                <label>Skip hardcoded levels:</label><br><br>
+                <input type="checkbox" id="map_01-01"><label for="map_01-01" class="no_label_style lbl_bold">1-1</label><br>
+                The background will always have Peach's Castle overlap othr background. Do not check this if you want 1-1 to be randomised<br><br>
+                <input type="checkbox" id="map_02-24" checked><label for="map_02-24" class="no_label_style lbl_bold">2-Castle</label><br>
+                Level gemotry, autoscroll, and some other stuff are hardcoded here. Placing 2-Castle outside its orginal map position will also crash the game on level loads. DO NOT uncheck this unless you have some actual good reasons to.<br><br>
+                <input type="checkbox" id="map_03-04" checked><label for="map_03-04" class="no_label_style lbl_bold" checked>3-4</label><br>
+                This level is centred around the red switch on the World 3 map. Putting it in place of other levels may result in non-progressable game, or unreachable levels, so checking it is recommended<br><br>
+                <input type="checkbox" id="map_06-24"><label for="map_06-24" class="no_label_style lbl_bold">6-Castle</label><br>
+                Some area is hardcoded to kill the player if they are above a certain height. Check this if you fear that might happen (although the chance of having 6-Castle unbeatable is small with this unchecked)<br><br>
+                <input type="checkbox" id="map_08-03"><label for="map_08-03" class="no_label_style lbl_bold">8-3</label><br>
+                Liquid waves is hardcoded to appear in this level, and the waves will be lava regardless of appearance<br><br>
+                <input type="checkbox" id="map_08-24" checked><label for="map_8-24" class="no_label_style lbl_bold">8-Castle</label><br>
+                Upon beating this level, the player will be going straight to the ending cutscene and credits. Check this if you do not want your game to end early.<br><br>
             </div>
 
             <div id="win_level" class="tab_win_default_hidden tab_win">
                 <h1>Enemies</h1>
                 <label for="#enemy_presets">Enemy randomization presets</label><br>
-                <select id="enemy_presets" title="Presets for the enemy raandomization">
-                    <option id="r_type"  value="r_type"  >Randomize enemies in groups with their respective species</option>
-                    <option id="r_world" value="r_world" >Randomize enemies in groups with their respective World.</option>
-                    <option id="r_all_b" value="r_all_b" >All the standalone enemies will be randomized. MAY CAUSE LAG OR CRASHES!</option>
-                    <option id="r_all"   value="r_all"   >All the enemies, including non-movable obsticles, will be randomized.MAY CAUSE LAG OR CRASHES!</option>
+                <select id="enemy_presets" title="Presets for the enemy raandomization" onchange="changeOpt(this)">
+                    <option id="r_type"  value="r_type">Same species</option>
+                    <option id="r_world" value="r_world" >Same world</option>
+                    <option id="r_all_b" value="r_all_b" >Controlled Chaos</option>
+                    <option id="r_all"   value="r_all"   >Everyone is here!</option>
                 </select>
+                <br>
+                <div id="enemy_presets_explain"></div>
                 <br><br>
                 <label>Reduce Lag</label><br>
-                <label for="#LagReduce" class="no_label_style">Enable</label><input id="LagReduce" type="checkbox" checked title="Delete some sprites to help make the game run smoother" checked><br>
+                <label for="#LagReduce" class="no_label_style">Enable</label><input id="LagReduce" type="checkbox" checked title="Delete some sprites to help make the game run smoother. Not recommended with average players."><br>
 
                 <h1>Blocks</h1>
-                <label for="#block_blockRando">Blocks content Randomization</label><br>
-                <select id="block_blockRando" title="Decide if any blocks in the game should be randomized">
-                    <option id="block_none" value="block_none" >No randomization</option>
-                    <option id="block_same" value="block_same" selected="selected">Randomize within the same type of block (? block remains as ? block)</option>
-                    <option id="block_all" value="block_all">Randomize all block types(? block -> brick block, etc.)</option>
-                </select><br><br>
+                <label for="#block_blockRando">Blocks content Randomisation</label><br>
+                <select id="block_blockRando" title="Decide if any blocks in the game should be randomised" onchange="changeOpt(this)">
+                    <option id="block_none" value="block_none" >No randomisation</option>
+                    <option id="block_same" value="block_same" selected="selected">Same block type</option>
+                    <option id="block_all" value="block_all">All blocks,</option>
+                </select><br>
+                <div id="block_blockRando_explain"></div>
+                <br><br>
                 <label>Block Types to be randomized</label><br>
                 <label for="#block_qBlock" class="no_label_style">? Block</label><input id="block_qBlock" type="checkbox" checked title="Include ? blcok in the randomization" checked><br>
                 <label for="#block_bBlock" class="no_label_style">Brick Block</label><input id="block_bBlock" type="checkbox" checked title="Include brick block in the randomization" checked>
@@ -117,12 +233,42 @@
                 </div>
             </div>
             <hr>
-            <div id="fileGen"><button onclick="genJson()">Generate</button></div>
+            <div id="fileGen"><button onclick="genJson()">Generate</button><input type="checkbox" id="gen_beauty"><label for="gen_beauty">Format JSON</label></div>
             <iframe id="downFrame" style="display:none"></iframe>
         </div>
         
         <script src="index.js"></script>
         <script src="index_vars.js"></script>
         <script src="index_level.js"></script>
+        <script src="index_select.js"></script>
+
+        <div id="bot_nav">
+            <span class="lbl_pad">Find more on YouTube:</span>
+            <a href="https://www.youtube.com/@hammerbrohei" class="bot_nav_btn" id="yt_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <br class="show_narrow">
+            <a href="https://youtube.com/@hackedbrohei5017" class="bot_nav_btn" id="yt2_btn"><img src="https://yt3.googleusercontent.com/ytc/AIdro_kKTVJaNi_WEg96csnm5cwRb-DF_tvF8WDKM7ulrQ=s176-c-k-c0x00ffffff-no-rj"> Hacked Bro Hei</a>
+            <hr>
+            <table>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/" class="hidden_narrow">Main Page</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/NSMRWii" class="hidden_narrow">NSMBW Randomiser</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/MiniStarCenter" class="hidden_narrow">Mini Star Center</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/MP9/" class="hidden_narrow">MP9 Custom Board</a>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <h3>HBroHei.github.io</h3>   
+            <a id="git_source_a" href="https:/www.github.com/HBroHei/hbrohei.github.io">Source</a>
+        </div>
     </body>
 </html>

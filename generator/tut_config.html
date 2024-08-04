@@ -6,6 +6,7 @@
         <title>NSMRW Config.json Documentation</title>
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
+        <link rel="stylesheet" href="../navbar.css">
     </head>
     <style>
         body{
@@ -38,7 +39,11 @@
     </style>
     <body>
         <div id="topbar" style="width:100%"></div>
-        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
+        <div id="top_nav">
+            <a href="https://hbrohei.github.io" class="top_nav_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <a href="https://hbrohei.github.io/MiniStarCenter" class="top_nav_btn hidden_narrow">Mini Star Center</a>
+            <a href="https://hbrohei.github.io/NSMRWii" class="top_nav_btn hidden_narrow">NSMBW Randomiser</a>
+        </div>
         <div style="height: 5vh;"></div>
         <div id="padd">
             <div style="width:99%;text-align: center; border-style: dashed;">
@@ -205,6 +210,34 @@
             The order of the groups will also affects the randomization effects. If the item is randomized once, it will be randomized with the latter group once more.<br>
             Example:<br>
             <div class="code_single"><pre class="code">"Tile Group":[[39,40,41,44,45,46,47,48],[29,30,31,33,34,35,36,37]]</pre></div>
+        </div>
+        <div id="bot_nav">
+            <span class="lbl_pad">Find more on YouTube:</span>
+            <a href="https://www.youtube.com/@hammerbrohei" class="bot_nav_btn" id="yt_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <br class="show_narrow">
+            <a href="https://youtube.com/@hackedbrohei5017" class="bot_nav_btn" id="yt2_btn"><img src="https://yt3.googleusercontent.com/ytc/AIdro_kKTVJaNi_WEg96csnm5cwRb-DF_tvF8WDKM7ulrQ=s176-c-k-c0x00ffffff-no-rj"> Hacked Bro Hei</a>
+            <hr>
+            <table>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/" class="hidden_narrow">Main Page</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/NSMRWii" class="hidden_narrow">NSMBW Randomiser</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/MiniStarCenter" class="hidden_narrow">Mini Star Center</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/MP9/" class="hidden_narrow">MP9 Custom Board</a>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <h3>HBroHei.github.io</h3>   
+            <a id="git_source_a" href="https://www.github.com/HBroHei/hbrohei.github.io">Source</a>
         </div>
     </body>
 </html>

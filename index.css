@@ -1,0 +1,82 @@
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+    padding: 0%;
+    margin: 0%;
+}
+button{
+    padding: 1%;
+    background-color: yellow;
+}
+#padd{
+    padding: 1%;
+    margin: 1%;
+}
+
+.a_btn{
+    padding: 0.75em;
+    text-decoration: none;
+    color:black;
+    background-color: #52B5F2;
+    border-width: 1%;
+    border-style: solid;
+    border-radius: 1em;
+
+    white-space: nowrap;
+    display: inline-block;
+}
+.a_btn:hover{
+    background-color: #C2D7F2;
+}
+
+#title_box{
+    width:99%;
+    text-align: center;
+    border-style: dashed; 
+    background-image: url('./big_title.jpg');
+    background-position: center;
+    text-shadow: 4px 4px black, -4px -4px black, -4px 4px black, 4px -4px black;
+    color: white;
+}
+
+#div_rando{
+    background-image: linear-gradient(to right, #347EBFFF, #FFFFFF00), url("./Screenshot/random.jpg ");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position-x: right;
+    color:white;
+    text-align: left;
+    padding-left: 5%;
+    padding-right: 50%;
+}
+#div_135remix{
+    background-image: linear-gradient(to left, #347EBFFF, #FFFFFF00), url("./Screenshot/135.jpg ");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position-x: left;
+    color:white;
+    text-align: right;
+    padding-right: 5%;
+    padding-left: 50%;
+}
+#div_custom{
+    background-image: linear-gradient(to right, #347EBFFF, #FFFFFF00), url("./Screenshot/config.jpg ");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position-x: right;
+    color:white;
+    text-align: left;
+    padding-left: 5%;
+    padding-right: 50%;
+}
+
+.big_banner{
+    margin:auto;
+    padding-top:0.1em;
+    padding-bottom:2em;
+    padding-left: 5%;
+}
+
+.big_banner h3{
+    font-size: 2em;
+}

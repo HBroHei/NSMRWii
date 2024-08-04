@@ -394,7 +394,8 @@ class NSMBWsprite:
     ################## RANDO ####################
     def processSprites(eData,leData,lvName):
         reData = deepcopy(eData)
-        relData = []#deepcopy(leData)
+        relData = set(deepcopy(leData))
+        # relData = set()  # Temp disabled for temp bug fixing
 
         posList = []
 
@@ -405,32 +406,36 @@ class NSMBWsprite:
         #print("=========== " + lvName)
 
         for enemyData in reData:
+            # if enemyData[0]==408:
+            #     print(lvName,enemyData)
             randomised = False
             #Randomize enemy
             for eLis in globalVars.enemyList:
                 if enemyData[0] in eLis: # Enemy in the list
-                    posList.append((enemyData[1],enemyData[2]))
-                    enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
                     # Sprite Limit check, kinda buggy but I will let it slide for the time being
-                    if (findSpritesInArea(enemyData,posList) or randint(0,2)==1) and (globalVars.reduceLag):
+                    if globalVars.reduceLag and (findSpritesInArea(enemyData,posList) and randint(0,2)==1):
                         try:
-                            del reData[reData.index(enemyData)]
+                            reData.remove(enemyData)
                             continue
                         except ValueError:
                             print("WARNING: Cannot remove sprite",enemyData)
-                    else:
-                        if enemyData[0] not in globalVars.SKIP_SPRITES:
-                            enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
+                        pass
+                    posList.append((enemyData[1],enemyData[2]))
+                    enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
+                    if enemyData[0] not in globalVars.SKIP_SPRITES:
+                        enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
 
             #Randomize enemy variation
-            if str(enemyData[0]) in globalVars.enemyVarList:
+            if str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
 
-            if enemyData[0] not in relData: #Add to the sprite loading list
-                relData.append(enemyData[0])
+            # Add to load sprite list
+            relData.add(enemyData[0])
             
-        del reData[-1] # This is the most hacky way to fix a bug but it works.
+        #print(reData[-1])
+
+        #del reData[-1] # This is the most hacky way to fix a bug but it works.
 
         return reData,relData,len(reData)*16
 

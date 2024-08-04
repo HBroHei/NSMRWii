@@ -1,0 +1,135 @@
+#top_nav{
+    height : 10%;
+    width: 100%;
+    background: linear-gradient(to right, #347EBF, #52B5F2);
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    margin-top: 0%;
+    list-style-type: none;
+    padding-left: 0;
+    left:0;
+}
+#top_nav a{
+    text-align: center;
+    text-decoration: none;
+}
+
+.top_nav_btn{
+    font-size: 1.425em;
+    padding:1em;
+    
+    color:white;
+}
+
+#top_nav a:hover{
+    background-color: rgb(3, 59, 229);
+}
+#top_nav a img{
+    vertical-align:middle;
+    height : auto;
+    width: 3em;
+}
+.hidden_narrow{
+    display: none;
+}
+.show_narrow{
+    display: initial;
+}
+
+@media only screen and (min-width: 600px) {
+    #top_nav a img{
+        width: 2em;
+    }
+    .hidden_narrow{
+        display:inline-block;
+    }
+    .show_narrow{
+        display: none;
+    }
+    #main_menu_btn{
+        font-size: 1.75em;
+    }
+    .top_nav_btn {
+        padding: 1.7%;
+    }
+}
+
+#bot_nav{
+    color:white;
+
+    display:block;
+    height:25%;
+    background-color: #347EBF;
+}
+#bot_nav img{
+    width:15%;
+    vertical-align: middle;
+}
+
+#bot_nav table{
+    padding: 1em;
+    width: 95%;
+}
+#bot_nav td a{
+    color:white;
+    padding: 1em;
+}
+#bot_nav a:visited{
+    color:white;
+}
+
+#bot_nav h3{
+    display: inline;
+}
+
+.bot_nav_btn{
+    display:inline-block;
+    height:auto;
+    
+    text-decoration: none;
+    color:white;
+    padding: 0.75em;
+    background-color: #52B5F2;
+    border-width: 1%;
+    border-style: solid;
+    border-radius: 1em;
+    border-color: black;
+
+    white-space: nowrap;
+    max-width: 15em;
+}
+.bot_nav_btn:hover{
+    background-color: #C2D7F2;
+}
+
+.lbl_pad{
+    display: inline-block;
+    padding: 1em;
+}
+
+#yt_btn{
+    background-color: #4FBB17;
+}
+#yt_btn:hover{
+    background-color: #5CB973;
+}
+
+#yt2_btn{
+    background-color: #00b2c2;
+}
+#yt2_btn:hover{
+    background-color: #0098A6;
+}
+
+#div_quote{
+    padding:2%;
+    color:white;
+}
+
+#git_source_a{
+    color:white;
+}
+#git_source_a:visited{
+    color:white;
+}

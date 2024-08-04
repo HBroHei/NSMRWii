@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width">
         <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
         <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomizaation. Updates are planned and will be released for this randomizer.">
+        <link rel="stylesheet" href="../navbar.css">
     </head>
     <style>
         body{
@@ -27,7 +28,11 @@
     </style>
     <body>
         <div id="topbar" style="width:100%"></div>
-        <script src="https://hbrohei.github.io/Nav/topbar.js"></script>
+        <div id="top_nav">
+            <a href="https://hbrohei.github.io" class="top_nav_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <a href="https://hbrohei.github.io/MiniStarCenter" class="top_nav_btn hidden_narrow">Mini Star Center</a>
+            <a href="https://hbrohei.github.io/NSMRWii" class="top_nav_btn hidden_narrow">NSMBW Randomiser</a>
+        </div>
         <div style="height: 5vh;"></div>
         <div id="padd">
             <div style="width:99%;text-align: center; border-style: dashed; background-image: url('big_title.jpg'); background-position: center;">
@@ -49,6 +54,8 @@
                 This program require Python 3.x to run.
                 If you do not know what "Python" is or you do not have Python 3.x, download it <a href="https://www.python.org/downloads/">Here</a><br>
                 (Click on the button, it will download the most suitable version for your computer)<br>
+                Windows user may download the latest version of Python at the <a href="https://apps.microsoft.com/search/publisher?name=Python+Software+Foundation&hl=en-us&gl=US">Windows Store</a>.
+                <br>
                 <span style="font-weight: bold;">(Python 2.x is not supported and may not work)</span>
                 <span style="font-weight: bold;">(Only tested with Python >=3.9. Other version is not guarenteed to work)</span>
             </p>
@@ -57,7 +64,7 @@
                 Whether it is in physical form (CD) or digital form (ISO), as long as you have the game,
                 it's OK.<br>
                 <span style="font-weight: bold;">Pirated game is strongly discouraged. Please obtain the game legitiumately.</span>
-                <span style="font-weight: bold;">In the following guide, "the game" will be used to represent New Super Mario Bros Wii</span>
+                <span style="font-weight: normal;">In the following guide, "the game" will be used to represent New Super Mario Bros Wii</span>
             </p>
             <h2>Dolphin Emulator</h2>
             <p>
@@ -119,9 +126,9 @@
             </p>
             <h2>6.2 Method 2: Riivolution Patch</h2>
             <p>
-                Follow the guide in the "New Super Mario Bros Wii" section in <a href="https://aerialx.github.io/rvlution.net/wiki/Patch_Templates/index.html#New_Super_Mario_Bros._Wii">here</a><br>
-                (The levels being all the content in the "Stage_Shuffled" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder into the "nsmb" folder)
+                Riivolution patches is a flexible way of patching the game. You can either set up Riivolution manually, or use the built-in auto copy function.
             </p>
+            <h3>6.2.1 Built-in autocopying</h3>
             <p>
                 This program now have a configuration file for automatically copying the shuffled levels to a desinated folder.<br>
                 1. Open config_autoCopy.json
@@ -131,11 +138,41 @@
                 <code>"riivolution_folder":"G:/folder_name/"</code><br>
                 4. Save the file, and run the randomiser. The shuffled levels should be copied to the specified path.
             </p>
+            <h3>6.2.2 Manuel copying</h3>
+            <p>
+                Follow the guide in the "New Super Mario Bros Wii" section in <a href="https://aerialx.github.io/rvlution.net/wiki/Patch_Templates/index.html#New_Super_Mario_Bros._Wii">here</a><br>
+                (The levels being all the content in the "Stage_Shuffled" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder into the "nsmb" folder)
+            </p>
             DISCLAMER: This project is not affiliated with Nintendo or any other NSMBW modding projects.
             
         </div>
-        <div id="bottomNav" style="width:95%">
-            <script src="https://hbrohei.github.io/Nav/bottom.js"></script>
+        <div id="bot_nav">
+            <span class="lbl_pad">Find more on YouTube:</span>
+            <a href="https://www.youtube.com/@hammerbrohei" class="bot_nav_btn" id="yt_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <br class="show_narrow">
+            <a href="https://youtube.com/@hackedbrohei5017" class="bot_nav_btn" id="yt2_btn"><img src="https://yt3.googleusercontent.com/ytc/AIdro_kKTVJaNi_WEg96csnm5cwRb-DF_tvF8WDKM7ulrQ=s176-c-k-c0x00ffffff-no-rj"> Hacked Bro Hei</a>
+            <hr>
+            <table>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/" class="hidden_narrow">Main Page</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/NSMRWii" class="hidden_narrow">NSMBW Randomiser</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://hbrohei.github.io/MiniStarCenter" class="hidden_narrow">Mini Star Center</a>
+                    </td>
+                    <td>
+                        <a href="https://hbrohei.github.io/MP9/" class="hidden_narrow">MP9 Custom Board</a>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <h3>HBroHei.github.io</h3>   
+            <a id="git_source_a" href="https:/www.github.com/HBroHei/hbrohei.github.io">Source</a>
         </div>
     </body>
 </html>

@@ -9,3 +9,13 @@ function getSkipOption(name,ele){
         lvList_skip.push("03-04.arc")
     }
 }
+
+function getGroupOption(name){
+    const selectedVal = document.querySelector('input[name="skip_' + name + '"]:checked').value
+    if(selectedVal=="skip"){
+        lvList_skip.push(...lvlJson_n[name]) // append(lvl) for lvl in lvlJson_n[name]
+    }
+    else if(selectedVal=="same"){
+        lvList_same.push(lvlJson_n[name]) // append array to array
+    }
+}

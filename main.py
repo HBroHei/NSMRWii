@@ -40,6 +40,8 @@ def copyStageFolder():
     shutil.copytree("Stage",STG_OLD)
 
 def autoCopyDolphin():
+    dolphinAutoTransfer.readAutoCopyConfig()
+
     # Starting Transfer to dolphin
     if dolphinAutoTransfer.verify_autotransfer_status(): 
         print("Auto Copying : Beginning transfer setting verification")
@@ -83,8 +85,12 @@ def readRandoRule():
     # Move the files that needs to be in the orginal names (Skipped levels)
     globalVars.skipLvl = rulesDict["Skip Level"]
     for istr in rulesDict["Skip Level"]:
-        globalVars.log += str("Processing [S]"+STG_OLD + "/" + istr+"to"+STG_NEW + "/" + istr + "\n")
-        shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+        globalVars.log += str("Processing [S]"+STG_OLD + "/" + istr+" to "+STG_NEW + "/" + istr + "\n")
+        try:
+            shutil.move(STG_OLD + "/" + istr,STG_NEW + "/" + istr)
+        except FileNotFoundError:
+            globalVars.log += "Level has already processed or does not exist. Skipping...\n"
+            continue
         if not istr=="Texture" and not isDebugging:
             editArcFile(istr,istr)
 
@@ -199,6 +205,7 @@ def main():
                 print(istr,": File not found in Stage folder. Please check if the file is missing or misspelled")
                 if istr in globalVars.skipLvl:
                     print("Hint: This level also appears in the Skip List. Do you still wish to randomize it?")
+                print("Exiting...")
                 exit()
             rdm = randint(0,len(ilis)-1)
             globalVars.log += ("Processing [G] "+istr+": Renaming to "+ilis[rdm] + "\n")
