@@ -57,7 +57,7 @@ def addEntranceData(areaNo : int, zoneToFind:list):
 
 # Adds a zone to the level
 def addRandomZone(tilesetList:list,types:list):
-    global zoneAddedNo, area_len, area_zone
+    global zoneAddedNo, area_len, area_zone, area_tileset
     print("Determine extra")
     # Need an exit zone, and a "main" zone
     generated_zone, gen_zone_tileset, gen_zone_type = genZone(tilesetList,types)
@@ -69,25 +69,30 @@ def addRandomZone(tilesetList:list,types:list):
     gen_zone_prop = generated_zone["zone"]
     # Check for overlap with zones
     if gen_zone_tileset==area_tileset[0] or area_tileset[0]=="":
+        print("Tileset same?",gen_zone_tileset,area_tileset[0])
         # TODO Alright the statements below are repeated, but I am not bothering with it now.
         overlap_zone_no = checks.checkPosInZone(area_zone[0], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[0][overlap_zone_no]["zone"]
+            print("OVERLAP with",overlap_zone_no,overlap_zone)
             new_x = 512
             new_y = 512
             y_tot = overlap_zone[1]+overlap_zone[3]+64+gen_zone_prop[3]
             x_tot = overlap_zone[0]+overlap_zone[2]+64+gen_zone_prop[2]
             if x_tot > y_tot: # Horizontal zone
-                new_y = overlap_zone[1]+overlap_zone[3]+480
+                new_y = overlap_zone[1]+overlap_zone[3]+512
+                print("New Y =",new_y)
             if x_tot < y_tot: # Vertical zone
-                new_x = overlap_zone[0]+overlap_zone[2]+480
+                new_x = overlap_zone[0]+overlap_zone[2]+512
+                print("New X =",new_x)
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
         # Check and correct duplicated zones
         generated_zone = corrections.corrDupID(0,generated_zone)
         generated_zone = corrections.corrSprZone(generated_zone)
         generated_zone["type"] = "main"
         area_zone[0].append(generated_zone)
+        area_tileset[0] = gen_zone_tileset
 
         return 0, gen_zone_tileset, gen_zone_type
     elif gen_zone_tileset==area_tileset[1] or area_tileset[1]=="":
@@ -105,7 +110,7 @@ def addRandomZone(tilesetList:list,types:list):
                 if x_tot < y_tot: # Vertical zone
                     new_x = overlap_zone[0]+overlap_zone[2]+480
                 print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(1,generated_zone)
@@ -115,6 +120,7 @@ def addRandomZone(tilesetList:list,types:list):
             area_len+=1
             pass
         area_zone[1].append(generated_zone)
+        area_tileset[1] = gen_zone_tileset
 
         return 1, gen_zone_tileset, gen_zone_type
     elif gen_zone_tileset==area_tileset[2] or area_tileset[2]=="": # Area 3
@@ -130,7 +136,7 @@ def addRandomZone(tilesetList:list,types:list):
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(2,generated_zone)
@@ -140,9 +146,10 @@ def addRandomZone(tilesetList:list,types:list):
             area_len+=1
             pass
         area_zone[2].append(generated_zone)
+        area_tileset[2] = gen_zone_tileset
 
         return 2, gen_zone_tileset, gen_zone_type
-    else: # Esort to Area 4 I guess
+    elif area_tileset[3]=="": # Esort to Area 4 I guess
         overlap_zone_no = checks.checkPosInZone(area_zone[3], gen_zone_prop[0:2], *gen_zone_prop[2:4])
         if overlap_zone_no!=-1:
             overlap_zone = area_zone[3][overlap_zone_no]["zone"]
@@ -155,7 +162,7 @@ def addRandomZone(tilesetList:list,types:list):
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,*tilePosToObjPos((new_x,new_y)))
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(3,generated_zone)
@@ -165,19 +172,23 @@ def addRandomZone(tilesetList:list,types:list):
             area_len+=1
             pass
         area_zone[3].append(generated_zone)
+        area_tileset[3] = gen_zone_tileset
 
         return 3, gen_zone_tileset, gen_zone_type
         # All that is done, back out from the if statement.
+    else:
+        return -1,"",None
     
 
 # NOTE This will remove the zone from the list
 def getRandomZone(tilesetName:str, zone_type:str) -> dict:
+    ret_zone = choice(groupTilesetJson[tilesetName][zone_type])
     zone_json_idx = randint(0,len(groupTilesetJson[tilesetName][zone_type])-1)
     # zone_json_idx = 0
     # print(len(groupTilesetJson[area1_tileset][zone_ent_type]))
-    return_zone = groupTilesetJson[tilesetName][zone_type][zone_json_idx]
+    # return_zone = groupTilesetJson[tilesetName][zone_type][zone_json_idx]
     #del groupTilesetJson[tilesetName][zone_type][zone_json_idx] # Remove added zone
-    return return_zone
+    return ret_zone
 
 def getRandomTileset(tilesetList:list):
     return_tileset = tilesetList[randint(0,len(tilesetList)-1)]
@@ -233,10 +244,12 @@ def genZone(tilesetList:list,types:list):
 
     # Add the entrance zone
     ret_zone = deepcopy(getRandomZone(cur_tileset, zone_ent_type))
+    assert ret_zone != None
     #area_zone[0].append(ret_zone)
 
     # Adjust coordinates relative to the new level
     ret_zone = corrections.alignToPos(ret_zone,*tilePosToObjPos((32,32)))
+    assert ret_zone!=None
     ret_zone = corrections.corrSprZone(ret_zone)
 
     # Add info
@@ -360,7 +373,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     print("============= Processed",lvlName,"=================")
 
 def main():
-    global inJson, zoneAddedNo, area_zone, entrance_list, area_enterable_count, area_nonenterable_count
+    global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count
     with open('out.json', 'r') as f:
         json_orginal = json.load(f)
     inJson = convertToDict(json_orginal)
@@ -460,7 +473,7 @@ def main():
         spawn_zone = deepcopy(generated_ent_zone)
         # Sprites randomisation
         spawn_zone["sprites"],_dum,__dum =\
-            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],None,stg_name)
+            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],[],stg_name)
         for lay_i in range(0,3):
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
@@ -485,7 +498,7 @@ def main():
                 print("Changed Flagpole")
             # Sprites randomisation
             exit_zone["sprites"],_dum,__dum =\
-                nsmbw.NSMBWsprite.processSprites(exit_zone["sprites"],None,stg_name)
+                nsmbw.NSMBWsprite.processSprites(exit_zone["sprites"],[],stg_name)
             for lay_i in range(0,3):
                 if "bgdatL"+str(lay_i) in exit_zone:
                     exit_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(exit_zone["bgdatL"+str(lay_i)])
@@ -547,7 +560,7 @@ def main():
                     main_zone = getRandomZone(main_tileset,"normal")
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
-                nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],None,stg_name)
+                nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[],stg_name)
             for lay_i in range(0,3):
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
@@ -567,7 +580,7 @@ def main():
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
                     print("Is X , Y",x_tot,y_tot)
-                    main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
+                    main_zone = corrections.alignToPos(main_zone,new_x,new_y)
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(0,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
@@ -589,7 +602,7 @@ def main():
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
                     print("Is X , Y",x_tot,y_tot)
-                    main_zone = corrections.alignToPos(main_zone,*tilePosToObjPos((new_x,new_y)))
+                    main_zone = corrections.alignToPos(main_zone,new_x,new_y)
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(1,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
@@ -635,7 +648,7 @@ def main():
                 print("Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
                 #input()
                 # If there is an secret exit in this level, set type to "exit", and "full" otherwise
-                added_area_no, added_tileset, added_type= addRandomZone(tilesetList,["exit"] if have_secret else ["full"])
+                added_area_no, added_tileset, added_type= addRandomZone(tilesetList,["exit"] if have_secret else ["normal","bonus"])
                 # added_area_no, added_tileset, added_type= addRandomZone([tileset_ for tileset_ in area_tileset if tileset_!=""],["exit"] if have_secret else ["full"])
                 if added_area_no==None:
                     # Lets start over
@@ -667,7 +680,7 @@ def main():
                         print("ADDED New Flagpole")
                     # Randomise sprite
                     area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
-                        nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],None,stg_name)
+                        nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],[],stg_name)
                     for lay_i in range(0,3):
                         if "bgdatL"+str(lay_i) in area_zone[added_area_no][-1]:
                             area_zone[added_area_no][-1]["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(area_zone[added_area_no][-1]["bgdatL"+str(lay_i)])
@@ -726,7 +739,8 @@ def main():
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
             for area_id in range(0,4):
-                for zone_pos in range(0,len(entrance_list[area_id])):
+                for zone_pos in range(0,len(area_zone[area_id])):
+                    #print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
                     nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
                     if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
                         nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
@@ -814,7 +828,7 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        if stg_name=="08-01.arc":input()
+        if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     exit()

@@ -1,4 +1,6 @@
-##### FILE FOR TESTING ONLY. NEW FILE WILL BE CREATED FOR ACTUAL USE #####
+##########################################################################################
+##### FOR TESTING ARC FILES / nsmbw.py ONLY. PLEASE USE read_zones.py FOR ACTUAL USE #####
+##########################################################################################
 
 import json
 from os import listdir
@@ -122,7 +124,7 @@ def main():
     # rf.close()
 
     # filename = "Stage/05-36.arc"
-    filename = "test_json.arc"
+    filename = "Stage/08-04.arc"
     outJson[filename] = {}
     
     print(filename)

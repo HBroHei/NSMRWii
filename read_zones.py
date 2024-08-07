@@ -45,8 +45,18 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
     # for every zone, Check X pos, then Y pos
     #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
     #              Min X                       Max X = min x + width
-    return sprPos[0]+width>=(zoneDat[0]-(16**2)) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+(16**2))\
-        and sprPos[1]+height>=(zoneDat[1]-(16**2)) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+(16**2))
+    #       Spr min X   Zone min X            Spr max X          Zone max X
+    # if sprPos[0]==656 and sprPos[1]==640:
+    #     print(sprPos[0] , (zoneDat[0]-(160)) , sprPos[0]+width , (zoneDat[0]+zoneDat[2]+(160))\
+    #     , sprPos[1] , (zoneDat[1]-(160)) , sprPos[1]+height , zoneDat[1]+zoneDat[3]+(160))
+    #     input()
+    # Check for 4 corners and see either one touches the zone
+    return (sprPos[0]>=(zoneDat[0]-160) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+160))\
+        or (sprPos[0]+width>=(zoneDat[0]-160) and sprPos[0]+width<=(zoneDat[0]+zoneDat[2]+160))\
+        or (sprPos[1]+height>=(zoneDat[1]-160) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+160))\
+        or (sprPos[1]>=(zoneDat[1]-160) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+160))\
+    # return  (sprPos[0]>=(zoneDat[0]-(160)) and sprPos[0]+width <=(zoneDat[0]+zoneDat[2]+(160)))\
+    #     and (sprPos[1]>=(zoneDat[1]-(160)) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+(160)))
 
 
 def readAllSettings(raw_setting):
@@ -114,6 +124,10 @@ def main():
             #print("\nREADING AREA",i,"of",areaNo)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
+            if rulesDict["Patches"]["09-05 Pipe"] and filename=="09-05.arc":
+                print("Patching 09-05.arc")
+                for ent in entrances:
+                    if ent[2]==2: ent[5] = 4
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
@@ -132,10 +146,21 @@ def main():
                     "location" : [loc for loc in locData if checkPosInSpecificZone(zone,(loc[0],loc[1]))],
                     "cameraProfile" : camProfile,
                     #"path" : [path for path in pathProp if checkPosInSpecificZone(zone,(node[0],node[1]))],
+                    #"pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
                     "pathNode" : [node for node in pathNode if checkPosInSpecificZone(zone,(node[0],node[1]))]
                 }
                 # Path
-                outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]]
+                # If any nodes defined to be included in the path prop (start pos, start pos+len of path) is in outJson (in zone)
+                outJson[filename][i][zone[6]]["path"] =\
+                    [path for path in pathProp\
+                     if any(pathNode[node_pos] in outJson[filename][i][zone[6]]["pathNode"] for node_pos in range(path[1],path[1]+path[2]))]
+                # Path Node adding for some node might not be added atm
+                outJson[filename][i][zone[6]]["pathNode"] = []
+                for added_path in outJson[filename][i][zone[6]]["path"]:
+                #                         start node    start_node      path len
+                    for node_pos in range(added_path[1],added_path[1] + added_path[2]):
+                        outJson[filename][i][zone[6]]["pathNode"].append(pathNode[node_pos])
+                # outJson[filename][i][zone[6]]["pathNode"] = list(outJson[filename][i][zone[6]]["pathNode"])
                 # Special case where entrance for 179 is not in zone:
                 _sprData = deepcopy(outJson[filename][i][zone[6]]["sprites"]) # Only need the added sprites
                 ent_179_lst = []
@@ -148,16 +173,19 @@ def main():
                         print("Far away entrance detetcted: ent",ent)
 
             # Read tiles
-            for j in range(0,2): #Loop through every layers
+            for j in range(0,3): #Loop through every layers
                 if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list.keys(): # if layer (j) exist
                     # Get tiles info
                     globalVars.tilesData[j] = nsmbw.NSMBWbgDat.phraseByteData(u8list["course"+ str(i) +"_bgdatL" + str(j) + ".bin"]["Data"])
                     for tile in globalVars.tilesData[j]:
                         # Zones are in sprite coordinate system
                         zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
+                        # if filename=="03-05.arc":
+                        #     print(tilePosToObjPos((tile[1],tile[2])),tilePosToObjPos((tile[3],tile[4])),zoneNo," || ",zoneData)
                         if zoneNo!=-1:
                             if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
+                            # Add to respective zone
                             outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
 
     with open('out.json', 'w', encoding='utf-8') as f:

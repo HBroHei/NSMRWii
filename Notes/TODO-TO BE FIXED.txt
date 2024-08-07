@@ -8,5 +8,8 @@ Entrances
 --Autoscroll levels don't start mid-way
 --Sprite 179
 
+TILE RANDO
+Vine block rando option
+
 MIGHT NOT FIX
 - 06-03 star coin area - unreachable exit

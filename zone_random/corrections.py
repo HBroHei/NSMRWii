@@ -1,4 +1,4 @@
-from Util import objPosToTilePos
+from Util import tilePosToObjPos, objPosToTilePos, changeBytesAt
 
 ID_POS_LOOKUP = {
     "ZoneBound" : 4,
@@ -29,19 +29,126 @@ def isEntranceDoorMatch(doorType:int, doorSpr:list, doorEnt:list):
         doorRange = (0,0)
     return doorEnt[0] in doorRange[0] and doorEnt[1] in doorRange[1]
 
-def alignToPos(zone,x,y):
+def alignToPos_n(zone,nx,ny):
+    def bgdat_layer_check(zone):
+        flag = True
+        for l_no in range(0,3):
+            if "bgdatL" + str(l_no) in zone:
+                flag = flag and all(0<=ent[1]<=16343 and 0<=ent[2]<=16343 for ent in zone["bgdatL" + str(l_no)])
+        return flag
+    def clamp(val):
+        # if max(0, min(val, 16343))!=val:
+        #     print("Clamp used" + str(val))
+        #     input("This should not have beem called. Copy the last ~100 lines and report")
+        # return max(0, min(val, 16343))
+        if val<0:
+            return val + 16343
+        elif val>16343:
+            return val - 16343
+        else:
+            return val
+    passes = 0
+
+    diffx = zone["zone"][0] - nx
+    diffy = zone["zone"][1] - ny
+
+    diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
+
+    while passes==0 or not (all(0<=spr[1]<=16343 and 0<=spr[2]<=16343 for spr in zone["sprites"])\
+        and all(0<=loc[0]<=16343 and 0<=loc[1]<=16343 for loc in zone["location"])\
+        and all(0<=pat[0]<=16343 and 0<=pat[1]<=16343 for pat in zone["pathNode"])\
+        and all(0<=ent[0]<=16343 and 0<=ent[1]<=16343 for ent in zone["entrance"])\
+        and (0<=zone["zone"][0]<=16343) and (0<=zone["zone"][1]<=16343)\
+        and bgdat_layer_check(zone)):
+        # print("Pass",passes,all(0<=spr[1]<=16343 and 0<=spr[2]<=16343 for spr in zone["sprites"])\
+        # , all(0<=loc[0]<=16343 and 0<=loc[1]<=16343 for loc in zone["location"])\
+        # , all(0<=pat[0]<=16343 and 0<=pat[1]<=16343 for pat in zone["pathNode"])\
+        # , all(0<=ent[0]<=16343 and 0<=ent[1]<=16343 for ent in zone["entrance"])\
+        # , bgdat_layer_check(zone))
+        # We do not care if x + width / y + height exceeds limit as it does not overflow python
+        zone["zone"][0] = clamp(zone["zone"][0] + diffx)
+        zone["zone"][1] = clamp(zone["zone"][1] + diffy)
+        zone["sprites"] =\
+            [[spr[0],clamp(spr[1] + diffx),clamp(spr[2] + diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
+        zone["location"] =\
+            [[clamp(loc[0] + diffx), clamp(loc[1] + diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
+        zone["pathNode"] =\
+            [[clamp(loc[0] + diffx), clamp(loc[1] + diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
+        for i in range(len(zone["entrance"])):
+            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] - diffx)
+            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] - diffy)
+            # Check entrance type:
+            #  - Door - get door sprite behind,
+            #    - Boss : door pos x + 8, door pos y + 32
+            #    - Ghost / Normal: door x + 0, door y + 32
+            #    - Bowser: door x + 8, door y + 32
+            #  - Pipe: Check if divisible by 16: -8 if no
+            if zone["entrance"][i][5] in (27,2): # Type == door
+                # Gets the door behind that ent (DISABLED)
+                # for j in door_lists:
+                #     print("Checking ", j, ":", zone["sprites"][j])
+                pass
+            elif zone["entrance"][i][5] in (3,4,5,6,16,17,18,19): # Type==pipe
+                if zone["entrance"][i][0]%16 != 0:
+                    zone["entrance"][i][0] -= 8
+                if zone["entrance"][i][1]%16 != 0:
+                    zone["entrance"][i][1] -= 8
+        for layerNo in range(0,2):
+            curLayerStr = "bgdatL" + str(layerNo)
+            #print("checking",curLayerStr)
+            if curLayerStr in zone:
+                #print("adjusting",curLayerStr)
+                zone[curLayerStr] =\
+                    [[til[0],clamp(til[1] + diffx_tiles),clamp(til[2] + diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
+        passes += 1
+
+    return zone
+
+# TODO Make this a loop instead
+def alignToPos(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
+    redo_align = tuple()
     # Assuming x and y are > 16
 
     # Gets Section 9[0], [1] for start of zone
-    # Gets the diff to x,y
-    diffx = zone["zone"][0] - x
-    diffy = zone["zone"][1] - y
+    # Gets the diff between zone x and new x + y
+    if take_min:
+        nx = min(zone["zone"][0],nx)
+        ny = min(zone["zone"][0],ny)
+    print("OLD - NEW",zone["zone"],nx,ny)
+    #input()
+    if diffx==None:
+        diffx = zone["zone"][0] - nx
+    if diffy==None:
+        diffy = zone["zone"][1] - ny
+    print("DIFF X,Y =",diffx,diffy)
     # Do not change the order of these 4 statements
     # ^ For future me, my brain liked to swap things
     #print(zone["zone"], x, y, diffx, diffy)
     # Put the zone to the new pos
-    zone["zone"][0] = x
-    zone["zone"][1] = y
+    zone["zone"][0] = nx
+    zone["zone"][1] = ny
+
+    # Tiles section
+    # Check if zones are align half-blocks in
+    # Add 0.5 tiles if they are
+    if diffx % 16 != 0:
+        diffx += 8
+    if diffy % 16 != 0:
+        diffy += 8
+    diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
+    for layerNo in range(0,2):
+        curLayerStr = "bgdatL" + str(layerNo)
+        if curLayerStr not in zone: # Skip; non-existing tiles layer
+            continue
+        for i in range(len(zone[curLayerStr])):
+            zone[curLayerStr][i][1] -= diffx_tiles
+            zone[curLayerStr][i][2] -= diffy_tiles
+            if zone[curLayerStr][i][1]<0 or zone[curLayerStr][i][1]>16343:
+                redo_align = ("bgdat","x",zone[curLayerStr][i][1]*16)
+                break
+            if zone[curLayerStr][i][2]<0 or zone[curLayerStr][i][2]>16343:
+                redo_align = ("bgdat","y",zone[curLayerStr][i][2]*16)
+                break
 
     door_lists = []
     # Iterate through every section to convert them to be relative to x, y
@@ -52,35 +159,34 @@ def alignToPos(zone,x,y):
         # Check if sprite is door
         if zone["sprites"][i][0] in [182, 259, 276, 277, 278, 452]:
             door_lists.append(i)
+        # Check pos overflow
         if zone["sprites"][i][1]<0 or zone["sprites"][i][2]<0:
-            redo_align = ("spr","x",zone["sprites"][i][1]) if zone["sprites"][i][0]<0\
+            redo_align = ("spr","x",zone["sprites"][i][1]) if zone["sprites"][i][1]<0\
                 else ("spr","y",zone["sprites"][i][2])
-
+            break
+        elif zone["sprites"][i][1]>16343 or zone["sprites"][i][2]>16343:
+            redo_align = ("spr","x",zone["sprites"][i][1]) if zone["sprites"][i][1]>16343\
+                else ("spr","y",zone["sprites"][i][2])
+            break
     # Zones covered above
     for i in range(len(zone["location"])):
         zone["location"][i][0] -= diffx
         zone["location"][i][1] -= diffy
         if zone["location"][i][0]<0 or zone["location"][i][1]<0:
-            redo_align = ("loc","x",zone["location"][i][0])\
-                if zone["location"][i][1]<0 else ("loc","y",zone["location"][i][1])
+            redo_align = ("location","x",zone["location"][i][0])\
+                if zone["location"][i][0]<0 else ("location","y",zone["location"][i][1])
+        if zone["location"][i][0]>16343 or zone["location"][i][1]>16343:
+            redo_align = ("location","x",zone["location"][i][0])\
+                if zone["location"][i][0]>16343 else ("location","y",zone["location"][i][1])
     for i in range(len(zone["pathNode"])):
         zone["pathNode"][i][0] -= diffx
         zone["pathNode"][i][1] -= diffy
         if zone["pathNode"][i][0]<0 or zone["pathNode"][i][1]<0:
             redo_align = ("pathNode","x",zone["pathNode"][i][0])\
                 if zone["pathNode"][i][0]<0 else ("pathNode","y",zone["pathNode"][i][1])
-
-    # Tiles section
-    diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
-    for layerNo in range(0,2):
-        curLayerStr = "bgdatL" + str(layerNo)
-        if curLayerStr not in zone: # Skip; non-existing tiles layer
-            continue
-        for i in range(len(zone[curLayerStr])):
-            zone[curLayerStr][i][1] -= diffx_tiles
-            zone[curLayerStr][i][2] -= diffy_tiles
-
-    redo_align = tuple()
+        if zone["pathNode"][i][0]>16343 or zone["pathNode"][i][1]>16343:
+            redo_align = ("pathNode","x",zone["pathNode"][i][0])\
+                if zone["pathNode"][i][0]>16343 else ("pathNode","y",zone["pathNode"][i][1])
 
     # SPECIAL: need to align entrances to specific pos
     # Boss doors: half a tile
@@ -95,23 +201,10 @@ def alignToPos(zone,x,y):
         #    - Bowser: door x + 8, door y + 32
         #  - Pipe: Check if divisible by 16: -8 if no
         if zone["entrance"][i][5] in (27,2): # Type == door
-            # Gets the door behind that ent
-            for j in door_lists:
-                print("Checking ", j, ":", zone["sprites"][j])
-                """if isEntranceDoorMatch(1,zone["sprites"][j],zone["entrance"][i]): # Boss door
-                    # Correct x pos?
-                    if (zone["entrance"][i][0]-zone["sprites"][j][0]+8)!=0:
-                        zone["entrance"][i][0] = zone["sprites"][j][0]+8
-                    # Correct y pos?
-                    if (zone["entrance"][i][1]-zone["sprites"][j][1]+32)!=0:
-                        zone["entrance"][i][1] = zone["sprites"][j][1]+32
-                elif isEntranceDoorMatch(0,zone["sprites"][j],zone["entrance"][i]): # Normal door
-                    # Correct x pos?
-                    if zone["entrance"][i][0]!=zone["sprites"][j][0]:
-                        zone["entrance"][i][0] = zone["sprites"][j][0]
-                    # Correct y pos?
-                    if (zone["entrance"][i][1]-zone["sprites"][j][1]+32)!=0:
-                        zone["entrance"][i][1] = zone["sprites"][j][1]+32"""
+            # Gets the door behind that ent (DISABLED)
+            # for j in door_lists:
+            #     print("Checking ", j, ":", zone["sprites"][j])
+            pass
         elif zone["entrance"][i][5] in (3,4,5,6,16,17,18,19): # Type==pipe
             if zone["entrance"][i][0]%16 != 0:
                 zone["entrance"][i][0] -= 8
@@ -123,15 +216,35 @@ def alignToPos(zone,x,y):
             print("OOB ALIGN", zone["entrance"][i][0], zone["entrance"][i][1])
             redo_align = ("entrance","x",zone["entrance"][i][0]) if zone["entrance"][i][0]<0\
                 else ("entrance","y",zone["entrance"][i][1])
+            break
+        elif zone["entrance"][i][0]>=16343 or zone["entrance"][i][1]>=16343:
+            print("OOB ALIGN", zone["entrance"][i][0], zone["entrance"][i][1])
+            redo_align = ("entrance","x",zone["entrance"][i][0]) if zone["entrance"][i][0]>16343\
+                else ("entrance","y",zone["entrance"][i][1])
+            break
     # Redo aligning if negative value
     if len(redo_align)!=0:
-        if redo_align[1]=="x":
-            print("Realigning X",redo_align,(redo_align[2]*-2))
-            return alignToPos(zone,x+(redo_align[2]*-2),y) # Realign x pos
+        if redo_align[2]<0:
+            if redo_align[1]=="x":
+                print("Realigning 0 X",redo_align,(redo_align[2]+320))
+                return alignToPos(zone,diffx=redo_align[2]*2) # Realign x pos
+            else:
+                print("Realigning 0 Y",redo_align,(redo_align[2]+320))
+                return alignToPos(zone,diffy=redo_align[2]*2) # Realign y pos
+        elif redo_align[2]>=16343:
+            if redo_align[1]=="x":
+                print("Realigning max X",redo_align,(redo_align[2]-320))
+                #input()
+                return alignToPos(zone,diffx=redo_align[2]/-2) # Realign x pos
+            else:
+                print("Realigning max Y",redo_align,(redo_align[2]-320))
+                return alignToPos(zone,diffy=redo_align[2]/-2) # Realign y pos
         else:
-            print("Realigning Y",redo_align,(redo_align[2]*-2))
-            return alignToPos(zone,x,y+(redo_align[2]*-2)) # Realign y pos
+            print("OOB Correction failed", redo_align)
+            return zone
     else:
+        # print("SPR PROCESSED",zone["sprites"]==None)
+        # assert zone!=None
         return zone
 
 # Correct incorrect sprite zone id
@@ -149,6 +262,7 @@ def corrSprZone(cur_zone):
 ## btw this is gonna be a hell to debug (and I dont even know an effective way to debug this lol(sign))
 def generate_unique_id(used_ids):
     new_id = max(used_ids) + 1 if used_ids else 1
+    # loop until the id is not duplicated
     while new_id in used_ids:
         new_id += 1
     return new_id
@@ -235,6 +349,18 @@ def corrDupID(areaNo,zone):
                             print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
                             new_id = generate_unique_id(used_ids[areaNo][key_prop])
                             zone_prop[id_position] = new_id
+                            # Check linked locations
+                            if key_prop=="location":
+                                for spr in re_zone["sprites"]:
+                                    # If is 138,139,216 liquid / 53 quicksand / 446 Light Cloud /
+                                    # 64,435 Fog effect
+                                    #print("CHANGING",spr,cur_id,(spr[3][5]&0x0F)==cur_id)
+                                    if spr[0] in (138,139,216,53,446) and spr[3][5]==cur_id:
+                                        # Change Location ID
+                                        spr[3] = changeBytesAt(spr[3],5,new_id)
+                                    # If is 234 Cloud
+                                    elif spr[0]==234 and (spr[3][5]&0x0F)==cur_id:
+                                        spr[3] = changeBytesAt(spr[3],5,(spr[3][5]&0xF0) + new_id)
                             if references!=tuple():
                                 print("Reference",references,re_zone[references[0]])
                                 ref_key, ref_pos = references

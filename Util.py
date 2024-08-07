@@ -10,7 +10,12 @@ def convertNULL(char):
 def tilePosToObjPos(tilePos):
     return [tilePos[0]*16,tilePos[1]*16]
 
-from math import ceil
+def changeBytesAt(bytesStr:bytes, pos:int, newVal):
+    tmp_bytearr = bytearray(bytesStr)
+    tmp_bytearr[pos] = newVal
+    return bytes(tmp_bytearr)
+
+from math import ceil,floor
 def objPosToTilePos(objPos):
     return [ceil(objPos[0]/16),ceil(objPos[1]/16)]
 

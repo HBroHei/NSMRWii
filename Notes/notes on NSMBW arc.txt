@@ -166,7 +166,7 @@ FILE STRUCTUIRE
 
         SECTION 10: LOCATIONS
         Used to define areas for objects (*e.g. clouds) / event triggers / entrance area / etc
-        11 bytes for each entry
+        12 bytes for each entry
         Format: (All offset from the start of the entry)
             Offset  DataType(C)  DataType(Py)  Description
             0x00    UnsignShort  Integer       X Pos

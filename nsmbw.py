@@ -392,7 +392,7 @@ class NSMBWsprite:
         return returnByte
 
     ################## RANDO ####################
-    def processSprites(eData,leData,lvName):
+    def processSprites(eData,leData:list,lvName):
         reData = deepcopy(eData)
         relData = set(deepcopy(leData))
         # relData = set()  # Temp disabled for temp bug fixing
@@ -430,7 +430,7 @@ class NSMBWsprite:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
 
-            # Add to load sprite list
+            # Add to load sprite list sst
             relData.add(enemyData[0])
             
         #print(reData[-1])
@@ -512,7 +512,7 @@ class NSMBWLocations:
                 # 3 Padding byte
                 ]
             )
-            i+=11 #Entry length
+            i+=12 #Entry length
 
         return returnList
     
