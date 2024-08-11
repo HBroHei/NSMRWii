@@ -124,7 +124,7 @@ def main():
     # rf.close()
 
     # filename = "Stage/05-36.arc"
-    filename = "Stage/08-04.arc"
+    filename = input("File name: ")
     outJson[filename] = {}
     
     print(filename)

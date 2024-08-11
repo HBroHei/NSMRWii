@@ -86,7 +86,7 @@ def addRandomZone(tilesetList:list,types:list):
                 new_x = overlap_zone[0]+overlap_zone[2]+512
                 print("New X =",new_x)
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y,False)
         # Check and correct duplicated zones
         generated_zone = corrections.corrDupID(0,generated_zone)
         generated_zone = corrections.corrSprZone(generated_zone)
@@ -110,7 +110,7 @@ def addRandomZone(tilesetList:list,types:list):
                 if x_tot < y_tot: # Vertical zone
                     new_x = overlap_zone[0]+overlap_zone[2]+480
                 print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y,False)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(1,generated_zone)
@@ -136,7 +136,7 @@ def addRandomZone(tilesetList:list,types:list):
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y,False)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(2,generated_zone)
@@ -162,7 +162,7 @@ def addRandomZone(tilesetList:list,types:list):
             if x_tot < y_tot: # Vertical zone
                 new_x = overlap_zone[0]+overlap_zone[2]+480
             print("Is X , Y",x_tot,y_tot)
-            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y)
+            generated_zone = corrections.alignToPos(generated_zone,new_x,new_y,False)
         # Check and correct duplicated zones
         try:
             generated_zone = corrections.corrDupID(3,generated_zone)
@@ -517,7 +517,7 @@ def main():
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
 
-                    exit_zone = corrections.alignToPos(exit_zone,new_x,new_y)
+                    exit_zone = corrections.alignToPos(exit_zone,new_x,new_y,False)
                 # Check and correct duplicated zones
                 exit_zone = corrections.corrDupID(0,exit_zone)
                 exit_zone = corrections.corrSprZone(exit_zone)
@@ -580,7 +580,7 @@ def main():
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
                     print("Is X , Y",x_tot,y_tot)
-                    main_zone = corrections.alignToPos(main_zone,new_x,new_y)
+                    main_zone = corrections.alignToPos(main_zone,new_x,new_y,False)
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(0,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
@@ -602,7 +602,7 @@ def main():
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
                     print("Is X , Y",x_tot,y_tot)
-                    main_zone = corrections.alignToPos(main_zone,new_x,new_y)
+                    main_zone = corrections.alignToPos(main_zone,new_x,new_y,False)
                 # Check and correct duplicated zones
                 main_zone = corrections.corrDupID(1,main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
@@ -746,7 +746,7 @@ def main():
                         nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
 
             # Assign entrances
-            for area_id in range(0,4):
+            for area_id in (0,2,1,3):
                 # Set default level entrance
                 try:
                     area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
@@ -828,7 +828,7 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-36.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     exit()

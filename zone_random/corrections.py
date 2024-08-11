@@ -29,18 +29,25 @@ def isEntranceDoorMatch(doorType:int, doorSpr:list, doorEnt:list):
         doorRange = (0,0)
     return doorEnt[0] in doorRange[0] and doorEnt[1] in doorRange[1]
 
-def alignToPos_n(zone,nx,ny):
+def alignToPos(zone,nx,ny,use_min = True):
     def bgdat_layer_check(zone):
         flag = True
         for l_no in range(0,3):
             if "bgdatL" + str(l_no) in zone:
-                flag = flag and all(0<=ent[1]<=16343 and 0<=ent[2]<=16343 for ent in zone["bgdatL" + str(l_no)])
-        return flag
+                flag = flag and all(0<=til[1]<=16343 and 0<=til[2]<=16343 for til in zone["bgdatL" + str(l_no)])
+                if not flag:
+                    print("layer",l_no,"failed")
+                    for til in zone["bgdatL" + str(l_no)]:
+                        if not (0<=til[1]<=16343 and 0<=til[2]<=16343):
+                            return til
+                    break
+        return []
     def clamp(val):
         # if max(0, min(val, 16343))!=val:
         #     print("Clamp used" + str(val))
         #     input("This should not have beem called. Copy the last ~100 lines and report")
         # return max(0, min(val, 16343))
+        return val
         if val<0:
             return val + 16343
         elif val>16343:
@@ -49,25 +56,38 @@ def alignToPos_n(zone,nx,ny):
             return val
     passes = 0
 
+    if use_min:
+        nx = min(zone["zone"][0],nx)
+        ny = min(zone["zone"][1],ny)
+
     diffx = zone["zone"][0] - nx
     diffy = zone["zone"][1] - ny
 
     diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
+    print("DIFF",diffx, diffy,zone["zone"][0],nx, zone["zone"][1],ny)
 
-    while passes==0 or not (all(0<=spr[1]<=16343 and 0<=spr[2]<=16343 for spr in zone["sprites"])\
-        and all(0<=loc[0]<=16343 and 0<=loc[1]<=16343 for loc in zone["location"])\
-        and all(0<=pat[0]<=16343 and 0<=pat[1]<=16343 for pat in zone["pathNode"])\
-        and all(0<=ent[0]<=16343 and 0<=ent[1]<=16343 for ent in zone["entrance"])\
-        and (0<=zone["zone"][0]<=16343) and (0<=zone["zone"][1]<=16343)\
-        and bgdat_layer_check(zone)):
-        # print("Pass",passes,all(0<=spr[1]<=16343 and 0<=spr[2]<=16343 for spr in zone["sprites"])\
-        # , all(0<=loc[0]<=16343 and 0<=loc[1]<=16343 for loc in zone["location"])\
-        # , all(0<=pat[0]<=16343 and 0<=pat[1]<=16343 for pat in zone["pathNode"])\
-        # , all(0<=ent[0]<=16343 and 0<=ent[1]<=16343 for ent in zone["entrance"])\
-        # , bgdat_layer_check(zone))
+    # Variables indicate if property passes check (*True if not passing*)
+    check_spr = False
+    check_loc = False
+    check_ent = False
+    check_pat = False
+    check_zone = False
+    check_tile = []
+
+    while passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone
+        or check_tile!=[]):
+        # print(zone["orgLvl"],"Pass a",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
+        # for spr in zone["sprites"]:
+        #     if not (0<=spr[1]<=16386 and 0<=spr[2]<=16386):
+        #         print(spr,"failed")
+        #         break
+        # else:
+        #     print("All good")
+
         # We do not care if x + width / y + height exceeds limit as it does not overflow python
         zone["zone"][0] = clamp(zone["zone"][0] + diffx)
         zone["zone"][1] = clamp(zone["zone"][1] + diffy)
+        print("New zone",zone["zone"],diffy)
         zone["sprites"] =\
             [[spr[0],clamp(spr[1] + diffx),clamp(spr[2] + diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
         zone["location"] =\
@@ -75,8 +95,8 @@ def alignToPos_n(zone,nx,ny):
         zone["pathNode"] =\
             [[clamp(loc[0] + diffx), clamp(loc[1] + diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
         for i in range(len(zone["entrance"])):
-            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] - diffx)
-            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] - diffy)
+            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] + diffx)
+            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] + diffy)
             # Check entrance type:
             #  - Door - get door sprite behind,
             #    - Boss : door pos x + 8, door pos y + 32
@@ -101,11 +121,74 @@ def alignToPos_n(zone,nx,ny):
                 zone[curLayerStr] =\
                     [[til[0],clamp(til[1] + diffx_tiles),clamp(til[2] + diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
         passes += 1
+        # if passes==1:
+        #     diffx = 160
+        #     diffy = 160
+        #     diffx_tiles = 10
+        #     diffy_tiles = 10
+        if passes==100:
+            print("Failed to align pos")
+            exit()
+
+        # Adjust based on the result
+        
+        change_x = 0
+        change_y = 0
+
+        check_spr = not all(0<=spr[1]<=16386 and 0<=spr[2]<=16386 for spr in zone["sprites"])
+        check_loc = not all(0<=loc[0]<=16386 and 0<=loc[1]<=16386 for loc in zone["location"])
+        check_pat = not all(0<=pat[0]<=16386 and 0<=pat[1]<=16386 for pat in zone["pathNode"])
+        check_ent = not all(0<=ent[0]<=16386 and 0<=ent[1]<=16386 for ent in zone["entrance"])
+        check_zone = not (0<=zone["zone"][0]<=16386) and (0<=zone["zone"][1]<=16386)
+        check_tile = bgdat_layer_check(zone)
+        # print(zone["orgLvl"],"Pass b",passes,":",\
+        #       check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
+        if passes>=1:
+            if check_spr:
+                for spr in zone["sprites"]:
+                    if spr[1]<0: change_x = 1; break
+                    elif spr[1]>16386: change_x = 2; break
+                    if spr[2]<0: change_y = 1; break
+                    elif spr[2]>16386: change_y = 2; break
+            elif check_loc:
+                for loc in zone["location"]:
+                    if loc[0]<0: change_x = 1; break
+                    elif loc[0]>16386: change_x = 2; break
+                    if loc[1]<0: change_y = 1; break
+                    elif loc[1]>16386: change_y = 2; break
+            elif check_pat:
+                for pat in zone["pathNode"]:
+                    if pat[0]<0: change_x = 1; break
+                    elif pat[0]>16386: change_x = 2; break
+                    if pat[1]<0: change_y = 1; break
+                    elif pat[1]>16386: change_y = 2; break
+            elif check_ent:
+                for ent in zone["entrance"]:
+                    if ent[0]<0: change_x = 1; break
+                    elif ent[0]>16386: change_x = 2; break
+                    if ent[1]<0: change_y = 1; break
+                    elif ent[1]>16386: change_y = 2; break
+            elif check_zone:
+                #print("Zone failed:",zone["zone"])
+                if zone["zone"][0]<0: change_x = 1; break
+                elif zone["zone"][0]>16386: change_x = 2; break
+                if zone["zone"][1]<0: change_y = 1; break
+                elif zone["zone"][1]>16386: change_y = 2; break
+            elif check_tile!=[]:
+                if check_tile[1]<0: change_x = 1; break
+                elif check_tile[1]>16386: change_x = 2; break
+                if check_tile[2]<0: change_y = 1; break
+                elif check_tile[2]>16386: change_y = 2; break
+
+            if change_x==1: diffx = 160; diffx_tiles = 10; diffy = 0; diffy_tiles = 0
+            if change_x==2: diffx = -160; diffx_tiles = -10; diffy = 0; diffy_tiles = 0
+            if change_y==1: diffy = 160; diffy_tiles = 10; diffx = 0; diffx_tiles = 0
+            if change_y==2: diffy = -160; diffy_tiles = -10; diffx = 0; diffx_tiles = 0
 
     return zone
 
 # TODO Make this a loop instead
-def alignToPos(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
+def alignToPos_o(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
     redo_align = tuple()
     # Assuming x and y are > 16
 

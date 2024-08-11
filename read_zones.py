@@ -51,10 +51,10 @@ def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May als
     #     , sprPos[1] , (zoneDat[1]-(160)) , sprPos[1]+height , zoneDat[1]+zoneDat[3]+(160))
     #     input()
     # Check for 4 corners and see either one touches the zone
-    return (sprPos[0]>=(zoneDat[0]-160) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+160))\
-        or (sprPos[0]+width>=(zoneDat[0]-160) and sprPos[0]+width<=(zoneDat[0]+zoneDat[2]+160))\
-        or (sprPos[1]+height>=(zoneDat[1]-160) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+160))\
-        or (sprPos[1]>=(zoneDat[1]-160) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+160))\
+    return ((sprPos[0]>=(zoneDat[0]-160) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+160))\
+        or (sprPos[0]+width>=(zoneDat[0]-160) and sprPos[0]+width<=(zoneDat[0]+zoneDat[2]+160)))\
+        and ((sprPos[1]+height>=(zoneDat[1]-160) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+160))\
+        or (sprPos[1]>=(zoneDat[1]-160) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+160)))\
     # return  (sprPos[0]>=(zoneDat[0]-(160)) and sprPos[0]+width <=(zoneDat[0]+zoneDat[2]+(160)))\
     #     and (sprPos[1]>=(zoneDat[1]-(160)) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+(160)))
 
@@ -180,8 +180,9 @@ def main():
                     for tile in globalVars.tilesData[j]:
                         # Zones are in sprite coordinate system
                         zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
-                        # if filename=="03-05.arc":
-                        #     print(tilePosToObjPos((tile[1],tile[2])),tilePosToObjPos((tile[3],tile[4])),zoneNo," || ",zoneData)
+                        # if filename=="08-06.arc" and zoneNo==0:
+                        #     print("Tile",tile,"(Spr Pos:",tilePosToObjPos((tile[1],tile[2])),",",tilePosToObjPos((tile[3],tile[4])),")")
+                        #     print("is in",zoneNo,":",zoneData[zoneNo])
                         if zoneNo!=-1:
                             if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []
