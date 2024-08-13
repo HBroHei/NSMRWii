@@ -393,14 +393,18 @@ def main():
                         "full" : [], # Level entrance and exit
                         "exit" : [], # Level exit only
                         "boss" : [], # Boss in zone
+                        "after_boss" : [], # Castle / Airship Boss cutscene
                         "bonus" : [], # Only 1 entrance / same ent and exit
                         "count" : 0
                     }
                 # Calculate number of zones for each tilesets
                 groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
 
-                if checks.checkisCutsceneZone(cur_zone):
-                    continue # Skip this zone
+                cutscene_spr = checks.checkisCutsceneZone(cur_zone)
+                if cutscene_spr!=-1:
+                    if cutscene_spr[0]==408 or checks.checkBossSprite(cur_zone)[0]==-1:
+                        groupTilesetJson[cur_tileset_str]["after_boss"].append(cur_zone) # Add to the cutscene list
+                        continue # Skip the zone
 
                 # Check zone has exit / entrances
                 exit_flag,_dum = checks.checkExitSprite(cur_zone)
@@ -534,6 +538,7 @@ def main():
                 normal_exit_zone_id = len(area_zone[0])-1
                 print("AREA ZONE 0",area_zone[0][0]["zone"])
                 print("AREA ZONE 0",exit_zone["zone"])
+                added_zone_area_no = 0
             else:
                 exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((32,32)))
                 area_zone[1].append(exit_zone)
@@ -542,6 +547,32 @@ def main():
                 normal_exit_zone_id = len(area_zone[1])-1
                 normal_exit_area_id = 1
                 area_len+=1
+                added_zone_area_no = 1
+
+            # TODO make 408 scene zone appear
+            if exit_spr[0] in (406,407):
+                # Gets the linked cutscene zone
+                cutscene_zone = deepcopy(groupTilesetJson[gen_exit_zone_tileset]["after_boss"][0])
+                cutscene_zone["cutscene"] = ""
+                overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
+                if overlap_zone_no!=-1:
+                    overlap_zone = area_zone[added_zone_area_no][overlap_zone_no]["zone"]
+                    new_x = 512
+                    new_y = 512
+                    y_tot = overlap_zone[1]+overlap_zone[3]+64+cutscene_zone["zone"][3]
+                    x_tot = overlap_zone[0]+overlap_zone[2]+64+cutscene_zone["zone"][2]
+                    if x_tot > y_tot: # Horizontal zone
+                        new_y = overlap_zone[1]+overlap_zone[3]+480
+                    if x_tot < y_tot: # Vertical zone
+                        new_x = overlap_zone[0]+overlap_zone[2]+480
+
+                    cutscene_zone = corrections.alignToPos(cutscene_zone,new_x,new_y,False)
+                # Check and correct duplicated zones
+                # cutscene_zone = corrections.corrDupID(added_zone_area_no,cutscene_zone)
+                # Surely this boss-dedicated scene would not have any other duplicates IDs
+                cutscene_zone = corrections.corrSprZone(cutscene_zone)
+                area_zone[added_zone_area_no].append(cutscene_zone)
+                print("Added cutscene zone from",cutscene_zone["orgLvl"],cutscene_zone["zone"]); input()
 
             zoneAddedNo += 1
 
@@ -747,6 +778,7 @@ def main():
             nonent_list = [[],[],[],[]]
             for area_id in range(0,4):
                 for zone_pos in range(0,len(area_zone[area_id])):
+                    if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
                     #print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
                     nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
                     if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
@@ -762,61 +794,61 @@ def main():
                 except IndexError:
                     pass
                 for zone_pos in range(0,len(area_zone[area_id])):
-                    #for zone_info in area_zone[area_id][zone_pos]:
-                        for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
-                            # Find suitable exit
-                            exit_found = False
-                            # Check assigned
-                            ent_key = str(area_id) + "_" + str(zone_pos) + "_" + str(entrance_pos)
-                            if ent_key in entrance_assign_list:
-                                continue
-                            # 1. Destination Area
-                            # find random area'
-                            # Check if there are priority
-                            if len(rando_priority_lst)==0:
-                                area_lists_choice = (0,1,2,3)
-                                dest_area_id = choice(area_lists_choice)
-                                round_count = 0
-                                while dest_area_id==area_id or len(nonent_list[dest_area_id])==0:
-                                    dest_area_id += 1
-                                    if dest_area_id>3: dest_area_id = 0
-                                    round_count+=1
-                                    if round_count == 4: break
-                            else:
-                                dest_area_id = rando_priority_lst.pop(0)
-                                print("Priority: Area set to",dest_area_id)
-                                
-                            if len(nonent_list[dest_area_id])!=0: # Area exist?
-                                exit_key = choice(nonent_list[dest_area_id])
-                                print("Ent key",ent_key)
-                                print("exit key",exit_key)
-                                # Set value to exit_key
-                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
-                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                    area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-
-                                nonent_list[dest_area_id].remove(exit_key)
-                                entrance_assign_list.append(ent_key)
-                                exit_found = True
-                            # 3. Any Area (Last Resort)
-                            if not exit_found:
-                                for _area_id in range(0,4):
-                                    if len(nonent_list[_area_id])!=0:
-                                        exit_key = choice(nonent_list[_area_id])
-                                        print("3. Area ID", _area_id)
-                                        print("3. ENT key",ent_key)
-                                        print("3. EXIT key",exit_key)
-                                        print("3. AREA LEN", len(area_zone[_area_id]))
-                                        # Set value to exit_key
-                                        area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = _area_id+1
-                                        area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                            area_zone[_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-                                        #             Area ID   Zone Pos                  Ent Pos
-                                        
-                                        nonent_list[_area_id].remove(exit_key)
-                                        entrance_assign_list.append(ent_key)
-                                        exit_found = True
-                                        break
+                    if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
+                    for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
+                        # Find suitable exit
+                        exit_found = False
+                        # Check assigned
+                        ent_key = str(area_id) + "_" + str(zone_pos) + "_" + str(entrance_pos)
+                        if ent_key in entrance_assign_list:
+                            continue
+                        # 1. Destination Area
+                        # find random area'
+                        # Check if there are priority
+                        if len(rando_priority_lst)==0:
+                            area_lists_choice = (0,1,2,3)
+                            dest_area_id = choice(area_lists_choice)
+                            round_count = 0
+                            while dest_area_id==area_id or len(nonent_list[dest_area_id])==0:
+                                dest_area_id += 1
+                                if dest_area_id>3: dest_area_id = 0
+                                round_count+=1
+                                if round_count == 4: break
+                        else:
+                            dest_area_id = rando_priority_lst.pop(0)
+                            print("Priority: Area set to",dest_area_id)
+                            
+                        if len(nonent_list[dest_area_id])!=0: # Area exist?
+                            exit_key = choice(nonent_list[dest_area_id])
+                            print("Ent key",ent_key)
+                            print("exit key",exit_key)
+                            # Set value to exit_key
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
+                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                            
+                            nonent_list[dest_area_id].remove(exit_key)
+                            entrance_assign_list.append(ent_key)
+                            exit_found = True
+                        # 3. Any Area (Last Resort)
+                        if not exit_found:
+                            for _area_id in range(0,4):
+                                if len(nonent_list[_area_id])!=0:
+                                    exit_key = choice(nonent_list[_area_id])
+                                    print("3. Area ID", _area_id)
+                                    print("3. ENT key",ent_key)
+                                    print("3. EXIT key",exit_key)
+                                    print("3. AREA LEN", len(area_zone[_area_id]))
+                                    # Set value to exit_key
+                                    area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = _area_id+1
+                                    area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
+                                        area_zone[_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                                    #             Area ID   Zone Pos                  Ent Pos
+                                    
+                                    nonent_list[_area_id].remove(exit_key)
+                                    entrance_assign_list.append(ent_key)
+                                    exit_found = True
+                                    break
 
                             if not exit_found:
                                 # Handle no exit found (e.g., add a new exit, adjust entrance, raise error)

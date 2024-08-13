@@ -20,9 +20,9 @@ from copy import deepcopy
 def checkisCutsceneZone(zone):
     for i in range(0,len(zone["sprites"])):
         spr = zone["sprites"][i]
-        if spr[0]==408:
-            return True
-    return False
+        if spr[0] in (408,409):
+            return spr
+    return -1
 
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
