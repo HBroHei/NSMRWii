@@ -34,7 +34,7 @@ def alignToPos(zone,nx,ny,use_min = True):
         flag = True
         for l_no in range(0,3):
             if "bgdatL" + str(l_no) in zone:
-                flag = flag and all(0<=til[1]<=16343 and 0<=til[2]<=16343 for til in zone["bgdatL" + str(l_no)])
+                flag = flag and all(0<=til[1]<=1024 and 0<=til[2]<=512 for til in zone["bgdatL" + str(l_no)])
                 if not flag:
                     print("layer",l_no,"failed")
                     for til in zone["bgdatL" + str(l_no)]:
@@ -76,9 +76,9 @@ def alignToPos(zone,nx,ny,use_min = True):
 
     while passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone
         or check_tile!=[]):
-        # print(zone["orgLvl"],"Pass a",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
+        print(zone["orgLvl"],"Pass a",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
         # for spr in zone["sprites"]:
-        #     if not (0<=spr[1]<=16386 and 0<=spr[2]<=16386):
+        #     if not (0<=spr[1]<=16384 and 0<=spr[2]<=16384):
         #         print(spr,"failed")
         #         break
         # else:
@@ -135,55 +135,55 @@ def alignToPos(zone,nx,ny,use_min = True):
         change_x = 0
         change_y = 0
 
-        check_spr = not all(0<=spr[1]<=16386 and 0<=spr[2]<=16386 for spr in zone["sprites"])
-        check_loc = not all(0<=loc[0]<=16386 and 0<=loc[1]<=16386 for loc in zone["location"])
-        check_pat = not all(0<=pat[0]<=16386 and 0<=pat[1]<=16386 for pat in zone["pathNode"])
-        check_ent = not all(0<=ent[0]<=16386 and 0<=ent[1]<=16386 for ent in zone["entrance"])
-        check_zone = not (0<=zone["zone"][0]<=16386) and (0<=zone["zone"][1]<=16386)
+        check_spr = not all(0<=spr[1]<=16384 and 0<=spr[2]<=8192  for spr in zone["sprites"])
+        check_loc = not all(0<=loc[0]<=16384 and 0<=loc[1]<=8192  for loc in zone["location"])
+        check_pat = not all(0<=pat[0]<=16384 and 0<=pat[1]<=8192  for pat in zone["pathNode"])
+        check_ent = not all(0<=ent[0]<=16384 and 0<=ent[1]<=8192  for ent in zone["entrance"])
+        check_zone = not ((0<=zone["zone"][0]<=16384) and (0<=zone["zone"][1]<=8192 ) and (0<=zone["zone"][0]+zone["zone"][2]<=16384) and (0<=zone["zone"][1]+zone["zone"][3]<=8192 ))
         check_tile = bgdat_layer_check(zone)
-        # print(zone["orgLvl"],"Pass b",passes,":",\
-        #       check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
+        print(zone["orgLvl"],"Pass b",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
         if passes>=1:
             if check_spr:
                 for spr in zone["sprites"]:
                     if spr[1]<0: change_x = 1; break
-                    elif spr[1]>16386: change_x = 2; break
+                    elif spr[1]>8192 : change_x = 2; break
                     if spr[2]<0: change_y = 1; break
-                    elif spr[2]>16386: change_y = 2; break
+                    elif spr[2]>8192 : change_y = 2; break
             elif check_loc:
                 for loc in zone["location"]:
                     if loc[0]<0: change_x = 1; break
-                    elif loc[0]>16386: change_x = 2; break
+                    elif loc[0]>16384: change_x = 2; break
                     if loc[1]<0: change_y = 1; break
-                    elif loc[1]>16386: change_y = 2; break
+                    elif loc[1]>8192 : change_y = 2; break
             elif check_pat:
                 for pat in zone["pathNode"]:
                     if pat[0]<0: change_x = 1; break
-                    elif pat[0]>16386: change_x = 2; break
+                    elif pat[0]>16384: change_x = 2; break
                     if pat[1]<0: change_y = 1; break
-                    elif pat[1]>16386: change_y = 2; break
+                    elif pat[1]>8192 : change_y = 2; break
             elif check_ent:
                 for ent in zone["entrance"]:
                     if ent[0]<0: change_x = 1; break
-                    elif ent[0]>16386: change_x = 2; break
+                    elif ent[0]>16384: change_x = 2; break
                     if ent[1]<0: change_y = 1; break
-                    elif ent[1]>16386: change_y = 2; break
+                    elif ent[1]>8192 : change_y = 2; break
             elif check_zone:
                 #print("Zone failed:",zone["zone"])
-                if zone["zone"][0]<0: change_x = 1; break
-                elif zone["zone"][0]>16386: change_x = 2; break
-                if zone["zone"][1]<0: change_y = 1; break
-                elif zone["zone"][1]>16386: change_y = 2; break
+                if zone["zone"][0]<0: change_x = 1
+                elif zone["zone"][0]>16384: change_x = 2
+                if zone["zone"][1]<0: change_y = 1
+                elif zone["zone"][1]>8192 : change_y = 2
             elif check_tile!=[]:
-                if check_tile[1]<0: change_x = 1; break
-                elif check_tile[1]>16386: change_x = 2; break
-                if check_tile[2]<0: change_y = 1; break
-                elif check_tile[2]>16386: change_y = 2; break
+                if check_tile[1]<0: change_x = 1
+                elif check_tile[1]>1024: change_x = 2
+                if check_tile[2]<0: change_y = 1
+                elif check_tile[2]>512 : change_y = 2
 
             if change_x==1: diffx = 160; diffx_tiles = 10; diffy = 0; diffy_tiles = 0
             if change_x==2: diffx = -160; diffx_tiles = -10; diffy = 0; diffy_tiles = 0
             if change_y==1: diffy = 160; diffy_tiles = 10; diffx = 0; diffx_tiles = 0
             if change_y==2: diffy = -160; diffy_tiles = -10; diffx = 0; diffx_tiles = 0
+            # print("Checklist",passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone or check_tile!=[]))
 
     return zone
 
@@ -326,7 +326,7 @@ def alignToPos_o(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
             print("OOB Correction failed", redo_align)
             return zone
     else:
-        # print("SPR PROCESSED",zone["sprites"]==None)
+        # print("SPR PROCES/SED",zone["sprites"]==None)
         # assert zone!=None
         return zone
 

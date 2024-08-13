@@ -828,7 +828,7 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        if stg_name=="01-36.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     exit()
