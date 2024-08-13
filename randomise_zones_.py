@@ -421,11 +421,15 @@ def main():
                         groupTilesetJson[cur_tileset_str]["normal"].append(cur_zone)
                 else:
                     groupTilesetJson[cur_tileset_str]["exit"].append(cur_zone)
-                    # if key_lvl=="01-24.arc":
-                    #         print("SPRITES",groupTilesetJson[cur_tileset_str]["exit"][-1]["sprites"])
-                    #         print("Get back this val by groupTilesetJson["\
-                    #               + cur_tileset_str + "][\"exit\"][" + str(len(groupTilesetJson[cur_tileset_str]["exit"])-1) + "][\"sprites\"]")
-                    #         input()
+                # if key_lvl=="04-05.arc":
+                #     print("Flags",exit_flag,ent_flag,oneent_flag)
+                #     try:
+                #         print("SPRITES",cur_zone["zone"])
+                #     except IndexError:
+                #         pass
+                #     print("Get back this val by groupTilesetJson[\""\
+                #           + cur_tileset_str + "\"][\"normal\"][" + str(len(groupTilesetJson[cur_tileset_str]["normal"])-1) + "][\"zone\"]")
+                #     input()
     # print(groupTilesetJson["Pa0_jyotyuPa1_noharaPa2_doukutu"]["full"][1])
     # These will always be area 1, with exit zone as zone 0 in the level
     """
@@ -452,6 +456,8 @@ def main():
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture":
             continue # Skip that folder
+        # print("04-05.arc status:",groupTilesetJson["Pa0_jyotyuPa1_kaiganPa2_sora"]["normal"][0]["zone"])
+        # input()
 
         entrance_list = [[],[],[],[]] # entrance_list[area_no][zone_no]["enterable"|"nonenterable"], no need to complicated things
         area_enterable_count = [0,0,0,0]
@@ -550,7 +556,7 @@ def main():
             # exit_tileset = "Pa0_jyotyuPa2_sora"
 
             # Gets the random zone
-            main_zone = getRandomZone(main_tileset,"normal")
+            main_zone = deepcopy(getRandomZone(main_tileset,"normal"))
             if have_secret: # If have secret, check whether main_zone has 2 or more enterables
                 while len(checks.findExitEnt(main_zone)[0])<2:
                     main_tileset = getRandomTileset(tilesetList)
@@ -673,7 +679,8 @@ def main():
                             exit_spr[4],
                             exit_spr[5]
                         ]
-                        area_zone[added_area_no][-1]["sprites"][exit_spr_pos] = new_pole
+                        # area_zone[added_area_no][-1]["sprites"][exit_spr_pos] = new_pole
+                        area_zone[added_area_no][-1]["sprites"].append(new_pole)
                         # Set entrance type to normal
                         area_zone[added_area_no][-1]["entrance"][0][5] = 20
                         area_zone[added_area_no][-1]["entrance"][0][1] += 32
@@ -732,9 +739,9 @@ def main():
             if only_main:
                 rando_priority_lst = []
             elif have_secret:
-                rando_priority_lst = [2,1,secret_exit_area_id]
+                rando_priority_lst = [2,1,secret_exit_area_id,1]
             else:
-                rando_priority_lst = [2,1]
+                rando_priority_lst = [2,1,1]
 
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
