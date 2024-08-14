@@ -572,7 +572,7 @@ def main():
                 # Surely this boss-dedicated scene would not have any other duplicates IDs
                 cutscene_zone = corrections.corrSprZone(cutscene_zone)
                 area_zone[added_zone_area_no].append(cutscene_zone)
-                print("Added cutscene zone from",cutscene_zone["orgLvl"],cutscene_zone["zone"]); input()
+                #print("Added cutscene zone from",cutscene_zone["orgLvl"],cutscene_zone["zone"]); input()
 
             zoneAddedNo += 1
 
@@ -594,7 +594,7 @@ def main():
                     # Prevent area without exit
                     while len(groupTilesetJson[main_tileset]["normal"])==0:
                         main_tileset = getRandomTileset(tilesetList)
-                    main_zone = getRandomZone(main_tileset,"normal")
+                    main_zone = deepcopy(getRandomZone(main_tileset,"normal"))
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
                 nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[],stg_name)
@@ -786,9 +786,11 @@ def main():
 
             # Assign entrances
             for area_id in (0,2,1,3):
-                # Set default level entrance
                 try:
+                    # Set default level entrance
                     area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
+                    # Set timer to a reasonable amount
+                    area_zone[area_id][0]["AreaSetting"][0][3] = 500
                     # Set ambush flag off
                     area_zone[area_id][0]["AreaSetting"][0][7] = False
                 except IndexError:
@@ -867,7 +869,7 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
+        # if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     exit()
