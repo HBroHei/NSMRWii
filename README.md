@@ -4,6 +4,14 @@
  Details: https://HBroHei.github.io/NSMRWii \
 ***DISCLAMER: This program only received limited testing. The game may crash or glitch at any time***
 
+# Version 2 is almost here!
+Almost half a year in the makes, this version is very close to its final release!
+### New Features in Version 2.0:
+- **Randomise Area and zones: You may expect an Area from 1-2 to appear alongside with an Area from 5-4!**
+- Power-up panels randomisation: Toad House Power-up panels will be as fresh as your first time playing Power-up Panels!
+- Random winds: Wanted to have a sandstorm in a snowy plains? Wanted the wind to be stronger? I've got you!
+### Beta build is now accessible in [Releases](https://github.com/HBroHei/NSMRWii/releases)!
+
 ## Features
 - Shuffle levels
 - Randomize enemies
