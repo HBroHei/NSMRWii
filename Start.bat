@@ -1,2 +1,3 @@
-python3 ./main.py
+python ./read_zones.py
+python ./randomise_zones_.py
 pause
