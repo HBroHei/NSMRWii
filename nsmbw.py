@@ -2,7 +2,7 @@
 Entity data: 2 bytes
 """
 
-from random import randint, shuffle
+from random import randint, shuffle, random, randbytes
 import globalVars
 from copy import deepcopy
 
@@ -392,12 +392,13 @@ class NSMBWsprite:
         return returnByte
 
     ################## RANDO ####################
-    def processSprites(eData,leData:list,lvName):
+    def processSprites(eData:list,leData:list,lvName):
         reData = deepcopy(eData)
         relData = set(deepcopy(leData))
         # relData = set()  # Temp disabled for temp bug fixing
 
         posList = []
+        is_panel = False # Is power-up panel level
 
         if len(eData)==0:
             print("Info: No sprites for this list")
@@ -424,14 +425,56 @@ class NSMBWsprite:
                     enemyData[0] = eLis[randint(0,len(eLis)-1)] #randomize
                     if enemyData[0] not in globalVars.SKIP_SPRITES:
                         enemyData[3] = b"\x00\x00\x00\x00\x00\x00" #Reset enemy state to default
-
+                elif globalVars.panel_rand and enemyData[0]==428: # It is a power-up panel level
+                    is_panel = True
+                    break
             #Randomize enemy variation
             if str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
+            if is_panel and globalVars.panel_rand: # Power-up Panel level
+                input("PANEL TIME")
+                # Set up matching combo
+                combo_lis = []
+                for __ in range(1,7):
+                    combo_lis.append([randint(0,8) for _ in range(0,9)]*2)
+                # Look for panels sprites
+                cur_combo_item_idx = 0
+                for spr_data in reData:
+                    if spr_data[0]==428: # Assign randomised items
+                        raw_bytes = b""
+                        for cur_combo_lis_idx in range(0,len(combo_lis),2):
+                            print("Assigning",cur_combo_lis_idx,cur_combo_item_idx)
+                            cur_combo_lis1 = combo_lis[cur_combo_lis_idx]
+                            cur_combo_lis2 = combo_lis[cur_combo_lis_idx+1]
+                            raw_bytes += ((cur_combo_lis1[cur_combo_item_idx]<<4) | cur_combo_lis2[cur_combo_item_idx]).to_bytes(1,"big")
+                        # Append orginal panel ID
+                        spr_data[3] = b"\x00\x00" + raw_bytes + (bytearray(spr_data[3])[5]).to_bytes(1,"big")
+                        cur_combo_item_idx+=1
+                break
 
             # Add to load sprite list sst
             relData.add(enemyData[0])
+
+        # Add winds
+        if randint(0,100)<globalVars.windChance:
+            # Gets the pos of first sprite
+            first_spr = reData[0]
+            # Add wind effect
+            reData.append([374,first_spr[1]+16,first_spr[2],b"\x00\x00\x00\x00\x00\x01",first_spr[4],first_spr[5]])
+            # Determine strength of wind
+            wind_stre = randint(0,3)
+            # Determine Active and inactive length
+            wind_time_len = randbytes(1)
+            # Determine wind direction
+            wind_dir = randint(0,1)
+            # Piece them together
+            wind_raw = b"\x00\x00" + wind_time_len + wind_dir.to_bytes(1,"big") + b"\x00" + wind_stre.to_bytes(1,"big")
+            # append to list
+            reData.append([90,first_spr[1]+32,first_spr[2],wind_raw,first_spr[4],first_spr[5]])
+            #input("Wind added")
+            relData.add(90)
+            relData.add(374)
             
         #print(reData[-1])
 

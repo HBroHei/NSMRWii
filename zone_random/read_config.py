@@ -62,8 +62,14 @@ except KeyError:
     log += str("[i] 'Tile Group' not included" + "\n")
     pass
 
+windChance = rulesDict["Wind Chance"]
+
+panel_rand = rulesDict["Power-up Panel Shuffle"]
+
 # Add them all to the global vars list
 globalVars.enemyList = enemyList
 globalVars.enemyVarList = enemyVarList
 globalVars.reduceLag = reduceLag
 globalVars.tileGroup = tileGroup
+globalVars.windChance = windChance
+globalVars.panel_rand = panel_rand

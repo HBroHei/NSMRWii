@@ -9,7 +9,7 @@ import globalVars
 from Util import tilePosToObjPos, convertToDict, objPosToTilePos
 from zone_random import checks,corrections, read_config
 
-from random import randint, shuffle, choice
+from random import randint, shuffle, choice, random
 from copy import deepcopy
 import traceback
 
@@ -41,7 +41,12 @@ def writeArea():
 # Add data to the list of enterables / nonenterables
 def addEntranceData(areaNo : int, zoneToFind:list):
     assert type(zoneToFind)==list or type(zoneToFind)==dict
-    allEnt, allNonEnt = checks.findExitEnt(zoneToFind)
+    # Special zones that needs to be skipped:
+    if zoneToFind==[]:
+        allEnt = []
+        allNonEnt = []
+    else:
+        allEnt, allNonEnt = checks.findExitEnt(zoneToFind)
     entrance_list[areaNo].append({
         "enterable" : allEnt,
         "nonenterable" : allNonEnt
@@ -549,11 +554,13 @@ def main():
                 area_len+=1
                 added_zone_area_no = 1
 
+            cutscene_zone_pos = (-1,-1)
             # TODO make 408 scene zone appear
             if exit_spr[0] in (406,407):
                 # Gets the linked cutscene zone
                 cutscene_zone = deepcopy(groupTilesetJson[gen_exit_zone_tileset]["after_boss"][0])
                 cutscene_zone["cutscene"] = ""
+                #cutscene_zone_pos = (added_area_no,len(area_zone[added_zone_area_no]))
                 overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
                     overlap_zone = area_zone[added_zone_area_no][overlap_zone_no]["zone"]
@@ -572,9 +579,11 @@ def main():
                 # Surely this boss-dedicated scene would not have any other duplicates IDs
                 cutscene_zone = corrections.corrSprZone(cutscene_zone)
                 area_zone[added_zone_area_no].append(cutscene_zone)
-                #print("Added cutscene zone from",cutscene_zone["orgLvl"],cutscene_zone["zone"]); input()
+                addEntranceData(added_zone_area_no,[])
+                print("Added cutscene zone from",cutscene_zone["orgLvl"],cutscene_zone["zone"], "at", len(area_zone[added_zone_area_no])); # input()
 
             zoneAddedNo += 1
+            # print("AONE LEN",len(area_zone[1]))
 
             # Generate the main area
             print("Determine main")
@@ -660,13 +669,12 @@ def main():
         else:
             main_zone = spawn_zone # Only for programmer's viewing sake, shouldn't do anything lol
             only_main = True # This, however, is to mark which entrance will be prioritised to be randomised
-        
+        # print("AONE LEN",len(area_zone[1]))
         #### END OF ADDING THE NECESSARY ZONES ####
         ### Check if new zones is needed to be added - for:
         # - Entrances > exit number
         # - have secret exit
         # I believe there is a better wauy to do this, but this will do for now
-        
         secret_generated = False
         ent_pipes_cand = []
         print("NONENT:",area_nonenterable_count)
@@ -714,7 +722,16 @@ def main():
                         area_zone[added_area_no][-1]["sprites"].append(new_pole)
                         # Set entrance type to normal
                         area_zone[added_area_no][-1]["entrance"][0][5] = 20
-                        area_zone[added_area_no][-1]["entrance"][0][1] += 32
+                        area_zone[added_area_no][-1]["entrance"][0][1] += 32 # Lower Y value
+                        # prevent softlock in tiles
+                        for til in area_zone[added_area_no][-1]["bgdatL1"]:
+                            # if stg_name=="08-02.arc":
+                            #     print("Area of pole",[zone_ent_x,zone_ent_y-160,96,160],"TILE:",til)
+                            #     input()
+                            if checks.checkPosInSpecificPos([zone_ent_x,zone_ent_y-160,96,160],tilePosToObjPos(til[1:3]),*tilePosToObjPos(til[3:])):
+                                print("Removing tile")
+                                area_zone[added_area_no][-1]["bgdatL1"].remove(til)
+
                         print("ADDED New Flagpole")
                     # Randomise sprite
                     area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
@@ -779,7 +796,7 @@ def main():
             for area_id in range(0,4):
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
-                    #print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
+                    print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
                     nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
                     if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
                         nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]

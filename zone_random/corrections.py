@@ -85,18 +85,18 @@ def alignToPos(zone,nx,ny,use_min = True):
         #     print("All good")
 
         # We do not care if x + width / y + height exceeds limit as it does not overflow python
-        zone["zone"][0] = clamp(zone["zone"][0] + diffx)
-        zone["zone"][1] = clamp(zone["zone"][1] + diffy)
+        zone["zone"][0] = clamp(zone["zone"][0] - diffx)
+        zone["zone"][1] = clamp(zone["zone"][1] - diffy)
         print("New zone",zone["zone"],diffy)
         zone["sprites"] =\
-            [[spr[0],clamp(spr[1] + diffx),clamp(spr[2] + diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
+            [[spr[0],clamp(spr[1] - diffx),clamp(spr[2] - diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
         zone["location"] =\
-            [[clamp(loc[0] + diffx), clamp(loc[1] + diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
+            [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
         zone["pathNode"] =\
-            [[clamp(loc[0] + diffx), clamp(loc[1] + diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
+            [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
         for i in range(len(zone["entrance"])):
-            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] + diffx)
-            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] + diffy)
+            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] - diffx)
+            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] - diffy)
             # Check entrance type:
             #  - Door - get door sprite behind,
             #    - Boss : door pos x + 8, door pos y + 32
@@ -119,7 +119,7 @@ def alignToPos(zone,nx,ny,use_min = True):
             if curLayerStr in zone:
                 #print("adjusting",curLayerStr)
                 zone[curLayerStr] =\
-                    [[til[0],clamp(til[1] + diffx_tiles),clamp(til[2] + diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
+                    [[til[0],clamp(til[1] - diffx_tiles),clamp(til[2] - diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
         passes += 1
         # if passes==1:
         #     diffx = 160
@@ -179,10 +179,10 @@ def alignToPos(zone,nx,ny,use_min = True):
                 if check_tile[2]<0: change_y = 1
                 elif check_tile[2]>512 : change_y = 2
 
-            if change_x==1: diffx = 160; diffx_tiles = 10; diffy = 0; diffy_tiles = 0
-            if change_x==2: diffx = -160; diffx_tiles = -10; diffy = 0; diffy_tiles = 0
-            if change_y==1: diffy = 160; diffy_tiles = 10; diffx = 0; diffx_tiles = 0
-            if change_y==2: diffy = -160; diffy_tiles = -10; diffx = 0; diffx_tiles = 0
+            if change_x==1: diffx = -160; diffx_tiles = -10; diffy = 0; diffy_tiles = 0
+            if change_x==2: diffx = 160; diffx_tiles = 10; diffy = 0; diffy_tiles = 0
+            if change_y==1: diffy = -160; diffy_tiles = -10; diffx = 0; diffx_tiles = 0
+            if change_y==2: diffy = 160; diffy_tiles = 10; diffx = 0; diffx_tiles = 0
             # print("Checklist",passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone or check_tile!=[]))
 
     return zone

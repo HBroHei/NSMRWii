@@ -94,6 +94,12 @@ def findExitEnt(zone):
             ret_pos_noExit.append(i)
     return ret_pos,ret_pos_noExit
 
+def checkPosInSpecificPos(hostPos, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
+    # for every hosts, Check X pos, then Y pos
+    #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
+    return hostPos[0] < sprPos[0]+width and hostPos[0]+hostPos[2] > sprPos[0]\
+        and hostPos[1] < sprPos[1]+height and hostPos[1]+hostPos[3] > sprPos[1]
+
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos
     #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
