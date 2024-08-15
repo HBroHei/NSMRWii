@@ -192,7 +192,7 @@ function toJson(){
             "Secret Exit List": ["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
-            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value,
+            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
             "Patches" : {
                 "09-05 Pipe" : true
             },
