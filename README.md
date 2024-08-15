@@ -1,21 +1,27 @@
 # New Super Mario Rando Wii
- A New Super Mario Bros Wii Randomizer for general use such as enemy randomization\
- Currently the project is a work-in-progress. \
+ A New Super Mario Bros Wii Randomizer that is capable of randomising Levels, Areas, Enemies, Power-ups, and more\
  Details: https://HBroHei.github.io/NSMRWii \
 ***DISCLAMER: This program only received limited testing. The game may crash or glitch at any time***
 
+## Version 2 is almost here!
+Almost half a year in the makes, this version is very close to its final release!
+### New Features in Version 2.0:
+- **Randomise Area and zones: You may expect an Area from 1-2 to appear alongside with an Area from 5-4!**
+- Power-up panels randomisation: Toad House Power-up panels will be as fresh as your first time playing Power-up Panels!
+- Random winds: Wanted to have a sandstorm in a snowy plains? Wanted the wind to be stronger? I've got you!
+
 ## Features
-- Shuffle levels
+- **Shuffle Areas and zones levels**
 - Randomize enemies
 - Randomize power-ups
-- Randomize Entrance (EXPERIMENTAL)
+- Randomize Toad Houses
+- Randomize winds
 
 ## Usage
  A guide on how to use the program is now available at https://hbrohei.github.io/NSMRWii/generator/tut.html
  
 ## Planned Features
 Note: Planned features may be changed or removed at anytime
-- Area (Zone) randomization
 - Support for custom levels (It should work at the moment but no guarentee)
 
 ## Notes
