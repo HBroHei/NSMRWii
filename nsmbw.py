@@ -433,7 +433,7 @@ class NSMBWsprite:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
             if is_panel and globalVars.panel_rand: # Power-up Panel level
-                input("PANEL TIME")
+                #input("PANEL TIME")
                 # Set up matching combo
                 combo_lis = []
                 for __ in range(1,7):

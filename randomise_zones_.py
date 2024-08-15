@@ -3,6 +3,7 @@
 
 import json
 
+from dolphinAutoTransfer import dolphinAutoTransfer
 import u8_m
 import nsmbw
 import globalVars
@@ -889,6 +890,22 @@ def main():
         # if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
+    #print("*****All levels have been generated. Please move the stages into the respective folder*****")
+    dolphinAutoTransfer.readAutoCopyConfig()
+
+    # Starting Transfer to dolphin
+    if dolphinAutoTransfer.verify_autotransfer_status(): 
+        print("Auto Copying : Beginning transfer setting verification")
+        if dolphinAutoTransfer.verify_transfer_settings():
+            print("Auto Copying : Transfer settings are valid, beginning transfer...")
+            if dolphinAutoTransfer.start_transfer("./Stage_output"):
+                print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
+            else:
+                print("Auto Copying : An error occurred during files transfer")
+        else:
+            print("Auto Copying : Transfer settings are invalid, aborting transfer")
+    else:
+        print("Auto Copying : Auto Copying is disabled, don't forget to follow instructions for copy files from \"Stage_output\"")
     exit()
 
 if __name__=="__main__":
