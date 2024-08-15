@@ -40,6 +40,11 @@ function openWin(ele){
 
 }
 
+function enableV2(){
+    document.getElementById("exp_windRand").disabled  = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_panelRand").disabled = !document.getElementById("exp_v2enable").checked;
+}
+
 function toJson(){
     lvList_skip = ["Texture","01-40.arc","01-41.arc","01-42.arc"] //re-initalize
     lvList_same = []
@@ -171,38 +176,39 @@ function toJson(){
     }
     */
 
-
-    /*
-    if(document.getElementById("SSE").checked){
-        lvList.push("01-03.arc");
-        lvList.push("02-04.arc");
-        lvList.push("02-06.arc");
-        lvList.push("03-04.arc");
-        lvList.push("03-05.arc");
-        lvList.push("03-21.arc");
-        lvList.push("04-21.arc");
-        lvList.push("04-22.arc");
-        lvList.push("05-21.arc");
-        lvList.push("06-05.arc");
-        lvList.push("06-06.arc");
-        lvList.push("07-21.arc");
-        lvList.push("07-22.arc");
-        lvList.push("08-02.arc");
-    }*/
     const e_rand_sel = document.getElementById(("enemy_presets"))
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
     //let tileRan = t_presets_data[t_rand_sel.options[t_rand_sel.options.selectedIndex].value];
     let tileRan = includeTilesList;
-    return {
-        "Seed": seeds,
-        "Reduce Lag": document.getElementById("LagReduce").checked,
-        "Entrance Randomisation": document.getElementById("exp_entRand").checked,
-        "Skip Level": lvList_skip,
-        "Enemies": eList,
-        "Enemy Variation": enemyVarients,
-        "Level Group": lvList_same,
-        "Tile Group": tileRan
+
+    // V2 checks
+    if(document.getElementById("exp_v2enable").checked){
+        return {
+            "Seed": seeds,
+            "Reduce Lag": document.getElementById("LagReduce").checked,
+            "Skip Level": lvList_skip,
+            "Enemies": eList,
+            "Enemy Variation": enemyVarients,
+            "Secret Exit List": ["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
+            "Tile Group": tileRan,
+            "Wind Chance": Number(document.getElementById("exp_windRand").value),
+            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value
+        }
     }
+    else{
+        return {
+            "Seed": seeds,
+            "Reduce Lag": document.getElementById("LagReduce").checked,
+            "Entrance Randomisation": document.getElementById("exp_entRand").checked,
+            "Skip Level": lvList_skip,
+            "Enemies": eList,
+            "Enemy Variation": enemyVarients,
+            "Level Group": lvList_same,
+            "Tile Group": tileRan
+        }
+    }
+    
+    
 }
 
 function genJson(){
