@@ -33,11 +33,15 @@ class dolphinAutoTransfer:
                     return True    
                 else:
                     print("Auto Copying : Dolphin Riivolution folder is not provided or incorrect, Trying to Locate Dolphin User Folder")
-                    if os.path.exists(os.path.join(os.environ['APPDATA'],"Dolphin Emulator","Load","Riivolution")):
-                        print("Auto Copying : A Dolphin Riivolution folder has been located in your filesystem")
-                        config["riivolution_folder"] = os.path.join(os.environ['APPDATA'],"Dolphin Emulator","Load","Riivolution")
-                        return True
-                    else:
+                    try:
+                        if os.path.exists(os.path.join(os.environ['APPDATA'],"Dolphin Emulator","Load","Riivolution")):
+                            print("Auto Copying : A Dolphin Riivolution folder has been located in your filesystem")
+                            config["riivolution_folder"] = os.path.join(os.environ['APPDATA'],"Dolphin Emulator","Load","Riivolution")
+                            return True
+                        else:
+                            print("Auto Copying : Cannot find a valid Dolphin Riivolution Folder")
+                            return False
+                    except KeyError:
                         print("Auto Copying : Cannot find a valid Dolphin Riivolution Folder")
                         return False
             else:
