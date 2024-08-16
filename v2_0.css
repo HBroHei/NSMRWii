@@ -40,17 +40,17 @@ button{
 }
 
 #div_rando{
-    background-image: linear-gradient(to right, #347EBFFF, #FFFFFF00), url("./Screenshot/random.jpg ");
+    background-image: linear-gradient(to right, #D4FA53FF, #FFFFFF00), url("./Screenshot/random.jpg ");
     background-repeat: no-repeat;
     background-size: contain;
     background-position-x: right;
-    color:white;
+    color:#53D4FA;
     text-align: left;
     padding-left: 5%;
     padding-right: 50%;
 }
-#div_135remix{
-    background-image: linear-gradient(to left, #347EBFFF, #FFFFFF00), url("./Screenshot/135.jpg ");
+#div_secret{
+    background-image: linear-gradient(to left, #D63A3CFF, #FFFFFF00), url("");
     background-repeat: no-repeat;
     background-size: contain;
     background-position-x: left;
@@ -59,8 +59,8 @@ button{
     padding-right: 5%;
     padding-left: 50%;
 }
-#div_custom{
-    background-image: linear-gradient(to right, #347EBFFF, #FFFFFF00), url("./Screenshot/config.jpg ");
+#div_wind{
+    background-image: linear-gradient(to right, #F2C029FF, #FFFFFF00), url("");
     background-repeat: no-repeat;
     background-size: contain;
     background-position-x: right;
@@ -69,15 +69,15 @@ button{
     padding-left: 5%;
     padding-right: 50%;
 }
-#div_v2_0{
-    background-image: linear-gradient(to left, #347EBFFF, #FFFFFF00), url("");
+#div_panel{
+    background-image: linear-gradient(to left, #F2E96DFF, #FFFFFF00), url("");
     background-repeat: no-repeat;
     background-size: contain;
-    background-position-x: left;
-    color:white;
+    background-position-x: right;
+    color:#6DF2E9;
     text-align: right;
-    padding-right: 5%;
     padding-left: 50%;
+    padding-right: 5%;
 }
 
 .big_banner{
