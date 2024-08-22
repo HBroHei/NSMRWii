@@ -94,9 +94,9 @@ function toJson(){
 
     //Set tile raandomization
     let includeTilesList = []
-    const qBlock = [38,39,40,41,42,43,44,45,46,47,48]
-    let bBolck = [26,27,28,29,30,31,32,33,34,35,36,37]
-    const hBlock = [17,18,19,20,21,22,23,24,25]
+    const qBlock = [38,39,40,41,43,44,45,46,47,48]
+    let bBolck = [26,27,28,29,30,31,33,34,35,36,37]
+    const hBlock = [17,18,19,20,22,23,24,25]
     const sBlock = [49,50,51,53,54]
     if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_same"){
         if(document.getElementById("block_qBlock").checked){

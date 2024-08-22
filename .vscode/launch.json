@@ -8,7 +8,7 @@
             "name": "Debug Program",
             "type": "python",
             "request": "launch",
-            "program": "main.py",
+            "program": "randomise_zones_.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
