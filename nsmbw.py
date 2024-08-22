@@ -475,6 +475,14 @@ class NSMBWsprite:
             #input("Wind added")
             relData.add(90)
             relData.add(374)
+
+        # Add rocks
+        if randint(0,100)<globalVars.rockChance:
+            # Gets the pos of first sprite
+            first_spr = reData[0]
+            # Add falling rocks
+            reData.append([293,first_spr[1]+16,first_spr[2],b"\x00\x00\x00\x00\x00\x00",first_spr[4],first_spr[5]])
+            relData.add(293)
             
         #print(reData[-1])
 
@@ -538,6 +546,18 @@ class NSMBWZones:
             byteData += i_lis[15].to_bytes(1,"big")
 
         return byteData
+
+    def processZones(z_data):
+        # Set level dark or not
+        if randint(0,100) <= globalVars.darkChance:
+            #TODO
+            if z_data[10] & 0xF0 == 0x19: # Check for layer 0 spotlight
+                z_data[10] = 0x30 # Always 0x30
+            elif z_data[10] & 0x0F == 0x00: # No set - start randomising!
+                z_data[10] = randint(0x20,0x25)
+            else:
+                z_data[10] = 0x01 # Set to layer 1 on top
+        return z_data
     
 class NSMBWLocations:
     def phraseByteData(byteData):

@@ -493,6 +493,7 @@ def main():
         for lay_i in range(0,3):
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
+        spawn_zone["zone"] = nsmbw.NSMBWZones.processZones(spawn_zone["zone"])
         area_zone[0].append(spawn_zone)
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
@@ -519,6 +520,7 @@ def main():
                 if "bgdatL"+str(lay_i) in exit_zone:
                     exit_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(exit_zone["bgdatL"+str(lay_i)])
             exit_tileset = deepcopy(gen_exit_zone_tileset)
+            exit_zone["zone"] = nsmbw.NSMBWZones.processZones(exit_zone["zone"])
             # Check for overlap with zones
             if exit_tileset==area_tileset[0]:
                 overlap_zone_no = checks.checkPosInZone(area_zone[0], exit_zone["zone"][1:3], *exit_zone["zone"][3:5])
@@ -612,6 +614,7 @@ def main():
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
             print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"])
+            main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
             # Check for overlap with zones
             if main_tileset==area_tileset[0]:
                 # TODO Alright the statements below are repeated, but I am not bothering with it now.
@@ -737,6 +740,7 @@ def main():
                     # Randomise sprite
                     area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
                         nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],[],stg_name)
+                    area_zone[added_area_no][-1]["zone"] = nsmbw.NSMBWZones.processZones(area_zone[added_area_no][-1]["zone"])
                     for lay_i in range(0,3):
                         if "bgdatL"+str(lay_i) in area_zone[added_area_no][-1]:
                             area_zone[added_area_no][-1]["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(area_zone[added_area_no][-1]["bgdatL"+str(lay_i)])

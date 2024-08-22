@@ -63,6 +63,8 @@ except KeyError:
     pass
 
 windChance = rulesDict["Wind Chance"]
+darkChance = rulesDict["Dark Chance"]
+rockChance = rulesDict["Rock Chance"]
 
 panel_rand = rulesDict["Power-up Panel Shuffle"]
 
@@ -72,4 +74,6 @@ globalVars.enemyVarList = enemyVarList
 globalVars.reduceLag = reduceLag
 globalVars.tileGroup = tileGroup
 globalVars.windChance = windChance
+globalVars.darkChance = darkChance
+globalVars.rockChance = rockChance
 globalVars.panel_rand = panel_rand

@@ -41,8 +41,10 @@ function openWin(ele){
 }
 
 function enableV2(){
-    document.getElementById("exp_windRand").disabled  = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_windRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_panelRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_darkRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
 }
 
 function toJson(){
@@ -192,6 +194,8 @@ function toJson(){
             "Secret Exit List": ["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
+            "Dark Chance": Number(document.getElementById("exp_darkRand").value),
+            "Rock Chance": Number(document.getElementById("exp_rockRand").value),
             "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value,
             "Patches" : {
                 "09-05 Pipe" : true

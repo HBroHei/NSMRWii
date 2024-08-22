@@ -150,19 +150,26 @@ FILE STRUCTUIRE
             0x04    UnsignShort  Integer       Width of the zone
             0x06    UnsignShort  Integer       Height of the zone
             0x08    UnsignShort  Integer       Zone theme
-            0x0A    UnsignShort  Integer       Terrain Lighting type
+            0x0A    UnsignShort  Integer       Ambience Lighting
             0x0C    Unsign Char  Integer       Zone ID
             0x0D    Unsign Char  Integer       Zone Bound settings? (sth related to section 2??)
             0x0E    Unsign Char  Integer       Camera Mode
             0x0F    Unsign Char  Integer       Camera Zoom Level?
             0x10    PaddingByte  /             -only 1 byte
-            0x11    Unsign Char  Integer       Darkness effect (TODO looks like some bitwising)
+            0x11    Unsign Char  Integer       Darkness effect (TODO looks like some bitwising){1}
             0x12    Unsign Char  Integer       Top background ("Scenery" in reggie?) (Ref. section 3)
             0x13    Unsign Char  Integer       Bottom background ("Backdrop" in reggie?) (Ref. section 4)
             0x14    Unsign Char  Integer       Camera Autoscroll Track ID?
             0x15    PaddingByte  /             -only 1 byte
             0x16    Unsign Char  Integer       Music
             0x17    Unsign Char  Integer       Effects modifier (Caves Echo, etc)
+		{1} First digit (in hex):
+			0 = No spotlight and darkness
+			1 = Layer 0 spotlight
+			2 = darkness
+			3 = layer 0 spotlight + darkness
+			Second Digit (in hex): Varies based on the value above.
+            - 3 is always hex 0x30 (only 1 option)
 
         SECTION 10: LOCATIONS
         Used to define areas for objects (*e.g. clouds) / event triggers / entrance area / etc
