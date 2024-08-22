@@ -41,8 +41,10 @@ function openWin(ele){
 }
 
 function enableV2(){
-    document.getElementById("exp_windRand").disabled  = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_windRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_panelRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_darkRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
 }
 
 function toJson(){
@@ -94,9 +96,9 @@ function toJson(){
 
     //Set tile raandomization
     let includeTilesList = []
-    const qBlock = [38,39,40,41,42,43,44,45,46,47,48]
-    let bBolck = [26,27,28,29,30,31,32,33,34,35,36,37]
-    const hBlock = [17,18,19,20,21,22,23,24,25]
+    const qBlock = [38,39,40,41,43,44,45,46,47,48]
+    let bBolck = [26,27,28,29,30,31,33,34,35,36,37]
+    const hBlock = [17,18,19,20,22,23,24,25]
     const sBlock = [49,50,51,53,54]
     if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_same"){
         if(document.getElementById("block_qBlock").checked){
@@ -192,7 +194,9 @@ function toJson(){
             "Secret Exit List": ["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
-            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
+            "Dark Chance": Number(document.getElementById("exp_darkRand").value),
+            "Rock Chance": Number(document.getElementById("exp_rockRand").value),
+            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value,
             "Patches" : {
                 "09-05 Pipe" : true
             },
