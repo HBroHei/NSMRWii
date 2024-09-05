@@ -3,6 +3,7 @@ enemyVarList = [[]]
 lvlGroup = []
 tileGroup = []
 skipLvl = []
+skip_but_rando = []
 
 reduceLag = True
 

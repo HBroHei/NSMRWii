@@ -51,9 +51,10 @@ shutil.rmtree(STG_TEMP,True)
 shutil.rmtree(STG_OUT,True)
 shutil.copytree("Stage",STG_TEMP)
 skipLvl = rulesDict["Skip Level"]
-for istr in rulesDict["Skip Level"]:
-    log += str("Processing [S]"+STG_TEMP + "/" + istr+"to"+STG_TEMP + "/" + istr + "\n")
-    shutil.move(STG_TEMP + "/" + istr,STG_OUT + "/" + istr)
+skip_but_rando = rulesDict["Skip But Randomise"]
+# for istr in rulesDict["Skip Level"]:
+#     log += str("Processing [S]"+STG_TEMP + "/" + istr+"to"+STG_TEMP + "/" + istr + "\n")
+#     shutil.move(STG_TEMP + "/" + istr,STG_OUT + "/" + istr)
 
 # Group blocks(Tiles)
 try:
@@ -77,3 +78,6 @@ globalVars.windChance = windChance
 globalVars.darkChance = darkChance
 globalVars.rockChance = rockChance
 globalVars.panel_rand = panel_rand
+
+globalVars.skipLvl = skipLvl
+globalVars.skip_but_rando = skip_but_rando
