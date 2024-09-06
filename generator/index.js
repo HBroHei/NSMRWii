@@ -45,6 +45,7 @@ function enableV2(){
     document.getElementById("exp_panelRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_darkRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_lvlRand").disabled = !document.getElementById("exp_v2enable").checked;
 }
 
 function toJson(){
