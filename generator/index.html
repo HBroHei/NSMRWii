@@ -189,6 +189,57 @@
                 <br>
                 <div id="enemy_presets_explain"></div>
                 <br><br>
+
+                <h1>Sprites Variations</h1>
+
+                <ul>
+                    <li>
+                        <label>Koopa Troopa</label>
+                        <ul>
+                            <li>
+                                <label for="#ev_k_red" class="no_label_style">Randomise Rad and Green Varients</label><input id="ev_k_red" type="checkbox" title="Randomise red and green Koopa"><br>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <label>Piranha Plant</label><br>
+                        <ul>
+                            <li>
+                                <label class="sub_lbl">Fireball amount per shot</label><br>
+                                <label for="#ev_piranha_fireball_1" class="no_label_style">1 Fireball</label><input id="ev_piranha_fireball_1" type="checkbox" checked title="The Piranha Plant will shoot out 1 fireball each time"><br>
+                                <label for="#ev_piranha_fireball_2" class="no_label_style">2 Fireball</label><input id="ev_piranha_fireball_2" type="checkbox" checked title="The Piranha Plant will shoot out 2 fireball each time"><br>
+                                <label for="#ev_piranha_fireball_3" class="no_label_style">3 Fireball</label><input id="ev_piranha_fireball_3" type="checkbox" checked title="The Piranha Plant will shoot out 3 fireball each time"><br>
+                                <label for="#ev_piranha_fireball_6" class="no_label_style">6 Fireball</label><input id="ev_piranha_fireball_6" type="checkbox" checked title="The Piranha Plant will shoot out 6 fireball each time"><br>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--
+                    <li>
+                        <label>Buillet Bill Launcher</label><br>
+                        <ul>
+                            <li>
+                                <label class="sub_lbl">Fireball amount per shot</label><br>
+                                <label for="#ev_buillet_freq" class="no_label_style">1 Fireball</label><input id="ev_buillet_freq" type="checkbox" title="The Piranha Plant will shoot out 1 fireball each time"><br>
+                            </li>
+                        </ul>
+                    </li>
+                    -->
+                    <li>
+                        <label>Winds</label><br>
+                        <ul>
+                            <li>
+                                <label class="sub_lbl">Wind Speed</label><br>
+                                <label for="#ev_wind_visual" class="no_label_style">Pure Visual</label><input id="ev_wind_visual" type="checkbox" title="Pure aesthetic wind and no physical wind" checked><br>
+                                <label for="#ev_wind_low"    class="no_label_style">Low</label><input id="ev_wind_low" type="checkbox" title="Traversing the level will be slighly more difficult" checked><br>
+                                <label for="#ev_wind_medium" class="no_label_style">Medium</label><input id="ev_wind_medium" type="checkbox" title="Traversing the level will be fairly difficult" checked><br>
+                                <label for="#ev_wind_high"   class="no_label_style">High (Difficult!)</label><input id="ev_wind_high" type="checkbox" title="Unable to move in the opposite direction while in the air. SOMEWHAT hard"><br>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                
+
                 <label>Reduce Lag</label><br>
                 <label for="#LagReduce" class="no_label_style">Enable</label><input id="LagReduce" type="checkbox" title="Delete some sprites to help make the game run smoother. Not recommended with average players."><br>
 
@@ -231,7 +282,9 @@
                 <br><br>
                 <label for="#exp_darkRand">Darkness Chance (n/100), n = 0-100</label><br><input id="exp_darkRand" type="number" min="0" max="100" value="30" title="Probability of an area is dark (Degraded visibility, hard mode)" disabled>
                 <br><br>
-                <label for="#exp_rockRand">Vocano Rock Spawning Chance (n/100), n = 0-100</label><br><input id="exp_rockRand" type="number" min="0" max="100" value="30" title="Probability of an area have falling volcano rocks" disabled>
+                <label for="#exp_rockRand">Volcano Rock Spawning Chance (n/100), n = 0-100</label><br><input id="exp_rockRand" type="number" min="0" max="100" value="30" title="Probability of an area have falling volcano rocks" disabled>
+                <br><br>
+                <label for="#exp_lvlRand">Do not randomise zones (Keep rother things random)</label><br><input id="exp_lvlRand" type="checkbox" title="Skip randomising areas and zones, but remain randomising others like sprites / tiles" checked disabled>
                 <br><br>
             </div>
 
