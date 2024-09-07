@@ -1,8 +1,3 @@
-<br>LATEST CHANGES<br>
-[GENERATOR] Added options for Castle, Tower, Airship and enemy ambush levels in the "Map" section<br>
-[GENERATOR] Added hardcoded level skipping options in the "Map" section<br>
-[FIX] Load sprite list missing sprites, cause the game to crash<br>
-[FIX] Some sprite would gone missing for some level<br>
-[FIX] Same seed should generate same results regardless of config_autoCopy.json<br>
-[GENERATOR] Defaults "Reduce Lag" to false, as it is only really useful in vanilla 9-7 and custom levels.<br>
+<br><strong>VERSION 2.0 IS HERE</strong><br>
+Learn more about it <a href="../v2_0.html">here</a> or download it <a href="https://hbrohei.github.io/NSMRWii/release/">here</a><br>
 <br>
