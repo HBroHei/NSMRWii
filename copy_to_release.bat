@@ -11,6 +11,7 @@ cp .\index.html ..\release\
 cp .\LATEST ..\release\
 cp .\LICENSE ..\release\
 cp main_v1.py ..\release\
+cp nsmbw.py ..\release\
 cp navbar.css ..\release\
 cp process.html ..\release\
 cp randomise_zones_.py ..\release\
