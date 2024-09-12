@@ -17,6 +17,11 @@ document.getElementById("t_rand_sel").onchange = function(evt) {
     document.getElementById("t_r_description").innerHTML = t_presets_desc[t_rand_sel.options[t_rand_sel.options.selectedIndex].value]
 }*/
 
+function checkValid(ele, min, max){
+    // This is just a clamp function lol
+    ele.value = Math.min(Math.max(ele.value,min),max)
+}
+
 function loadChangelog(){
     fetch("../LATEST").then(a => a.text().then(txt => {
         document.getElementById("changelog_box").innerHTML = txt
@@ -65,7 +70,7 @@ function toJson(){
         lvList_skip.push("08-24.arc");
     }*/
     // Get skipping special levels
-    for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_06-24","map_08-03","map_08-24"]){
+    for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_03-05","map_06-24","map_08-03","map_08-24"]){
         if(document.getElementById(lvl_skip_item).checked){
             const skipLvlName = lvl_skip_item.replace("map_","") + ".arc";
             lvList_skip.push(skipLvlName)
@@ -108,8 +113,8 @@ function toJson(){
             "0000 0000 0010","0000 0000 0011","0000 0000 0012","0000 0000 0013",
             "0000 0000 1000","0000 0000 1001","0000 0000 1002","0000 0000 1003",
             "0000 0000 1010","0000 0000 1011","0000 0000 1012","0000 0000 1013"
-        ]
-
+        ],
+        "338":[]
     }
 
     //Set tile raandomization
@@ -242,6 +247,18 @@ function toJson(){
         enemyVarients["71"].push("0000 0000 0003")
     }
 
+    // Buillet Bill Launcher
+    // Rise / Fall Varient
+    highNib1 = Number(document.getElementById("ev_buillet_min_1").value).toString(16);
+    highNib2 = Number(document.getElementById("ev_buillet_min_2").value).toString(16);
+    lowNib1 = Number(document.getElementById("ev_buillet_max_1").value).toString(16);
+    lowNib2 = Number(document.getElementById("ev_buillet_max_2").value).toString(16);
+    // Filter out non-related data
+    for(const rawDat of e_rflauncher_data){
+        if(rawDat[12]>=highNib1 && rawDat[12]<=highNib2 && rawDat[13]>=lowNib1 && rawDat[13]<=lowNib2){
+            enemyVarients["338"].push(rawDat)
+        }
+    }
     // Wind Speed
     if(document.getElementById("ev_wind_visual").checked){
         if(enemyVarients["90"]===undefined){
@@ -282,7 +299,7 @@ function toJson(){
 
     // V2 checks
     if(document.getElementById("exp_v2enable").checked){
-        let skipRandoList = []
+        let skipRandoList = ["03-05.arc"] // Skip but randomise list
         if(document.getElementById("exp_lvlRand").checked){
             skipRandoList = [
                 "01-01.arc",
