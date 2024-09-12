@@ -425,7 +425,7 @@ def corrDupID(areaNo,zone):
                     used_ids[areaNo][key_prop].add(cur_id)
             else: # Anything other than "zone" prop
                 for zone_prop in zone_prop_lst:
-                    cur_id = zone_prop[id_position]
+                    cur_id = zone_prop[id_position] % 32 # No way there are 32 entrances
                     try:
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
@@ -454,6 +454,7 @@ def corrDupID(areaNo,zone):
                         used_ids[areaNo][key_prop] = set()
                     addID(areaNo,key_prop,zone_prop_lst)
 
+    print("USED IDS",used_ids)
     return re_zone
 
 # Alright but these are written by myself okay?
