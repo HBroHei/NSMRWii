@@ -405,6 +405,8 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     #print(u8_dict)
 
     returnARC = u8_m.repackToBytes(u8_dict)
+    from pathlib import Path
+    Path("./Stage_output/").mkdir(exist_ok=True)
     with open("./Stage_output/" + lvlName, 'wb') as f:
         f.write(returnARC)
     print("============= Processed",lvlName,"=================")
@@ -589,6 +591,9 @@ def main():
         print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
         addEntranceData(0,spawn_zone)
 
+        # if area_zone[0][-1]["orgLvl"]=="07-22.arc":
+        #     input("07-22===========")
+
         if gen_ent_zone_type=="entrance":
             print("Determine exit")
             # Need an exit zone, and a "main" zone
@@ -680,6 +685,8 @@ def main():
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
             print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"])
+            # if main_zone["orgLvl"]=="07-22.arc":
+            #     input("07-22===========")
             main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
             # Check for overlap with zones
             if main_tileset == area_tileset[0]:
@@ -914,7 +921,8 @@ def main():
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        # if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
+        corrections.used_ids = [{},{},{}] # Reset duplicate ID list
+        #if stg_name=="08-33.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     #print("*****All levels have been generated. Please move the stages into the respective folder*****")

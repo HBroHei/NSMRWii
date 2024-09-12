@@ -344,7 +344,7 @@ def corrSprZone(cur_zone):
 ######## TODO DUPLICATE REPLACEMNENT FUNCTION NOT DEBUGGED ######## 
 ## btw this is gonna be a hell to debug (and I dont even know an effective way to debug this lol(sign))
 def generate_unique_id(used_ids):
-    new_id = max(used_ids) + 1 if used_ids else 1
+    new_id = 0
     # loop until the id is not duplicated
     while new_id in used_ids:
         new_id += 1
