@@ -585,6 +585,7 @@ def main():
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
         spawn_zone["zone"] = nsmbw.NSMBWZones.processZones(spawn_zone["zone"])
+        addEntranceData(0,spawn_zone)
         spawn_zone = corrections.alignToPos(spawn_zone,*tilePosToObjPos((32,32)))
         spawn_zone = corrections.corrDupID(0, spawn_zone)
         spawn_zone = corrections.corrSprZone(spawn_zone)
@@ -592,10 +593,7 @@ def main():
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
         print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
-        addEntranceData(0,spawn_zone)
-
-        if area_zone[0][-1]["orgLvl"]=="07-22.arc":
-            input("07-22===========")
+        
 
         if gen_ent_zone_type=="entrance":
             print("Determine exit")
@@ -688,8 +686,6 @@ def main():
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
             print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"])
-            # if main_zone["orgLvl"]=="07-22.arc":
-            #     input("07-22===========")
             main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
             # Check for overlap with zones
             if main_tileset == area_tileset[0]:
@@ -925,7 +921,7 @@ def main():
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         corrections.used_ids = [{},{},{}] # Reset duplicate ID list
-        if stg_name=="08-33.arc":input("PRESS ENTER TO CONTINUE...")
+        # if stg_name=="03-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     #print("*****All levels have been generated. Please move the stages into the respective folder*****")

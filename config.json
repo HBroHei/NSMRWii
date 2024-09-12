@@ -226,8 +226,8 @@
             54
         ]
     ],
-    "Wind Chance": 30,
-    "Dark Chance": 30,
+    "Wind Chance": 5,
+    "Dark Chance": 5,
     "Rock Chance": 30,
     "Power-up Panel Shuffle": "on",
     "Patches": {
