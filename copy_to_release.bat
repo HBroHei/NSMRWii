@@ -1,8 +1,8 @@
 del /f "..\release" 
 mkdir "..\release"
-xcopy .\generator ..\release\ /e
-xcopy .\Notes ..\release\ /e
-xcopy .\zone_random ..\release\ /e
+xcopy .\generator ..\release\generator\ /e
+xcopy .\Notes ..\release\Notes\ /e
+xcopy .\zone_random ..\release\zone_random\ /e
 cp .\big_title.jpg ..\release\
 cp .\dolphinAutoTransfer.py ..\release\
 cp .\globalVars.py ..\release\
