@@ -11,7 +11,6 @@
     <style>
         body{
             font-family: Arial, Helvetica, sans-serif;
-            background-color: skyblue;
             padding: 0%;
             margin: 0%;
         }
@@ -43,14 +42,13 @@
             </div>
             <h1>Notice</h1>
             <ul>
-                <li>Some puzzles involve enemies may not be solvable (Such as 7-Ghost House's Secret Exit). An update is planned to address this.</li>
+                <li>Some puzzles involve enemies may not be solvable (Such as 7-Ghost House's Secret Exit). The issue will be resolved once I find a method to detect such cases.</li>
                 <li>RANDOMIZER NOT CONSOLE VERTIFIED. Play it at your own risk if you intended to play it on the actual hardware.</li>
-                <li>RANDOMIZER CONFIRMED TO HAVE LAG AND CAN CAUSE CRASHES! Too many sprites in an area will cause lag and crashes. Updates is being worked on for optimizing performance.</li>
+                <li>RANDOMIZER MAY CAUSE LAG. Certain areas may have a large amoubt of sprites on the same screen, and will cause lag or even crashes. If you fear it will or it has happened, turn on the "Reduce Lag" option in the generator</li>
             </ul>
             <h1>Prerequest</h1>
             <h2>Python 3.x</h2>
             <p>
-                <img class="img" src="https://github.com/HBroHei/NSMRWii/blob/development/generator/Img/pyDownload.jpg?raw=true"><br>
                 This program require Python 3.x to run.
                 If you do not know what "Python" is or you do not have Python 3.x, download it <a href="https://www.python.org/downloads/">Here</a><br>
                 (Click on the button, it will download the most suitable version for your computer)<br>
@@ -75,9 +73,11 @@
             <p>
                 Go to <a href="https://github.com/HBroHei/NSMRWii/releases/">https://github.com/HBroHei/NSMRWii/releases/</a><br>
                 Download the top "NSMRW_release_vx.x.zip" file (just click on it)<br>
-                File name examples: "NSMRW_release_v1.6.zip", "NSMRW_release_v5.1.zip"<br>
+                File name examples: "NSMRW_release_v1.2.1.zip", "NSMRW_release_v2.0.0.zip"<br>
                 <span style="font-weight: bold;">In the following guide, "Root folder" will be used to represent where the program is<br>
-                i.e. the folder which contains "Start.bat", "Start" and "main.py"</span>
+                i.e. the folder which contains "Start.bat", "Start" and "main.py"</span><br>
+                Release tagged with "Pre-release" are builds that are less stable than the ones which does not,
+                but may receive features first than the other ones. Choose which version based on whether you prefer stability, or features.
             </p>
             <h1>2. Place the "Stage" folder into the Root folder</h1>
             <p>
@@ -98,10 +98,19 @@
                 </ul>
                 <br><br>
             </p>
-            <p>
-                Alternative: Create the configuration file by youeself.<br>
-                <a href="tut_config.html">See here</a>
+            <p style="background-color:skyblue">
+                <span style="font-weight:bold">Alternative: Create the configuration file by yourself:</span><br>I would recommend players finding the generator too limiting and familar with JSON file to give this a try!<br>
+                <a href="tut_config.html">See Configuration file Documentation</a>
             </p>
+            <div style="background-color: #bfff00;">
+                <p>
+                    <h3>Version 2.0 now in beta</h3>
+                    If you want to test out version 2.0 of the randomiser, please check the "Enable" checkbox
+                    inside "Version 2.0" of the Experimental Tag. Older versions of the configuration file is not compactible with the v2.0 configuration file.
+                    <a href="../v2_0.html">Learn more about Version 2.0 here</a>
+                </p>
+            </div>
+            
             <h1>4. Move the config file</h1>
             <p>
                 Once you are satisfied with the randomize ruleset, Click the "Generate" button at the bottom.<br>
@@ -141,9 +150,14 @@
             <h3>6.2.2 Manuel copying</h3>
             <p>
                 Follow the guide in the "New Super Mario Bros Wii" section in <a href="https://aerialx.github.io/rvlution.net/wiki/Patch_Templates/index.html#New_Super_Mario_Bros._Wii">here</a><br>
-                (The levels being all the content in the "Stage_Shuffled" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder into the "nsmb" folder)
+                (The levels being all the content in the "Stage_Shuffled" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder (v1) or "Stage_output" folder (v2) into the "nsmb" folder)
             </p>
-            DISCLAMER: This project is not affiliated with Nintendo or any other NSMBW modding projects.
+            <p>
+                DISCLAMER: This project is not affiliated with Nintendo.<br>
+                I would also like to thanks the NSMBW Community (especially the contributors of Reggie! Level Editor) for providing resources about the level format of NSMBW.
+                This project would not be possible without those resources.<br>
+                (Like, seriously.)
+            </p>
             
         </div>
         <div id="bot_nav">

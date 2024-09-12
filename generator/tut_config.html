@@ -58,14 +58,18 @@
                 <li><a href="#Format">Format</a></li>
                 <li><a href="#Seed">"Seed" Section</a></li>
                 <li><a href="#ReduceLag">"Reduce Lag" Section</a></li>
+                <li><a href="#Patches">"Patches" Section</a></li>
                 <li><a href="#EntRando">"Entrance Randomisation" Section</a></li>
                 <li><a href="#Skip_Level">"Skip level" Section</a></li>
+                <li><a href="#Secret_Lvl">"Secret Exit List" Section</a></li>
                 <li><a href="#Enemies">"Enemies" Section</a></li>
                 <li><a href="#Enemy_Var">"Enemy Variation" Section</a></li>
+                <li><a href="#WindChance">"Wind Chance" Section</a></li>
+                <li><a href="#PanelShuffle">"Power-up Panel Shuffle" Section</a></li>
                 <li><a href="#Level_Group">"Level Group" Section</a></li>
                 <li><a href="#Tile_Group">"Tile Group" Section</a></li>
             </ol></div>
-            <br>Last updated 03/12/2023 (DD/MM/YYYY)<br>
+            <br>Last updated 15/08/2024 (DD/MM/YYYY)<br>
             <h2 id="Introduction">Introduction</h2>
             <p>
                 The config.json file foe New Super Mario Randomizer Wii (NSMRW) is used to read randomization preference.
@@ -74,16 +78,19 @@
             <br>
             <h2 id="Format">Format</h2>
             <p>
-                The config file consists of 2 parts: <span class="code_single">Skip Level</span> and <span class="code_single">Enemies</span>.<br>
                 The format should be structured as below:<br>
                 <pre>
                     <div class="code">{
     "Seed":"",
     "Reduce Lag":True|False,
+    "Patches":{},
     "Entrance Randomization":True|False,
     "Skip":[],
+    "Secret Exit List":[],
     "Enemies":[],
     "Enemy Variation":{},
+    "Wind Chance":0-100,
+    "Power-up Panel Shuffle":True|False,
     "Level Group":[],
     "Tile Group":[]
 }</div>
@@ -98,6 +105,7 @@
             Example 1:<div class="code_single">"Seed":523814998</div><br>
             Example 2:<div class="code_single">"Seed":"NSMRW"</div>
             <br>
+
             <h2 id="ReduceLag">"Reduce Lag" Section</h2>
             <div class="code_single">"Reduce Lag": Boolean</div>
             <p>Determine if the randomizer should delete sprites to improve performance.</p>Parameter:<br>
@@ -105,16 +113,25 @@
             Example 1:<div class="code_single">"Reduce Lag":true</div><br>
             Example 2:<div class="code_single">"Reduce Lag":false</div>
             <br>
-            <h2 id="EntRando">"Entrance Randomisation" Section (Optional) [EXPERMENTIAL]</h2>
+
+            <h2 id="Patches">"Patches" Section (COMING V2.0)</h2>
+            <div class="code_single">"Patches": Object</div>
+            <p>Determine if the randomizer should apply some hard-coded fixes to stages</p>
+            <br>
+
+            <h2 id="EntRando">"Entrance Randomisation" Section (Optional) [TO BE DEPRECATED]</h2>
             <div class="code_single">"Entrance Randomisation": Boolean</div>
             <p>Determine if the randomizer should randomise wrap pipe / door exits and level spawn</p>
-            <strong>NOTE: This feature is in experimental. It may create unbeatable levels or inaccessible areas.</strong><br><br>
+            <strong>NOTE: This feature is in experimental. It may create unbeatable levels or inaccessible areas.</strong>
+            <strong>NOTE: This feature will not be supported staring from version 2.0, which contains area and zone randomisation</strong>
+            <br><br>
             Parameter:<br>
             <span class="code_single">Boolean</span> Will the randomiser randomise Entrances. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
             Default: <span class="code_single">False</span><br>
             Example 1:<div class="code_single">"Entrance Randomisation":true</div><br>
             Example 2:<div class="code_single">"Entrance Randomisation":false</div>
             <br>
+
             <h2 id="Skip_Level">"Skip Level" Section</h2>
             <div class="code_single">"Skip": Array</div>
             <p>A list of levels that will be skipped during randomization. Can be useful if some levels prevents progress.</p>
@@ -123,6 +140,16 @@
             <strong>NOTE: "Texture" should ALWAYS be included in the list to avoid errors when using the program (unless the "Texture" folder is not included in the "Stage" folder. In this case, DO NOT include "Texture" in the list.)</strong><br><br>
             Example:<div class="code_single">"Skip Level":["Texture","01-26.arc","01-27.arc","01-28.arc","01-29.arc","01-36.arc","01-40.arc","01-41.arc","01-42.arc","02-36.arc","02-24.arc","02-26.arc","02-27.arc","02-28.arc","03-26.arc"]</div>
             <br>
+
+            <h2 id="Secret_Lvl">"Secret Exit List" Section (COMING V2.0)</h2>
+            <div class="code_single">"Secret Exit List": Array</div>
+            <p>A list of levels that are defined to have a secret exit so that the randomiser knows when to generate secret exit rooms</p>
+            Parameter:<br>
+            <span class="code_single">Array</span> A list of <span style="font-weight: bold;">file names</span> of the levels that should contain a secret exit<br>
+            <br><br>
+            Example:<div class="code_single">"Secret Exit List":["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"]</div>
+            <br>
+
             <h2 id="Enemies">"Enemies" Section</h2>
             <div class="code_single">"Enemies": [Array]</div>
             <p>
@@ -144,6 +171,7 @@
 ]</pre>
             </div>
             <br>
+
             <h2 id="Enemy_Var">"Enemy Variartion" Section</h2>
             <div class="code_single">"Enemy Variation": {ID : enemyVariation, ID : enemyVariation, ...}</div>
             <p>
@@ -172,6 +200,25 @@
 },</pre>
             </div>
             <br>
+
+            <h2 id="WindChance">"Wind Chance" Section (COMING V2.0)</h2>
+            <div class="code_single">"Wind Chance": Integer</div>
+            <p>Determine the probability that the level will have wind (sandstorm)</p>
+            Parameter:<br>
+            <span class="code_single">Integer</span> The probability value of the area having wind, out of 100. Value should be between <span class="code_single">0</span> to <span class="code_single">100</span><br>
+            Example 1:<div class="code_single">"Wind Chance":36</div><br>
+            Example 2:<div class="code_single">"Wind Chance":100</div>
+            <br>
+
+            <h2 id="PanelShuffle">"Power-up Panel Shuffle" Section (COMING V2.0)</h2>
+            <div class="code_single">"Power-up Panel Shuffle": Boolean</div>
+            <p>Determine if the randomizer should randomise the panels in the Power-up Panels minigame</p>
+            Parameter:<br>
+            <span class="code_single">Boolean</span> Should the randomizer randomise the panels. Value should be <span class="code_single">True</span> or <span class="code_single">False</span><br>
+            Example 1:<div class="code_single">"Power-up Panel Shuffle":true</div><br>
+            Example 2:<div class="code_single">"Power-up Panel Shuffle":false</div>
+            <br>
+
             <h2 id="Level_Group">"Level Group" Section (Optional)</h2>
             <div class="code_single">"Level Group": [Array]</div>
             <p>
@@ -197,6 +244,7 @@
 ],</pre>
             </div>
             <br>
+
             <h2 id="Tile_Group">"Tile Group" Section (Optional)</h2>
             <div class="code_single">"Tile Group": [Array]</div>
             <p>

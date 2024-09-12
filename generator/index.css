@@ -107,6 +107,12 @@ label{
     font-weight: bold;
 }
 
+.sub_lbl{
+    font-size: 1.05em;
+    font-weight: bold;
+    text-decoration: none;
+}
+
 .tab_win_default_hidden{
     display:none;
 }
@@ -134,3 +140,5 @@ label{
 #fileGen button{
     cursor: pointer;
 }
+
+
