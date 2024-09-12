@@ -99,6 +99,12 @@ def addRandomZone(tilesetList:list,types:list):
         print("Cannot find suitable zone")
         return None,None,None
     print("[D] Extra zone =",generated_zone["zone"])
+    generated_zone["sprites"],_dum,__dum =\
+        nsmbw.NSMBWsprite.processSprites(generated_zone["sprites"],[],"")
+    for lay_i in range(0,3):
+        if "bgdatL"+str(lay_i) in generated_zone:
+            generated_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(generated_zone["bgdatL"+str(lay_i)])
+    generated_zone["zone"] = nsmbw.NSMBWZones.processZones(generated_zone["zone"])
     zoneAddedNo += 1
     gen_zone_prop = generated_zone["zone"]
     # Check for overlap with zones
