@@ -5,6 +5,7 @@ Entity data: 2 bytes
 from random import randint, shuffle, random, randbytes
 import globalVars
 from copy import deepcopy
+from Util import changeBytesAt
 
 from struct import unpack, pack
 
@@ -429,7 +430,15 @@ class NSMBWsprite:
                     is_panel = True
                     break
             #Randomize enemy variation
-            if str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
+            # Check if Rise / Fall Launcher
+            if enemyData[0]==338:
+                varList = globalVars.enemyVarList[str(enemyData[0])]
+                enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
+            # Check if checkpoint - set 1st / 2nd CP
+            elif enemyData[0]==188:
+                enemyData[3] = changeBytesAt(enemyData[3],5,((randint(0,1) << 4) | (0 if globalVars.cp1 else 1)))
+                globalVars.cp1 = not globalVars.cp1
+            elif str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
                 varList = globalVars.enemyVarList[str(enemyData[0])]
                 enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
             if is_panel and globalVars.panel_rand: # Power-up Panel level

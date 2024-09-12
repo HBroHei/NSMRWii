@@ -451,6 +451,9 @@ def corrDupID(areaNo,zone):
                                     if spr[0]==179 and ((spr[3][5]&0x0F) | (spr[3][3]&0xF0))==cur_id:
                                         spr[3] = changeBytesAt(spr[3],5,(spr[3][5]&0xF0) + (new_id&0x0F)) # Preserve the upper 4 bits
                                         spr[3] = changeBytesAt(spr[3],3,(spr[3][3]&0x0F) + (new_id&0xF0)) # Preserve the lower 4 bits
+                                    # If is 188 Checkpoint
+                                    elif spr[0]==188 and spr[3][3]==cur_id:
+                                        spr[3] = changeBytesAt(spr[3],3,new_id)
 
                             if references!=tuple():
                                 print("Reference",references,re_zone[references[0]])

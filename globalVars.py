@@ -20,3 +20,5 @@ darkChance = 0.0
 rockChance = 0.0
 
 panel_rand = False
+
+cp1 = True

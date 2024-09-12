@@ -918,6 +918,7 @@ def main():
         writeToFile(stg_name,area_zone,area_len)
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         corrections.used_ids = [{},{},{}] # Reset duplicate ID list
+        globalVars.cp1 = True
         # if stg_name=="03-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
