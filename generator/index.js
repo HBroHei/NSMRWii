@@ -464,7 +464,7 @@ function toJson(){
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
             "Dark Chance": Number(document.getElementById("exp_darkRand").value),
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
-            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value,
+            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
             "Patches" : {
                 "09-05 Pipe" : true
             },
