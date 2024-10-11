@@ -127,7 +127,6 @@ def addRandomZone(types: list):
         if area_tileset[idx] == "" or gen_zone_tileset in area_tileset[idx] or area_tileset[idx] in gen_zone_tileset:
             if area_tileset[idx] in gen_zone_tileset: area_tileset[idx] = gen_zone_tileset
             print("Tileset same?", gen_zone_tileset, area_tileset[idx])
-            
             # Use handle_zone_overlap to manage overlap
             #print("MAIN",)
             try:
@@ -135,13 +134,8 @@ def addRandomZone(types: list):
             except IndexError: # New Area
                 area_len += 1
             # Check for duplication and add zone
-            # try:
-            #     generated_zone = corrections.corrDupID(idx, generated_zone)
-            #     generated_zone = corrections.corrSprZone(generated_zone)
-            # except IndexError:
-            #     area_len += 1
             
-            area_zone[idx].append(generated_zone)
+            #area_zone[idx].append(generated_zone)
             area_tileset[idx] = gen_zone_tileset
             
             return idx, gen_zone_tileset, gen_zone_type
@@ -284,7 +278,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             # path_node_lst += cur_zone["pathNode"]
             # path_lst += cur_zone["path"]
             # TODO Add them to file
-
+            
             # Add tiles data
             for i in range(0,2): # Loop through each layer
                 if "bgdatL"+str(i) in cur_zone.keys():
@@ -563,7 +557,8 @@ def main():
         print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
         D_count_levelzone(area_zone[0][-1]["orgLvl"])
 
-        check_conditions(spawn_zone)        
+        check_conditions(spawn_zone)
+        
 
         if gen_ent_zone_type=="entrance":
             print("Determine exit")
@@ -702,6 +697,7 @@ def main():
             only_main = True # This, however, is to mark which entrance will be prioritised to be randomised
 
         #### END OF ADDING THE NECESSARY ZONES ####
+
         ### Check if new zones is needed to be added - for:
         # - Entrances > exit number
         # - have secret exit
@@ -723,10 +719,12 @@ def main():
                 print("NEW ZONE NEEDED, PLEASE ADD CODE HERE")
                 print("Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
                 #input()
+                # if stg_name=="01-05.arc": input(str(area_no) + "," + str(len(area_zone[1])))
                 # If there is an secret exit in this level, set type to "exit", and "full" otherwise
                 added_area_no, added_tileset, added_type= addRandomZone(["exit"] if have_secret else ["normal","bonus"])
                 if added_area_no==None:
                     # Lets start over
+                    # TODO Is this necessary anymore?
                     start_over = True
                     break
                 if have_secret:
@@ -774,7 +772,6 @@ def main():
                 secret_exit_area_id = added_area_no
                 secret_exit_zone_id = len(area_zone[added_area_no])
                 print("NEW Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
-
                 # input()
 
                 secret_generated = True

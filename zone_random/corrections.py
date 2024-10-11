@@ -469,7 +469,6 @@ def corrDupID(areaNo,zone):
                     addID(areaNo,key_prop,zone_prop_lst)
 
     print("USED IDS",used_ids)
-    if re_zone["orgLvl"]=="01-29.arc": input("01-29")
     return re_zone
 
 # Alright but these are written by myself okay?
