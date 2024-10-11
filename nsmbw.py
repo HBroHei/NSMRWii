@@ -438,9 +438,16 @@ class NSMBWsprite:
             elif enemyData[0]==188:
                 enemyData[3] = changeBytesAt(enemyData[3],5,((randint(0,1) << 4) | (0 if globalVars.cp1 else 1)))
                 globalVars.cp1 = not globalVars.cp1
-            elif str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]:
+            # Enemy Variant
+            elif str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]: # TODO Find a better way to implement the last statement
                 varList = globalVars.enemyVarList[str(enemyData[0])]
-                enemyData[3] = bytes.fromhex(varList[randint(0,len(varList)-1)])
+                choice_var = varList[randint(0,len(varList)-1)]
+                # Replace x with original value
+                final_var = bytes([o if p=="x" else p for o, p in zip(enemyData[3].hex(), choice_var)])
+                # Replace the original value
+                #if enemyData[0]==289: input(final_var)
+                enemyData[3] = bytes.fromhex(final_var)
+            #if lvName=="01-05.arc": input(enemyData)
             if is_panel and globalVars.panel_rand: # Power-up Panel level
                 #input("PANEL TIME")
                 # Set up matching combo

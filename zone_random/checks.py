@@ -57,7 +57,7 @@ def checkEntSpawn(zone):
     return -1
 
 def checkOnlyOneEnt(zone):
-    return len(zone)==1
+    return len(zone["entrance"])==1
 
 # Find all the enterables and non-enterables
 def findExitEnt(zone):

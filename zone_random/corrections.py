@@ -363,8 +363,9 @@ def update_references(data_list, position, old_id, new_id):
 def corrDupID(areaNo,zone):
     re_zone = zone
 
-    # for cur_dict in area:
+    # For each property in zones
     for key_prop, zone_prop_lst in re_zone.items():
+        # IF there is stuff inside the list
         if isinstance(zone_prop_lst, list) and len(zone_prop_lst) > 0:
             """
                 if key == "bound":
@@ -391,6 +392,7 @@ def corrDupID(areaNo,zone):
                 else:
                     continue
                 """
+            # Check which position is the id
             try:
                 id_position = ID_POS_LOOKUP[key_prop]
             except KeyError:
@@ -427,6 +429,7 @@ def corrDupID(areaNo,zone):
                 for zone_prop in zone_prop_lst:
                     cur_id = zone_prop[id_position] % 32 # No way there are 32 entrances
                     try:
+                        print("AREA NO", areaNo, used_ids)
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
                             print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
@@ -466,6 +469,7 @@ def corrDupID(areaNo,zone):
                     addID(areaNo,key_prop,zone_prop_lst)
 
     print("USED IDS",used_ids)
+    if re_zone["orgLvl"]=="01-29.arc": input("01-29")
     return re_zone
 
 # Alright but these are written by myself okay?
