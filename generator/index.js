@@ -125,22 +125,22 @@ function toJson(){
     const sBlock = [49,50,53,54]
 
     const_s_qBlock = [
-        "0000 0000 0000", // Nothing
-        "0000 0000 0001", 
-        "0000 0000 0002", 
-        "0000 0000 0003", 
-        "0000 0000 0004", 
-        "0000 0000 0005", 
-        "0000 0000 0006", 
-        "0000 0000 0007", 
-        "0000 0000 0008",
-        "0000 0000 0009",
-        "0000 0000 000A",
-        "0000 0000 000B",
-        "0000 0000 000C",
-        "0000 0000 000D",
-        "0000 0000 000E",
-        "0000 0000 000F"  
+        "0000 0xxx xx00", // Nothing
+        "0000 0xxx xx01", 
+        "0000 0xxx xx02", 
+        "0000 0xxx xx03", 
+        "0000 0xxx xx04", 
+        "0000 0xxx xx05", 
+        "0000 0xxx xx06", 
+        "0000 0xxx xx07", 
+        "0000 0xxx xx08",
+        "0000 0xxx xx09",
+        "0000 0xxx xx0A",
+        "0000 0xxx xx0B",
+        "0000 0xxx xx0C",
+        "0000 0xxx xx0D",
+        "0000 0xxx xx0E",
+        "0000 0xxx xx0F"  
     ]
 
     if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_same"){

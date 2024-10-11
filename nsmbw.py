@@ -2,10 +2,10 @@
 Entity data: 2 bytes
 """
 
-from random import randint, shuffle, random, randbytes
+from random import randint, shuffle, random, randbytes, choice
 import globalVars
 from copy import deepcopy
-from Util import changeBytesAt
+from Util import changeBytesAt, hex_to_str, matches_pattern
 
 from struct import unpack, pack
 
@@ -391,6 +391,23 @@ class NSMBWsprite:
         #while len(returnByte)<orgLen:
         #    returnByte += b"\x00"
         return returnByte
+    
+    # Function to replace org_item with replacement, retaining original values for 'x'
+    def replace_varient(org_item, replacement):
+        hex_str = hex_to_str(org_item)
+        new_hex = []
+        hex_str_clean = hex_str.replace(' ', '')  # Clean hex string
+        
+        # Iterate over the replacement pattern
+        replacement_clean = replacement.replace(' ', '')  # Clean the replacement pattern
+        for i, char in enumerate(replacement_clean):
+            if char == 'x':
+                new_hex.append(hex_str_clean[i])  # Keep original hex value
+            else:
+                new_hex.append(char)  # Replace with new value
+
+        # Convert the list of characters back to bytes
+        return bytes.fromhex(''.join(new_hex))
 
     ################## RANDO ####################
     def processSprites(eData:list,leData:list,lvName):
@@ -439,14 +456,24 @@ class NSMBWsprite:
                 enemyData[3] = changeBytesAt(enemyData[3],5,((randint(0,1) << 4) | (0 if globalVars.cp1 else 1)))
                 globalVars.cp1 = not globalVars.cp1
             # Enemy Variant
-            elif str(enemyData[0]) in globalVars.enemyVarList and enemyData[3] in globalVars.enemyVarList[str(enemyData[0])]: # TODO Find a better way to implement the last statement
-                varList = globalVars.enemyVarList[str(enemyData[0])]
-                choice_var = varList[randint(0,len(varList)-1)]
-                # Replace x with original value
-                final_var = bytes([o if p=="x" else p for o, p in zip(enemyData[3].hex(), choice_var)])
-                # Replace the original value
-                #if enemyData[0]==289: input(final_var)
-                enemyData[3] = bytes.fromhex(final_var)
+            elif str(enemyData[0]) in globalVars.enemyVarList:
+                varient_string = hex_to_str(enemyData[3])
+                for pattern in globalVars.enemyVarList[str(enemyData[0])]:
+                    if matches_pattern(varient_string, pattern):
+                        new_varient = choice(globalVars.enemyVarList[str(enemyData[0])])
+                        # print(f"Replacing {pattern} with {replacement}")
+                        # Replace the pattern
+                        enemyData[3] = NSMBWsprite.replace_varient(varient_string, new_varient)
+                        if enemyData[0]==207: input(enemyData)
+                        break  # Exit after first match; remove this if you want to check all patterns
+                # (enemyData[3]) in globalVars.enemyVarList[str(enemyData[0])]: # TODO Find a better way to implement the last statement
+                # varList = globalVars.enemyVarList[str(enemyData[0])]
+                # choice_var = varList[randint(0,len(varList)-1)]
+                # # Replace x with original value
+                # final_var = bytes([o if p=="x" else p for o, p in zip(enemyData[3].hex(), choice_var)])
+                # # Replace the original value
+                # #if enemyData[0]==289: input(final_var)
+                # enemyData[3] = bytes.fromhex(final_var)
             #if lvName=="01-05.arc": input(enemyData)
             if is_panel and globalVars.panel_rand: # Power-up Panel level
                 #input("PANEL TIME")

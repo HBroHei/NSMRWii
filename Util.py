@@ -15,6 +15,19 @@ def changeBytesAt(bytesStr:bytes, pos:int, newVal):
     tmp_bytearr[pos] = newVal
     return bytes(tmp_bytearr)
 
+# Function to convert hex bytes to a formatted string
+def hex_to_str(hex_bytes):
+    return ''.join(f'{b:02}' for b in hex_bytes)
+# Function to check if a pattern matches a hex string
+def matches_pattern(hex_str, pattern):
+    hex_str = hex_str.replace(' ', '')  # Remove spaces for comparison
+    if len(hex_str) != len(pattern.replace(' ', '')):
+        return False
+    for h, p in zip(hex_str, pattern.replace(' ', '')):
+        if p != 'x' and h != p:
+            return False
+    return True
+
 from math import ceil,floor
 def objPosToTilePos(objPos):
     return [ceil(objPos[0]/16),ceil(objPos[1]/16)]
