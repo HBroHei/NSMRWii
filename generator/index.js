@@ -124,38 +124,66 @@ function toJson(){
     const hBlock = [17,18,19,20,22,23,24,25]
     const sBlock = [49,50,53,54]
 
-    const_s_qBlock = [
-        "0000 0xxx xx00", // Nothing
-        "0000 0xxx xx01", 
-        "0000 0xxx xx02", 
-        "0000 0xxx xx03", 
-        "0000 0xxx xx04", 
-        "0000 0xxx xx05", 
-        "0000 0xxx xx06", 
-        "0000 0xxx xx07", 
-        "0000 0xxx xx08",
-        "0000 0xxx xx09",
-        "0000 0xxx xx0A",
-        "0000 0xxx xx0B",
-        "0000 0xxx xx0C",
-        "0000 0xxx xx0D",
-        "0000 0xxx xx0E",
-        "0000 0xxx xx0F"  
+    const s_qBlock = [
+        "0000 xxxx xx00",
+        "0000 xxxx xx01", 
+        "0000 xxxx xx02", 
+        "0000 xxxx xx03", 
+        "0000 xxxx xx04", 
+        "0000 xxxx xx05", 
+        "0000 xxxx xx06", 
+        "0000 xxxx xx07", 
+        "0000 xxxx xx08",
+        "0000 xxxx xx09",
+        "0000 xxxx xx0A",
+        "0000 xxxx xx0B",
+        "0000 xxxx xx0C",
+        "0000 xxxx xx0D",
+        "0000 xxxx xx0E",
+        "0000 xxxx xx0F"  
     ]
 
+    const s_qBlock_rotate = [
+        "0000 xxxx x0xx",
+        "0000 xxxx x1xx", 
+        "0000 xxxx x2xx", 
+        "0000 xxxx x3xx", 
+        "0000 xxxx x4xx", 
+        "0000 xxxx x5xx", 
+        "0000 xxxx x6xx", 
+        "0000 xxxx x7xx", 
+        "0000 xxxx x8xx",
+        "0000 xxxx x9xx",
+        "0000 xxxx xAxx",
+        "0000 xxxx xBxx",
+        "0000 xxxx xCxx",
+        "0000 xxxx xDxx",
+        "0000 xxxx xExx",
+        "0000 xxxx xFxx"  
+    ]
+
+
+    // Blocks randomisation
+    let blocksRando = []
     if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_same"){
         if(document.getElementById("block_qBlock").checked){
             includeTilesList.push(qBlock);
-
+            enemyVarients["207"] = s_qBlock;
+            enemyVarients["402"] = s_qBlock; // TODO speed varient
+            enemyVarients["255"] = s_qBlock_rotate;
         }
         if(document.getElementById("block_bBlock").checked){
             if(document.getElementById("block_exbBlock").checked){ // Exclude breakable bricks
                 bBolck.shift();
             }
             includeTilesList.push(bBolck);
+            enemyVarients["256"] = s_qBlock_rotate;
+            enemyVarients["209"] = s_qBlock;
+            enemyVarients["403"] = s_qBlock; // TOD same, need speed
         }
         if(document.getElementById("block_hBlock").checked){
             includeTilesList.push(hBlock);
+            enemyVarients["221"] = s_qBlock;
         }
         if(document.getElementById("block_sBlock").checked){
             includeTilesList.push(sBlock);
@@ -164,12 +192,27 @@ function toJson(){
     else if(document.getElementById("block_blockRando").options[document.getElementById("block_blockRando").options.selectedIndex].value=="block_all"){
         if(document.getElementById("block_qBlock").checked){
             includeTilesList.join(qBlock);
+            enemyVarients["207"] = s_qBlock;
+            enemyVarients["402"] = s_qBlock; // TODO speed varient
+            enemyVarients["255"] = s_qBlock_rotate;
+            blocksRando.push(207);
+            blocksRando.push(402);
+            blocksRando.push(255);
         }
         if(document.getElementById("block_bBlock").checked){
             includeTilesList.join(bBolck);
+            enemyVarients["256"] = s_qBlock_rotate;
+            enemyVarients["209"] = s_qBlock;
+            enemyVarients["403"] = s_qBlock; // TOD same, need speed
+            blocksRando.push(256);
+            blocksRando.push(209);
+            blocksRando.push(403);
         }
         if(document.getElementById("block_hBlock").checked){
             includeTilesList.join(hBlock);
+            enemyVarients["221"] = s_qBlock;
+            console.log("Beware of Kaizo block lol");
+            blocksRando.push(221);
         }
         if(document.getElementById("block_sBlock").checked){
             includeTilesList.join(sBlock);
@@ -294,6 +337,7 @@ function toJson(){
 
     const e_rand_sel = document.getElementById(("enemy_presets"))
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
+    if(blocksRando!=[]){eList.push(blocksRando);}
     //let tileRan = t_presets_data[t_rand_sel.options[t_rand_sel.options.selectedIndex].value];
     let tileRan = includeTilesList;
 
@@ -464,7 +508,7 @@ function toJson(){
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
             "Dark Chance": Number(document.getElementById("exp_darkRand").value),
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
-            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").value,
+            "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
             "Patches" : {
                 "09-05 Pipe" : true
             },
