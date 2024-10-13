@@ -74,7 +74,7 @@
                         Although, I have only learnt Python for a few months. (but I have been learning programming for 6 years!)</td>
                     </tr>
                     <tr>
-                        <td>Oprating System</td>
+                        <td>Operating System</td>
                         <td>Web (JSON Generator)<br>Win/MacOS/Linux/whatever OS that can run Python locally(Randomizer)</td>
                         <td>I still wish to make it an executable (.exe)(mainly I have no experience in this subject), but the Batch script should be sufficent for now</td>
                     </tr>
@@ -92,7 +92,7 @@
                 </table>
             </p>
             <hr>
-            <h1>How the program works</h1>
+            <h1>How the program works (v1)</h1>
             <span style="background-color: gold;">For a more detailed guide on how to use the randomizer, see <a href="https://hbrohei.github.io/NSMRWii/generator/tut.html">this guide</a></span>
             <p>
                 First, the program would make a backup of all the files so that datas will not be lost during editing. It will also read the configuration file.<br>
@@ -104,7 +104,7 @@
                 The randomized levels would be in the "Stage_Shuffled" folder.
             </p>
             <hr>
-            <h1>Updates</h1>
+            <h1>Updates (v1)</h1>
             <p>
                 One step at a time is always a good thing, especially when there is no time pressure. That's why I have been rolling out updates to this project.<br>
                 Having updates also means that bugs can be traced more easily, unlike developing all the thing at once.<br>
@@ -139,12 +139,99 @@
                         <td>I am kind of not satisfied with how the "Enemy Variants" work in the configuration file, but it was the best approach I have came up with (at least at the moment).<br>
                         (I mean that currently you have to know the raw data, which can be inconvenient at times.)</td>
                     </tr>
+                    <tr>
+                        <td>v1.2.4</td>
+                        <td>Sprites disappearance - case closed</td>
+                        <td>
+                            After the previous release, I have put down the project for quite a bit, until my randomiser started to get noticed by some other content creator (I first watched NinTyler played this. It was a milestone for me considering he is known for Mario modding content.)<br>
+                            (I was very introverted and shy to join any modding discord, or to promote the randomiser other than on YouTube and doing SEO)<br>
+                            I have noticed that some important sprites have gone missing (such as the goal pole, door) in their playthrough. So I picked up the project again and fixed the bug a month later.<br>
+                            That is the upper half of the story. The latter half is Entrance Randomisation, which was never marked out of Experiment due to difficulty to verify if the level is actually beatable, and also v2.0 came along, which includes zones randomisation.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>v1.2.5</td>
+                        <td>First actual hotfix</td>
+                        <td>This is the first time I got actual GitHub Issues created by others, and the reported bug would crash the game, so I released this as a hotfix.<br>The underlying changes is just that the load sprites list is missing some sprites if the "Reduce Lag" option is turned on, so I fixed it.</td>
+                    </tr>
+                    tr>
+                        <td>v1.2.6</td>
+                        <td>Level customisation - suggested by YOU!</td>
+                        <td>
+                            Since the last release, I got a few issues mentioning issues related to hardcoded levels features. There was also a request to seperate ambush levels to its own category. Therefore, I have redone the "Level" tab in the generator to not only looks nicer, but also includes more customisaion options.
+                        </td>
+                    </tr>
                 </table>
             </p>
             <hr>
-            <h1></h1>
+            <h1>Version 2 - Background and Process</h1>
             <p>
-
+                I have always enjoyed watching loading zone randomisers. I started watching the one for TTYD when or before I started the project. Loading zobe randomisation has always been on my wishlist for the randomiser features.<br>
+                The development started in Feburary / March.<br>
+                Despite there now exist other loading zone randomiser for NSMBW (only one actually as of the time writing, the Pipe randomiser), I still wish to publish v2.0 as it has been where my attebtion went most of the time, 
+            </p>
+            <p>
+                Each NSMBW level has an amount of "zone"zls (which are a list of definition of where the bounding box the player and camera is allowed to move, death barrier, sprites will be spawning, etc). Seeing this, I plan to seperate the level by zones. So in order to split the level into zones, I first need to know how zones are defined. After that, I need to know all the relavant stuff that can appear in the zone. (TL;DR: I need to know the entire level structure, which I didn't at that point) So, once again, huge shoutout to the Reggie! team for providing the code for me to understand the format of the level. After that, I have wrote some driver code to test whether it can read and write a level correctly. The driver code later has became a very important tool for me to test what part of the code went wrong. (You have no idea, the code came in handy even after I finished the main part of the code)
+            </p>
+            <p>
+                After the save / read code, I need a way to store the extracted zones. This is where the core of the program starts. First, I have created a function to check whether a given position is in a zone, and categorise all stuff into zones. Then, I have created a dictionary / JSON structure to store the zones data. I used JSON, because it is the most convenient (familar) way to store some amount of data.
+            </p>
+            <p>
+                Now that the level data were stored by zones, I need to test whether the stored data can be written back into a level. This is where "write_zone_test.py" was coded. Although it cannot output a full level without error, it does the job of confirming that my JSON file is good.
+            </p>
+            <p>
+                With all that setup done (Yes, those are all setups), I can finally program in the main part.
+            </p>
+            <hr>
+            <h1>How the program works (v2)</h1>
+            <span style="background-color: gold;">This is a semi-documentation on how the program flows. For a more detailed guide on how to use the randomizer, see <a href="https://hbrohei.github.io/NSMRWii/generator/tut.html">this guide</a></span>
+            <p>
+                First, the program reads the JSON file that stored all the zone definitions and the configurations into the memory. It will then categorise all the zones based on the type of zone (full, normal, bonus, entrance, exit, after boss), and the tileset of the zone.
+            </p>
+            <p>
+                The program would then start generating randomised levels.
+            </p>
+            <p>
+                For every level, It would first generate an "entrance zone", as the entry point of the level. If the generated zone does not have an goal object, it would then proceed to generate 2 more zones (referred as "main zone" and "exit zone", with one of them having an goal object.<br>
+                It would then proceed to check whether an extra zone is needed, by checking if there are more entrance than exit, or a secret exit is required by that level.<br>
+                In all of the process above, it would also randomise other stuff, such as sprites and tiles.
+            </p>
+            <p>
+                After this, all entrances will be linked by the order of: entrance zone -> main zone -> exit zone. All other remaining entrances would be randomly assigned an existing non-enterable entrances.
+            </p>
+            <p>
+                At the end of each loop, all data processed would be converted into an ARC level file, playable in-game.
+            </p>
+            <p>
+                <table>
+                    <tr><th>Version</th><th>Item</th><th>Description</th></tr>
+                    <tr>
+                        <td>beta v2.0.0.0</td>
+                        <td>First v2 release</td>
+                        <td>
+                            I am kinda relieved that this has now released, meaning that the program will work >50% of the time (If you know what I mean lol)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>beta v2.0.0.1</td>
+                        <td>Rocks & Darkness intensifies</td>
+                        <td>
+                            It feels wrong to release v2.0 with only 1 feature, so I added random darkness and falling rocks. They are an addition, I guess. 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>beta v2.0.0.2</td>
+                        <td>Skips, Checks & Fixes</td>
+                        <td>This release contains a few fixes for bugs, options for skipping random zones, but most important in my opinion, CP2 implementation. (As generated levels sometimes will be very long)</td>
+                    </tr>
+                    <tr>
+                        <td>beta v2.0.0.4</td>
+                        <td>Wildcards Varients</td>
+                        <td>
+                            I have realised that ? blocks in sprite form cannot be randomised without resetting its attribute, so I introduced wildcard for the configuration. With this, some other creative combo is also possible.
+                        </td>
+                    </tr>
+                </table>
             </p>
         </div>
         <div id="bottomNav" style="width:95%">
