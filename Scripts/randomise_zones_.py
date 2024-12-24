@@ -10,8 +10,9 @@ from zone_random import checks,corrections, read_config
 
 from random import randint, shuffle, choice, random
 from copy import deepcopy
-import traceback
 from collections import defaultdict
+from pathlib import Path
+from os import listdir, getcwd
 
 inJson = {}
 
@@ -41,6 +42,10 @@ area_len = 1
 
 tileData = [[],[],[]]
 u8_files_list = []
+
+STAGE_OUT_DIR = "./Stage_output/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_output/"
+STAGE_TMP_DIR = "./Stage_temp/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_temp/"
+OUTJSON_PATH = "./out.json" if "out.json" in listdir(getcwd()) else "./Scripts/out.json"
 
 isDebug = False
 
@@ -336,9 +341,8 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     u8_dict = u8_m.constructFromScratch(no_of_areas,[u8_files_dir] + u8_files_list)
 
     returnARC = u8_m.repackToBytes(u8_dict)
-    from pathlib import Path
-    Path("./Stage_output/").mkdir(exist_ok=True)
-    with open("./Stage_output/" + lvlName, 'wb') as f:
+    Path(STAGE_OUT_DIR).mkdir(exist_ok=True)
+    with open(STAGE_OUT_DIR + lvlName, 'wb') as f:
         f.write(returnARC)
     print("============= Processed",lvlName,"=================")
 
@@ -361,9 +365,8 @@ def vanilla_processLvl(istr):
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
-    from pathlib import Path
-    Path("./Stage_output/").mkdir(exist_ok=True)
-    with open("./Stage_output/" + istr, 'wb') as f:
+    Path(STAGE_OUT_DIR).mkdir(exist_ok=True)
+    with open(STAGE_OUT_DIR + istr, 'wb') as f:
         f.write(u8n)
             
 
@@ -408,10 +411,8 @@ def D_count_levelzone(org_lvl):
 
 def main():
     global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count
-    
-    
 
-    with open('out.json', 'r') as f:
+    with open(OUTJSON_PATH, 'r') as f:
         json_orginal = json.load(f)
     inJson = convertToDict(json_orginal)
 
@@ -424,19 +425,6 @@ def main():
                 cur_zone["orgLvl"] = key_lvl
                 cur_tileset_str = "".join([ba.decode() for ba in cur_zone["tileset"]]) # All tilesets
                 
-                # Add key to dict if dict does not have the key
-                # if cur_tileset_str not in groupTilesetJson.keys():
-                #     lst_tileset.append(cur_tileset_str)
-                #     groupTilesetJson[cur_tileset_str] = {
-                #         "normal" : [] , # No Entrance / Exit
-                #         "entrance" : [], # Have  Level entrance only
-                #         "full" : [], # Have both Level entrance and exit
-                #         "exit" : [], # Have Level exit only
-                #         "boss" : [], # Have Boss in zone
-                #         "after_boss" : [], # Castle / Airship Boss cutscene
-                #         "bonus" : [], # Only 1 entrance / same ent and exit
-                #         "count" : 0
-                #     }
                 # Calculate number of zones for each tilesets
                 #groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
                 lst_tileset.add(cur_tileset_str)
@@ -506,14 +494,14 @@ def main():
     zoneAddedNo = 0
     normal_exit_area_id = -1
     secret_exit_area_id = -1
-    stg_lst = read_config.listdir("./Stage_temp/")
+    stg_lst = read_config.listdir(STAGE_TMP_DIR)
     stg_i = 0
     while stg_i<len(stg_lst):
         stg_name = stg_lst[stg_i]
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture" or stg_name in globalVars.skipLvl :
             #log += str("Processing [S]"+ "Stage_temp" + "/" + stg_name +"to" + "Stage_output/" + stg_name + "\n")
-            move("Stage_temp" + "/" + stg_name,"Stage_output" + "/" + stg_name)
+            move(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name)
             stg_i += 1
             continue # Skip that folder
         elif stg_name in globalVars.skip_but_rando:
@@ -629,13 +617,6 @@ def main():
 
             # Generate the main area
             print("Determine main")
-            # main_tileset = getRandomTileset(tilesetList)
-            # # Prevent area without exit
-            # while len(groupTilesetJson["normal"][main_tileset])==0:
-            #     main_tileset = getRandomTileset(tilesetList)
-            # ### DEBUGGING
-            # # zone_ent_type = "full"
-            # # exit_tileset = "Pa0_jyotyuPa2_sora"
 
             # # Gets the random zone
             # main_zone = deepcopy(getRandomZone(main_tileset,"normal"))
@@ -651,19 +632,9 @@ def main():
                 while len(checks.findExitEnt(main_zone)[0])<2 or (len(checks.findExitEnt(main_zone)[0])<1 and zone_type=="exit"):
                     main_tileset, zone_type = getRandomTileset(["normal","exit"])
                     # Prevent area without exit
-                    # while len(groupTilesetJson[main_tileset]["normal"])==0 and len(groupTilesetJson[main_tileset]["exit"])==0:
-                    #     main_tileset = getRandomTileset(tilesetList)
-                    #     # if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset:
-                    #     #     print(len(groupTilesetJson[main_tileset]["normal"]), len(groupTilesetJson[main_tileset]["exit"]))
-                    #     #     input()
-                    # if len(groupTilesetJson["normal"][main_tileset])!=0:
-                    #     zone_type = "normal"
-                    # else:
-                    #     zone_type = "exit"
-                    # if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset, zone_type)
                     main_zone = deepcopy(getRandomZone(main_tileset,zone_type))
                     
-                if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset)
+                #if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset)
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
                 nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[],stg_name)
@@ -768,11 +739,11 @@ def main():
                             area_zone[added_area_no][-1]["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(area_zone[added_area_no][-1]["bgdatL"+str(lay_i)])
                 print("Extra to Area:",added_area_no)
                 print("Extra from", area_zone[added_area_no][-1]["orgLvl"] , "data =",area_zone[added_area_no][-1]["zone"])
-                addEntranceData(added_area_no,area_zone[added_area_no][-1])
+                #addEntranceData(added_area_no,area_zone[added_area_no][-1]) #TODO Duplicated?
                 secret_exit_area_id = added_area_no
                 secret_exit_zone_id = len(area_zone[added_area_no])
                 print("NEW Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
-                # input()
+                # input() 
 
                 secret_generated = True
         if start_over:
@@ -840,6 +811,7 @@ def main():
                     pass
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
+                    print("ENTLIST",area_zone[area_id][zone_pos]["orgLvl"],entrance_list[area_id][zone_pos],area_zone[area_id][zone_pos]["entrance"])
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
                         # Find suitable exit
                         exit_found = False
@@ -914,7 +886,7 @@ def main():
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         corrections.used_ids = [{},{},{},{}] # Reset duplicate ID list
         globalVars.cp1 = True
-        if stg_name=="01-05.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="08-38.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

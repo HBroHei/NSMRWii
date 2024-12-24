@@ -1,6 +1,6 @@
 from random import seed
 from json import loads
-from os import listdir
+from os import listdir, getcwd
 import shutil
 
 import globalVars
@@ -15,9 +15,13 @@ skipLvl = []
 lvlGroup = []
 tileGroup = []
 secret_exit = []
-stageList = listdir("./Stage/")
 
-rf = open("config.json")
+STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
+CONFIG_PATH = "./config.json" if "config.json" in listdir(getcwd()) else "./Scripts/config.json"
+
+stageList = listdir(STAGE_DIR)
+
+rf = open(CONFIG_PATH)
 rulesDict = loads(rf.read())
 rf.close()
 # Initalize seed
@@ -49,7 +53,7 @@ STG_TEMP = "Stage_temp"
 STG_OUT = "Stage_output"
 shutil.rmtree(STG_TEMP,True)
 shutil.rmtree(STG_OUT,True)
-shutil.copytree("Stage",STG_TEMP)
+shutil.copytree(STAGE_DIR,STG_TEMP)
 skipLvl = rulesDict["Skip Level"]
 skip_but_rando = rulesDict["Skip But Randomise"]
 # for istr in rulesDict["Skip Level"]:

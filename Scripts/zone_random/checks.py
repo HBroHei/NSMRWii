@@ -84,7 +84,8 @@ def findExitEnt(zone):
     for i in range(0,len(zone["entrance"])):
         # TODO Find if "Normal" Entrances have sprites associated with them
         #   Marked "enterable", Orginal Dest Area & ID!=0, Area Entrance Type can be entered
-        print("Finding exit:",zone["entrance"][i][9]&128,zone["entrance"][i][5] in (27,3,4,5,6,16,17,18,19),zone["entrance"][i][5])
+        #print("Finding exit:",zone["orgLvl"],zone["entrance"][i][9]&128,zone["entrance"][i][5] in (27,3,4,5,6,16,17,18,19),zone["entrance"][i][5])
+        print("Finding exit:",i,":",zone["orgLvl"],zone["entrance"][i])
         if ((zone["entrance"][i][9]&128)==0 and\
             #((zone["entrance"][i][3]!=0 and zone["entrance"][i][4]!=0) and\
             zone["entrance"][i][5] in (27,2,3,4,5,6,15,16,17,18,19)) or\

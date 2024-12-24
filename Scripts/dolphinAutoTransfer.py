@@ -8,13 +8,16 @@ config = {
     "riivolution_folder":""
 }
 
+CONFIG_PATH = "./config_autoCopy.json" if "Stage" in os.listdir(os.getcwd()) else "./Scripts/config_autoCopy.json"
+
+
 class dolphinAutoTransfer:
     def __init__(self):
         pass
 
     def readAutoCopyConfig():
         global config
-        rf = open("config_autoCopy.json")
+        rf = open(CONFIG_PATH)
         config = loads(rf.read())
         rf.close()
     
