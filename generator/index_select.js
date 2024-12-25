@@ -30,7 +30,7 @@ const valueLookup = {
     "block_blockRando":{
         "block_none": "No blocks will be randomised",
         "block_same": "Blocks will be randomised, but would still visually looks the same. (? blocks would remain as ? blocks, brick blocks woukd still be brick blocks, etc.)",
-        "block_all": "All blocks will be randomised. *May cause inaccwssible area*"
+        "block_all": "All blocks will be randomised. *May cause inaccessible area*"
     }
 };
 
