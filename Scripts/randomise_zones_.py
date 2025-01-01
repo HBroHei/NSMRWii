@@ -151,7 +151,7 @@ def addRandomZone(types: list):
 # NOTE This will NOT remove the zone from the list
 def getRandomZone(tilesetName:str, zone_type:str) -> dict:
     print("SELECT",tilesetName,zone_type)
-    ret_zone = choice(groupTilesetJson[zone_type][tilesetName])
+    ret_zone = deepcopy(choice(groupTilesetJson[zone_type][tilesetName]))
     return ret_zone
 
 # Unbiased zone chooser
@@ -163,7 +163,7 @@ def genZone(types_list:list):
             all_zones.extend(tileset_lst)
     #all_zones = [z for z in [tileset_lst for tileset_lst in [cur_type_zone_lst for cur_type_zone_lst in groupTilesetJson[types_list].values()]]]
     # Then choose a zone from it
-    ret_zone = choice(all_zones)
+    ret_zone = deepcopy(choice(all_zones))
     ret_tileset = "".join([ba.decode() for ba in ret_zone["tileset"]])
     return ret_zone, ret_tileset, ret_zone["type"]
 
@@ -738,7 +738,7 @@ def main():
                         if "bgdatL"+str(lay_i) in area_zone[added_area_no][-1]:
                             area_zone[added_area_no][-1]["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(area_zone[added_area_no][-1]["bgdatL"+str(lay_i)])
                 print("Extra to Area:",added_area_no)
-                print("Extra from", area_zone[added_area_no][-1]["orgLvl"] , "data =",area_zone[added_area_no][-1]["zone"])
+                #print("Extra from", area_zone[added_area_no][-1]["orgLvl"] , "data =",area_zone[added_area_no][-1]["zone"])
                 #addEntranceData(added_area_no,area_zone[added_area_no][-1]) #TODO Duplicated?
                 secret_exit_area_id = added_area_no
                 secret_exit_zone_id = len(area_zone[added_area_no])
@@ -886,7 +886,7 @@ def main():
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         corrections.used_ids = [{},{},{},{}] # Reset duplicate ID list
         globalVars.cp1 = True
-        #if stg_name=="08-38.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="08-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

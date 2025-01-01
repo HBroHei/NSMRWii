@@ -438,10 +438,11 @@ def corrDupID(areaNo,zone):
                             # Check linked locations
                             if key_prop=="location":
                                 for spr in re_zone["sprites"]:
-                                    # If is 138,139,216 liquid / 53 quicksand / 446 Light Cloud /
+                                    # If is:
+                                    # 138,139,216 liquid / 53 quicksand / 446 Light Cloud /
                                     # 64,435 Fog effect
                                     #print("CHANGING",spr,cur_id,(spr[3][5]&0x0F)==cur_id)
-                                    if spr[0] in (138,139,216,53,446) and spr[3][5]==cur_id:
+                                    if spr[0] in (138,139,216,53,446,64,435) and spr[3][5]==cur_id:
                                         # Change Location ID
                                         spr[3] = changeBytesAt(spr[3],5,new_id)
                                     # If is 234 Cloud
@@ -457,6 +458,11 @@ def corrDupID(areaNo,zone):
                                     # If is 188 Checkpoint
                                     elif spr[0]==188 and spr[3][3]==cur_id:
                                         spr[3] = changeBytesAt(spr[3],3,new_id)
+                                        # If it is 360 / 355 Rolling hills w/ pipe
+                                    elif (spr[0]==360 or spr[0]==355) and ((spr[3][4]&0x0F)==cur_id):
+                                        #print("ROLL1 " + str(spr[3]))
+                                        spr[3] = changeBytesAt(spr[3],4,(spr[3][4]&0xF0) + (new_id&0x0F)) # Preserve the lower 4 bits
+                                        #input("ROLL2 " + str(spr[3]))
 
                             if references!=tuple():
                                 print("Reference",references,re_zone[references[0]])

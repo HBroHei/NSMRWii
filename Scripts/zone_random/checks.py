@@ -64,8 +64,9 @@ def findExitEnt(zone):
     ret_pos = [] # Enterable
     ret_pos_noExit = [] # Non-enterable
     ent_179 = [] # Entrance IDs related to sprite 179 OR rolling hills
+    entspr_ref = [] # sprites position in list that needs altering
     # First, check for sprite 179
-    spr_list = deepcopy(zone["sprites"])
+    spr_list = zone["sprites"]
     for spr in spr_list:
         if spr[0]==179: # Special Exit Controller
             # Get the 4th([3]) char, 1st digit and 6th([5]) char, 2nd digit
@@ -78,8 +79,9 @@ def findExitEnt(zone):
                 tmp_bytearr[2] = 0x00
                 zone["sprites"][spr_pos][3] = bytes(tmp_bytearr)
         elif spr[0]==355 or spr[0]==360: # Rolling hill pipes
-            # Gets the 5th byte (4th pos), seconf digit
+            # Gets the 5th byte (4th pos), lower nibble
             ent_179.append(int((spr[3][4] & 0x0F)))
+            spr_pos = zone["sprites"].index(spr)
 
     for i in range(0,len(zone["entrance"])):
         # TODO Find if "Normal" Entrances have sprites associated with them

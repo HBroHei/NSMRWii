@@ -464,7 +464,7 @@ class NSMBWsprite:
                         # print(f"Replacing {pattern} with {replacement}")
                         # Replace the pattern
                         enemyData[3] = NSMBWsprite.replace_varient(varient_string, new_varient)
-                        if enemyData[0]==207: input(enemyData)
+                        #if enemyData[0]==207: input(enemyData)
                         break  # Exit after first match; remove this if you want to check all patterns
                 # (enemyData[3]) in globalVars.enemyVarList[str(enemyData[0])]: # TODO Find a better way to implement the last statement
                 # varList = globalVars.enemyVarList[str(enemyData[0])]
