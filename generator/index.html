@@ -184,9 +184,9 @@
                 <label for="#enemy_presets">Enemy randomization presets</label><br>
                 <select id="enemy_presets" title="Presets for the enemy raandomization" onchange="changeOpt(this)">
                     <option id="r_type"  value="r_type">Same species</option>
-                    <option id="r_world" value="r_world" >Same world</option>
-                    <option id="r_all_b" value="r_all_b" >Controlled Chaos</option>
-                    <option id="r_all"   value="r_all"   >Everyone is here!</option>
+                    <option id="r_world" value="r_world">Same world</option>
+                    <option id="r_all_b" value="r_all_b">Controlled Chaos</option>
+                    <option id="r_all"   value="r_all"  >Everyone is here!</option>
                 </select>
                 <br>
                 <div id="enemy_presets_explain"></div>
@@ -239,6 +239,41 @@
                                 <label for="#ev_wind_low"    class="no_label_style">Low</label><input id="ev_wind_low" type="checkbox" title="Traversing the level will be slighly more difficult" checked><br>
                                 <label for="#ev_wind_medium" class="no_label_style">Medium</label><input id="ev_wind_medium" type="checkbox" title="Traversing the level will be fairly difficult" checked><br>
                                 <label for="#ev_wind_high"   class="no_label_style">High (Difficult!)</label><input id="ev_wind_high" type="checkbox" title="Unable to move in the opposite direction while in the air. SOMEWHAT hard"><br>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li style="display: none;">
+                        <label>Arrow lift (Move-When-On Platoform) (INCOMPLETE)</label><br>
+                        <ul>
+                            <li>
+                                <label class="sub_lbl">Platform length</label><br>
+                                <label for="#ev_396_len_min" class="no_label_style">Minimum: </label><input id="ev_396_len_min" type="number" size="2" max="15" min="1" value="3" title="The minimum length of the platform" onchange="checkValid(this,1,15)"> tiles<br>
+                                <label for="#ev_396_len_max" class="no_label_style">Maximum: </label><input id="ev_396_len_max" type="number" size="2" max="15" min="1" value="14" title="The maximum length of the platform" onchange="checkValid(this,1,15)"> tiles<br>
+                            </li>
+                            <li>
+                                <label class="sub_lbl">Platform return to orginal position</label><br>
+                                <label for="#ev_396_goback" class="no_label_style">Disabled</label><input id="ev_396_goback" type="checkbox" title="When disabled, the platform will stay at its position after being moved.">
+                            </li>
+                            <li>
+                                <label class="sub_lbl">Number of passengers to move</label><br>
+                                <div>Note: Setting to above 1 might make the level difficult!</div>
+                                <label for="#ev_396_numpass_min" class="no_label_style">Minimum: </label><input id="ev_396_numpass_min" type="number" size="2" max="15" min="1" value="1" title="The minimum number of passengers on the platform for it to move" onchange="checkValid(this,1,15)"> tiles<br>
+                                <label for="#ev_396_numpass_max" class="no_label_style">Maximum: </label><input id="ev_396_numpass_max" type="number" size="2" max="15" min="1" value="1" title="The maximum number of passengers on the platform for it to move" onchange="checkValid(this,1,15)"> tiles<br>
+                            </li>
+                            <li>
+                                <label class="sub_lbl">Platform direction</label><br>
+                                <label for="#ev_396_dir_r" class="no_label_style">Right</label><input id="ev_396_dir_r" type="checkbox" title="The platform will move right"><br>
+                                <label for="#ev_396_dir_l" class="no_label_style">Left</label><input id="ev_396_dir_l" type="checkbox" title="The platform will move left"><br>
+                                <label for="#ev_396_dir_u" class="no_label_style">Up</label><input id="ev_396_dir_u" type="checkbox" title="The platform will move up"><br>
+                                <label for="#ev_396_dir_d" class="no_label_style">Down</label><input id="ev_396_dir_d" type="checkbox" title="The platform will move down"><br>
+                                <label for="#ev_396_dir_x" class="no_label_style">Retain original</label><input id="ev_396_dir_x" type="checkbox" title="The platform will retain its original direction" checked><br>
+                            </li>
+                            <li>
+                                <label class="sub_lbl">Moving Speed</label><br>
+                                <div>Note: Greater the value, harder it will get!</div>
+                                <label for="#ev_396_spd_min" class="no_label_style">Minimum: </label><input id="ev_396_spd_min" type="number" size="2" max="15" min="1" value="1" title="The minimum speed of the platform" onchange="checkValid(this,1,15)"> tiles<br>
+                                <label for="#ev_396_spd_max" class="no_label_style">Maximum: </label><input id="ev_396_spd_max" type="number" size="2" max="15" min="1" value="1" title="The maximum speed of the platform" onchange="checkValid(this,1,15)"> tiles<br>
                             </li>
                         </ul>
                     </li>
@@ -310,11 +345,12 @@
             <iframe id="downFrame" style="display:none"></iframe>
         </div>
         
-        <script src="index.js"></script>
-        <script src="index_vars.js"></script>
-        <script src="index_vars_rflauncher.js"></script>
-        <script src="index_level.js"></script>
-        <script src="index_select.js"></script>
+        <script src="./index.js"></script>
+        <script src="./index_vars.js"></script>
+        <script src="./variants/index_vars_rflauncher.js"></script>
+        <script src="./variants/index_vars_396.js"></script>
+        <script src="./index_level.js"></script>
+        <script src="./index_select.js"></script>
 
         <div id="bot_nav">
             <span class="lbl_pad">Find more on YouTube:</span>
