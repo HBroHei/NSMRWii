@@ -73,14 +73,14 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
-def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: dict, zone_index: int):
-    overlap_zone_no = checks.checkPosInZone(area_zone[zone_index], main_zone["zone"][0:2], *main_zone["zone"][2:4])
+def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: dict, area_id: int):
+    overlap_zone_no = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
 
     check_conditions(main_zone)
 
     if overlap_zone_no != -1:
-        print("Overlap with ZONE", overlap_zone_no, len(area_zone[zone_index]))
-        overlap_zone = area_zone[zone_index][overlap_zone_no]["zone"]
+        print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
+        overlap_zone = area_zone[area_id][overlap_zone_no]["zone"]
         
         new_x = 512
         new_y = 512
@@ -96,12 +96,12 @@ def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: 
         main_zone = corrections.alignToPos(main_zone, new_x, new_y, False)
         
     # Check and correct duplicated zones
-    main_zone = corrections.corrDupID(zone_index, main_zone)
+    main_zone = corrections.corrDupID(area_id, main_zone)
     main_zone = corrections.corrSprZone(main_zone)
     
-    area_zone[zone_index].append(main_zone)
+    area_zone[area_id].append(main_zone)
     # Add entrances in zone to list of entrances
-    addEntranceData(zone_index, main_zone)
+    addEntranceData(area_id, main_zone)
     
     return main_zone
 
@@ -164,7 +164,8 @@ def genZone(types_list:list):
     #all_zones = [z for z in [tileset_lst for tileset_lst in [cur_type_zone_lst for cur_type_zone_lst in groupTilesetJson[types_list].values()]]]
     # Then choose a zone from it
     ret_zone = deepcopy(choice(all_zones))
-    ret_tileset = "".join([ba.decode() for ba in ret_zone["tileset"]])
+    ret_tileset = ",".join([ba.decode() for ba in ret_zone["tileset"][1:]])
+    #if ret_zone["orgLvl"]=="05-02.arc": input(ret_zone["orgLvl"])
     return ret_zone, ret_tileset, ret_zone["type"]
 
 def getRandomTileset(types_list:list):
@@ -423,7 +424,7 @@ def main():
             for key_zone in inJson[key_lvl][key_area]:
                 cur_zone = deepcopy(inJson[key_lvl][key_area][key_zone])
                 cur_zone["orgLvl"] = key_lvl
-                cur_tileset_str = "".join([ba.decode() for ba in cur_zone["tileset"]]) # All tilesets
+                cur_tileset_str = ",".join([ba.decode() for ba in cur_zone["tileset"][1:]])# All tilesets exclude 1st one, added "," to identify unique tileset name
                 
                 # Calculate number of zones for each tilesets
                 #groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
@@ -577,6 +578,7 @@ def main():
                 exit_zone = handle_zone_overlap(exit_tileset, area_tileset, area_zone, exit_zone, 0)
             else:
                 exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((32,32)))
+                exit_zone = corrections.corrDupID(1, exit_zone) # Still needed to add IDs in this zone
                 exit_zone = corrections.corrSprZone(exit_zone)
                 area_zone[1].append(exit_zone)
                 area_tileset[1] = exit_tileset
@@ -655,6 +657,7 @@ def main():
                 main_zone = handle_zone_overlap(main_tileset, area_tileset, area_zone, main_zone, 1)
             else:  # Esort to Area 3 I guess
                 main_zone = corrections.alignToPos(main_zone, *tilePosToObjPos((32, 32)))
+                main_zone = corrections.corrDupID(2, main_zone)
                 main_zone = corrections.corrSprZone(main_zone)
                 area_zone[2].append(main_zone)
                 area_tileset[2] = main_tileset
@@ -758,7 +761,7 @@ def main():
         #############################################
         ######## START RANDOMISING ENTRANCES ########
         #############################################
-
+        print("***START OF Entrance Randomisation***")
         print("Nonenterable list",area_nonenterable_count)
         print("   enterable list",area_enterable_count)
         #### CALCULATE THE NECESSARRY ENTRANCES / EXITS, AND ADDITIONAL ZONES ####
@@ -775,9 +778,6 @@ def main():
                 [[] for _ in range(len(entrance_list[3]))]
             ] # Storing randomised entrance ids
             print("Processed_Ent_Ids",processed_enterable_id)
-            processed_nonent_id = [[],[],[],[]] # Storing randomised exit ids
-            processed_normal_exit_zone = False
-            processed_secret_exit_zone = False # For future use, dont implement it just yet
 
             entrance_assign_list = []
 
@@ -794,9 +794,13 @@ def main():
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
                     print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
-                    nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
-                    if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
-                        nonent_list[area_id] = [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
+                    nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
+                if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
+                    for zone_pos in range(0,len(area_zone[area_id])):
+                        print("Dest Ent Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
+                        nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
+                print("NONENT LIST", area_id, nonent_list[area_id], len(area_zone[area_id]))
+            nonent_list_backup = deepcopy(nonent_list) # Backup list in case the list got emptied
 
             # Assign entrances
             for area_id in (0,2,1,3):
@@ -811,18 +815,19 @@ def main():
                     pass
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
-                    print("ENTLIST",area_zone[area_id][zone_pos]["orgLvl"],entrance_list[area_id][zone_pos],area_zone[area_id][zone_pos]["entrance"])
+                    print("ENTLIST",area_zone[area_id][zone_pos]["orgLvl"], entrance_list[area_id][zone_pos], area_zone[area_id][zone_pos]["entrance"])
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
+                        print(f"PROCESSING AREA {area_id} ZONE {zone_pos} ENTRANCEID {area_zone[area_id][zone_pos]["entrance"][entrance_pos][2]}")
                         # Find suitable exit
                         exit_found = False
                         # Check assigned
                         ent_key = str(area_id) + "_" + str(zone_pos) + "_" + str(entrance_pos)
                         if ent_key in entrance_assign_list:
                             continue
-                        # 1. Destination Area
-                        # find random area'
+                        # Get the dest area id
                         # Check if there are priority
                         if len(rando_priority_lst)==0:
+                            # No priority - choose randomly
                             area_lists_choice = (0,1,2,3)
                             dest_area_id = choice(area_lists_choice)
                             round_count = 0
@@ -832,10 +837,13 @@ def main():
                                 round_count+=1
                                 if round_count == 4: break
                         else:
+                            # Have priority
                             dest_area_id = rando_priority_lst.pop(0)
                             print("Priority: Area set to",dest_area_id)
-                            
-                        if len(nonent_list[dest_area_id])!=0: # Area exist?
+                        
+                        # Check area have nonent
+                        if len(nonent_list[dest_area_id])!=0:
+                            # Exist - choose a nonent
                             exit_key = choice(nonent_list[dest_area_id])
                             print("Ent key",ent_key)
                             print("exit key",exit_key)
@@ -844,29 +852,25 @@ def main():
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
                                 area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
                             
-                            nonent_list[dest_area_id].remove(exit_key)
-                            entrance_assign_list.append(ent_key)
                             exit_found = True
                         # 3. Any Area (Last Resort)
                         if not exit_found:
-                            for _area_id in range(0,4):
-                                if len(nonent_list[_area_id])!=0:
-                                    exit_key = choice(nonent_list[_area_id])
-                                    print("3. Area ID", _area_id)
-                                    print("3. ENT key",ent_key)
-                                    print("3. EXIT key",exit_key)
-                                    print("3. AREA LEN", len(area_zone[_area_id]))
-                                    # Set value to exit_key
-                                    area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = _area_id+1
-                                    area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                        area_zone[_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-                                    #             Area ID   Zone Pos                  Ent Pos
-                                    
-                                    nonent_list[_area_id].remove(exit_key)
-                                    entrance_assign_list.append(ent_key)
-                                    exit_found = True
-                                    break
+                            available_choose_area = [a for a in range(0,4) if len(nonent_list[a])!=0]
+                            dest_area_id = choice(available_choose_area if len(available_choose_area)!=0 else (0,))
+                            print("RESORTING.", nonent_list[dest_area_id])
+                            print("3. Area ID", dest_area_id)
+                            exit_key = choice(nonent_list[dest_area_id])
+                            print("3. ENT key",ent_key)
+                            print("3. EXIT key",exit_key)
+                            print("3. AREA LEN", len(area_zone[dest_area_id]))
+                            # Set value to exit_key
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
+                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                            #             Area ID   Zone Pos                  Ent Pos
+                            exit_found = True
 
+                            ## \/ TODO TO BE DELETED (code not reachable)
                             if not exit_found:
                                 # Handle no exit found (e.g., add a new exit, adjust entrance, raise error)
                                 print(f"No suitable exit found for entrance: {ent_key}")
@@ -876,6 +880,12 @@ def main():
                                 area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
                                 area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
                                     choice(area_zone[dest_area_id][0]["entrance"])[2]
+                            ## /\
+                        # Remove available exit from list if there are still other exits available
+                        nonent_list[dest_area_id].remove(exit_key)
+                        if len(nonent_list[dest_area_id])==0: nonent_list[dest_area_id] = deepcopy(nonent_list_backup[dest_area_id])
+                        print("NONENT LIST", nonent_list[dest_area_id])
+                        entrance_assign_list.append(ent_key)
             
         stg_i += 1
         # Why keeping track of area_len when I can just do this?
@@ -886,7 +896,7 @@ def main():
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         corrections.used_ids = [{},{},{},{}] # Reset duplicate ID list
         globalVars.cp1 = True
-        if stg_name=="08-01.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="05-24.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

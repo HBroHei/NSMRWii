@@ -429,11 +429,12 @@ def corrDupID(areaNo,zone):
                 for zone_prop in zone_prop_lst:
                     cur_id = zone_prop[id_position] % 32 # No way there are 32 entrances
                     try:
-                        print("AREA NO", areaNo, used_ids)
+                        print("AREA NO", areaNo, key_prop, used_ids[areaNo][key_prop], "checking", cur_id)
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
-                            print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
+                            # Generate another ID
                             new_id = generate_unique_id(used_ids[areaNo][key_prop])
+                            print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop],"using",new_id)
                             zone_prop[id_position] = new_id
                             # Check linked locations
                             if key_prop=="location":
@@ -441,7 +442,6 @@ def corrDupID(areaNo,zone):
                                     # If is:
                                     # 138,139,216 liquid / 53 quicksand / 446 Light Cloud /
                                     # 64,435 Fog effect
-                                    #print("CHANGING",spr,cur_id,(spr[3][5]&0x0F)==cur_id)
                                     if spr[0] in (138,139,216,53,446,64,435) and spr[3][5]==cur_id:
                                         # Change Location ID
                                         spr[3] = changeBytesAt(spr[3],5,new_id)
@@ -458,7 +458,7 @@ def corrDupID(areaNo,zone):
                                     # If is 188 Checkpoint
                                     elif spr[0]==188 and spr[3][3]==cur_id:
                                         spr[3] = changeBytesAt(spr[3],3,new_id)
-                                        # If it is 360 / 355 Rolling hills w/ pipe
+                                    # If it is 360 / 355 Rolling hills w/ pipe
                                     elif (spr[0]==360 or spr[0]==355) and ((spr[3][4]&0x0F)==cur_id):
                                         #print("ROLL1 " + str(spr[3]))
                                         spr[3] = changeBytesAt(spr[3],4,(spr[3][4]&0xF0) + (new_id&0x0F)) # Preserve the lower 4 bits

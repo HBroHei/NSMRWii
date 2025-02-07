@@ -32,6 +32,7 @@ def checkExitSprite(zone):
             return spr,i
     return -1,-1
 
+# Check for any bosses
 def checkBossSprite(zone):
     EXIT_SPRITES = [211,363,383,405,406,407,479]
     for i in range(len(zone["sprites"])):
@@ -95,6 +96,9 @@ def findExitEnt(zone):
             ret_pos.append(i)
         else:
             ret_pos_noExit.append(i)
+
+    # Failsafe - if every entrance is enterable, copy ret_pos to ret_pos_noExt (to avoid zone have no exit)
+    #if len(ret_pos_noExit)==0: ret_pos_noExit = deepcopy(ret_pos)
     return ret_pos,ret_pos_noExit
 
 def checkPosInSpecificPos(hostPos, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?

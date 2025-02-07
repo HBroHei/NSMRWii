@@ -487,7 +487,7 @@ class NSMBWsprite:
                     if spr_data[0]==428: # Assign randomised items
                         raw_bytes = b""
                         for cur_combo_lis_idx in range(0,len(combo_lis),2):
-                            print("Assigning",cur_combo_lis_idx,cur_combo_item_idx)
+                            #print("Assigning item panel",cur_combo_lis_idx,cur_combo_item_idx)
                             cur_combo_lis1 = combo_lis[cur_combo_lis_idx]
                             cur_combo_lis2 = combo_lis[cur_combo_lis_idx+1]
                             raw_bytes += ((cur_combo_lis1[cur_combo_item_idx]<<4) | cur_combo_lis2[cur_combo_item_idx]).to_bytes(1,"big")
