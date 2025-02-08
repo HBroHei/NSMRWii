@@ -156,14 +156,16 @@
                 Lists of enemies to be randomized.<br>
                 That is, the enemies in the list will be randomized to another enemy in the same list.<br>
                 Enemies outside of the list will not be randomized.<br>
-                The Array is a multi-dimentional array. Enemies can be grouped in an array, therefore forming a randomization group.<br>
-                Enemies in the same group will only be randomized and changed to another enemy in the same group.
+                The Array is a multi-dimentional array. Enemies can be grouped in an array, therefore forming a randomization group (pool).<br>
+                Enemies in the same pool will only be randomized and changed to another enemy in the same pool.
             </p>
             Parameter:<br>
             <span class="code_single">[Array]</span> Arrays of array of <span style="font-weight: bold;">sprite IDs</span> to be randomized.<br>
-            Each array will be classified as 1 group, and will randomize only within the group.<br>
-            Note: Items can be included in multiple groups, and can be repeated within the group. The number of repeats decides the weight of that item in the respective group.<br>
-            The order of the groups will also affects the randomization effects. If the item is randomized once, it will be randomized with the latter group once more.<br>
+            Each array will be classified as 1 pool, and will randomize only within the pool.<br>
+            Note: Items can be included in multiple pool, and can be repeated within the pool. The number of repeats decides the weight of that item in the respective pool.<br>
+            For example, Goomba's ID can be included in a pool 3 times out of 10 total IDs. This would result in 30% (3/10) chance of a sprite in the pool being randomised into a Goomba.<br>
+            The order of the pools will also affects the randomization effects. If the item is randomized once, it will be randomized with the latter group once more.<br>
+            For example, when a Goomba is in both pool A and pool B, and pool A is first in the array, another enemy can be randomised into a Goomba when pooling from pool A, then got randomised into something else from pool B.<br>
             Example:<br><div class="code_single"><pre class="code">"Enemies":[
     [20,21,200,199,170],
     [57,58,80,94,95,308,272,120],

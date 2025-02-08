@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NSMRW Advanced Generator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <meta name="keywords" content="Randomizer,NSMBW,New Super Mario Bros,Wii,NSMB,Mario,level,enemy">
+        <meta name="description" content="A New Super Mario Bros Wii Randomizer, with not only levels but also enemies randomization. It also supports advanced randomisation. Updates are planned and will be released for this randomizer.">
+        <link rel="stylesheet" href="adv.css">
+        <link rel="stylesheet" href="../navbar.css">
+        <script src="adv.js" defer></script>
+    </head>
+    <body>
+        <div id="top_nav">
+            <a href="https://hbrohei.github.io" class="top_nav_btn"><img src="https://hbrohei.github.io/Nav/main_yt_logo.jpg"> Hammer Bro Hei</a>
+            <a href="https://hbrohei.github.io/MiniStarCenter" class="top_nav_btn hidden_narrow">Mini Star Center</a>
+            <a href="https://hbrohei.github.io/NSMRWii" class="top_nav_btn hidden_narrow">NSMBW Randomiser</a>
+        </div>
+        <div style="height: 5vh;"></div>
+        <h1>Advanced JSON Helper</h1>
+        <div id="padd">
+            <div id="div_work">
+                <code style="padding:0">
+{
+    "Seed":<input id="inp_seed" size=8>,
+    "Reduce Lag":<input id="inp_lag" type="checkbox">,
+    "Patches":<button onclick="propertyManager('patch')">Open</button>,
+    "Entrance Randomization":<input id="inp_ent" type="checkbox">,
+    "Skip":,
+    "Secret Exit List":<input id="inp_secret">,
+    "Enemies":<button onclick="groupManager('sprites')">Open</button>,
+    "Enemy Variation":<button onclick="propertyManager('sprVar')">Open</button>,
+    "Wind Chance":0-100,
+    "Power-up Panel Shuffle":<input id="inp_ent" type="checkbox">,
+    "Level Group":<button onclick="groupManager('lvlGrp')">Open</button>,
+    "Tile Group":<button onclick="groupManager('tileGrp')">Open</button>
+}
+                </code>
+                <div id="div_gp_manager">
+                    <h2 id="h2_gptitle">Group Manager</h2>
+                    <select id="sel_gp" size="7">
+                        <option>test1</option>
+                        <option>test3</option>
+                    </select>
+                    <br>
+                    <div id="div_editAttr">
+                        <label for="inp_gptb">Edit attributes:</label>
+                        <input id="inp_gptb">
+                        <button id="btn_gpedit">Edit</button>
+                    </div>
+                    <div id="div_addAttr">
+                        <label for="inp_gptb_add">Add attributes:</label>
+                        <input id="inp_gptb_add">
+                        <button id="btn_gpedit_add">Add</button>
+                    </div>
+                    <br>
+                    <button onclick=“addAttr()”>Add Attribute</button>
+                </div>
+            </div>
+        </div>
+        <div id="div_preview">
+            
+        </div>
+    </body>
+</html>
