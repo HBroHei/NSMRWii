@@ -7,7 +7,6 @@ Stage_Shuffled/
 __pycache__/
 *.pyc
 *.json
-!id_match.json
 U8/
 Skip List.txt
 .gitignore
@@ -16,3 +15,4 @@ U8O.txt
 log.txt
 *.bin
 *.json
+!id_match.json
