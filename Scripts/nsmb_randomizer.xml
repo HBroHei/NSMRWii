@@ -1,16 +1,21 @@
-<wiidisc version="1">
-	<id game="SMN" />
-	<options>
-		<section name="NSMB Randomizer (NSMRWii)">
-			<option name="Use Randomized Files">
-				<choice name="Enabled">
-					<patch id="randomized_game" />
-				</choice>
-			</option>
-		</section>
-	</options>
-	<patch id="randomized_game">
-		<folder external="/nsmb_randomized" recursive="false" />
-		<folder external="/nsmb_randomized" disc="/" />
-	</patch>
+<wiidisc version="1" shiftfiles="true" log="true">
+    <id game="SMN">
+		<region type="P"/>
+		<region type="E"/>
+		<region type="J"/>
+		<region type="K"/>
+		<region type="W"/>
+	</id>
+    <options>
+        <section name="NSMB Randomizer (NSMRWii)">
+            <option name="Use Randomized Files">
+                <choice name="Enabled">
+                    <patch id="randomized_game" />
+                </choice>
+            </option>
+        </section>
+    </options>
+    <patch id="randomized_game">
+        <folder external="/nsmb_randomized" disc="/Stage"/>
+    </patch>
 </wiidisc>

@@ -22,5 +22,6 @@ copy start.bat ..\..\release\Scripts\
 copy start.sh ..\..\release\Scripts\
 copy u8_m.py ..\..\release\Scripts\
 copy Util.py ..\..\release\Scripts\
+copy nsmb_randomizer.xml ..\..\release\Scripts\
 
 PAUSE
