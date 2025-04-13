@@ -5,7 +5,7 @@ from dolphinAutoTransfer import dolphinAutoTransfer
 import u8_m
 import nsmbw
 import globalVars
-from Util import tilePosToObjPos, convertToDict, objPosToTilePos
+from Util import tilePosToObjPos, convertToDict, objPosToTilePos, decodeTileset
 from zone_random import checks,corrections, read_config
 
 from random import randint, shuffle, choice, random
@@ -73,7 +73,8 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
-def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: dict, area_id: int):
+def handle_zone_overlap(main_tileset, cur_area_tileset, area_zone: list, main_zone: dict, area_id: int):
+    global area_tileset
     overlap_zone_no = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
 
     check_conditions(main_zone)
@@ -99,6 +100,10 @@ def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: 
     main_zone = corrections.corrDupID(area_id, main_zone)
     main_zone = corrections.corrSprZone(main_zone)
     
+    # Check if more tilesets needed to be loaded
+    if len(main_tileset)>len(cur_area_tileset):
+        area_tileset[area_id] = main_tileset
+        area_zone[area_id][0]["tileset"] = main_zone["tileset"]
     area_zone[area_id].append(main_zone)
     # Add entrances in zone to list of entrances
     addEntranceData(area_id, main_zone)
@@ -163,7 +168,7 @@ def genZone(types_list:list):
     #all_zones = [z for z in [tileset_lst for tileset_lst in [cur_type_zone_lst for cur_type_zone_lst in groupTilesetJson[types_list].values()]]]
     # Then choose a zone from it
     ret_zone = deepcopy(choice(all_zones))
-    ret_tileset = ",".join([ba.decode() for ba in ret_zone["tileset"][1:]])
+    ret_tileset = decodeTileset(ret_zone)
     #if ret_zone["orgLvl"]=="05-02.arc": input(ret_zone["orgLvl"])
     return ret_zone, ret_tileset, ret_zone["type"]
 

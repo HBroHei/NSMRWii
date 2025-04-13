@@ -77,3 +77,6 @@ def convertToDict(obj):
         return {k: convertToDict(v) for k, v in obj.items()}
     else:
         return obj
+    
+def decodeTileset(ret_zone):
+    return ",".join([ba.decode() for ba in ret_zone["tileset"][1:]])
