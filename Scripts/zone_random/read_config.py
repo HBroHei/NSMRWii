@@ -55,7 +55,13 @@ shutil.rmtree(STG_TEMP,True)
 shutil.rmtree(STG_OUT,True)
 shutil.copytree(STAGE_DIR,STG_TEMP)
 skipLvl = rulesDict["Skip Level"]
-skip_but_rando = rulesDict["Skip But Randomise"]
+try:
+    skip_but_rando = rulesDict["Skip But Randomise"]
+except KeyError:
+    print("\"Skip But Randomise\" not found in the config file.")
+    print("Make sure you have enabled 'Version 2' in the Generator's Experimential Tab.")
+    print("Levels not randomised. Exiting...")
+    exit() # TODO Remove all of the above when V2 officially comes out
 # for istr in rulesDict["Skip Level"]:
 #     log += str("Processing [S]"+STG_TEMP + "/" + istr+"to"+STG_TEMP + "/" + istr + "\n")
 #     shutil.move(STG_TEMP + "/" + istr,STG_OUT + "/" + istr)
@@ -73,6 +79,10 @@ rockChance = rulesDict["Rock Chance"]
 
 panel_rand = rulesDict["Power-up Panel Shuffle"]
 
+# Sound related config
+musicList = rulesDict["Music"]
+ambientList = rulesDict["Ambient"]
+
 # Add them all to the global vars list
 globalVars.enemyList = enemyList
 globalVars.enemyVarList = enemyVarList
@@ -82,6 +92,8 @@ globalVars.windChance = windChance
 globalVars.darkChance = darkChance
 globalVars.rockChance = rockChance
 globalVars.panel_rand = panel_rand
+globalVars.musicList = musicList
+globalVars.ambientList = ambientList
 
 globalVars.skipLvl = skipLvl
 globalVars.skip_but_rando = skip_but_rando

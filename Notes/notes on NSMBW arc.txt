@@ -162,7 +162,7 @@ FILE STRUCTUIRE
             0x14    Unsign Char  Integer       Camera Autoscroll Track ID?
             0x15    PaddingByte  /             -only 1 byte
             0x16    Unsign Char  Integer       Music
-            0x17    Unsign Char  Integer       Effects modifier (Caves Echo, etc)
+            0x17    Unsign Char  Integer       Effects modifier (Caves Echo, etc) (ID = this value >> 4 (see reggie))
 		{1} First digit (in hex):
 			0 = No spotlight and darkness
 			1 = Layer 0 spotlight

@@ -588,6 +588,13 @@ class NSMBWZones:
                 z_data[10] = randint(0x20,0x25)
             else:
                 z_data[10] = 0x01 # Set to layer 1 on top
+        # Randomise music and ambient
+        for m_lis in globalVars.musicList:
+            if z_data[14] in m_lis:
+                z_data[14] = choice(m_lis)
+        for a_lis in globalVars.ambientList:
+            if z_data[15] in a_lis:
+                z_data[15] = choice(a_lis)
         return z_data
     
 class NSMBWLocations:

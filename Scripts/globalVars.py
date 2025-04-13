@@ -4,6 +4,8 @@ lvlGroup = []
 tileGroup = []
 skipLvl = []
 skip_but_rando = []
+musicList = []
+ambientList = []
 
 reduceLag = True
 

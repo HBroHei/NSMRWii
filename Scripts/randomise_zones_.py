@@ -553,7 +553,7 @@ def main():
             generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(["full","exit"])
         
             exit_zone = deepcopy(generated_exit_zone)
-            print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"])
+            print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset)
             D_count_levelzone(exit_zone["orgLvl"])
             # Change Flagpole type to normal
             exit_spr,exit_spr_pos = checks.checkExitSprite(exit_zone)
@@ -641,7 +641,7 @@ def main():
             for lay_i in range(0,3):
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
-            print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"])
+            print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"], main_tileset)
             main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
             check_conditions(main_zone)
             D_count_levelzone(main_zone["orgLvl"])
@@ -813,7 +813,6 @@ def main():
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
-                        print(f"PROCESSING AREA {area_id} ZONE {zone_pos} ENTRANCEID {area_zone[area_id][zone_pos]["entrance"][entrance_pos][2]}")
                         # Find suitable exit
                         exit_found = False
                         # Check assigned
@@ -891,7 +890,7 @@ def main():
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        #if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
