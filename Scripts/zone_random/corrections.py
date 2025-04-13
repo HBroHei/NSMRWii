@@ -1,4 +1,7 @@
-from Util import tilePosToObjPos, objPosToTilePos, changeBytesAt
+from Util import tilePosToObjPos, objPosToTilePos, changeBytesAt, changeNibbleAt, getNibbleAt, nibblesToByte
+from json import load
+from collections import defaultdict
+from os import listdir, getcwd
 
 ID_POS_LOOKUP = {
     "ZoneBound" : 4,
@@ -15,7 +18,16 @@ ID_REF_LOOKUP = {
     "bottomBackground" : ("zone", 12),
 }
 
-used_ids = [{},{},{}]
+ID_MATCH_TABLE = load(open("./zone_random/id_match.json" if "id_match.json" in listdir(getcwd()) else "./Scripts/zone_random/id_match.json"))
+# Extract a tuple of sprite IDs included
+ID_MATCH_SPRID = (key.replace("D","") for inner_dict in ID_MATCH_TABLE.values() if isinstance(inner_dict, dict) for key in inner_dict.keys() if "_Special" not in key)
+# TODO /\ Untested
+ID_MATCH_LIMIT16 = ["path", "location", "entrance"] # These IDs are limited to be 16 max dur to sprite limitation
+
+used_ids_sprites = [defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)]
+new_ids_sprites = [defaultdict(int),defaultdict(int),defaultdict(int),defaultdict(int)]
+
+used_ids = [{},{},{},{}]
 
 DOOR_TYPE_3X2 = 0
 DOOR_TYPE_BOSS = 1
@@ -64,7 +76,6 @@ def alignToPos(zone,nx,ny,use_min = True):
     diffy = zone["zone"][1] - ny
 
     diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
-    print("DIFF",diffx, diffy,zone["zone"][0],nx, zone["zone"][1],ny)
 
     # Variables indicate if property passes check (*True if not passing*)
     check_spr = False
@@ -76,7 +87,6 @@ def alignToPos(zone,nx,ny,use_min = True):
 
     while passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone
         or check_tile!=[]):
-        print(zone["orgLvl"],"Pass a",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
         # for spr in zone["sprites"]:
         #     if not (0<=spr[1]<=16384 and 0<=spr[2]<=16384):
         #         print(spr,"failed")
@@ -141,7 +151,6 @@ def alignToPos(zone,nx,ny,use_min = True):
         check_ent = not all(0<=ent[0]<=16384 and 0<=ent[1]<=8192  for ent in zone["entrance"])
         check_zone = not ((0<=zone["zone"][0]<=16384) and (0<=zone["zone"][1]<=8192 ) and (0<=zone["zone"][0]+zone["zone"][2]<=16384) and (0<=zone["zone"][1]+zone["zone"][3]<=8192 ))
         check_tile = bgdat_layer_check(zone)
-        print(zone["orgLvl"],"Pass b",passes,":",check_spr , check_loc , check_pat , check_ent , check_zone , check_tile)
         if passes>=1:
             if check_spr:
                 for spr in zone["sprites"]:
@@ -309,18 +318,18 @@ def alignToPos_o(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
     if len(redo_align)!=0:
         if redo_align[2]<0:
             if redo_align[1]=="x":
-                print("Realigning 0 X",redo_align,(redo_align[2]+320))
+                # print("Realigning 0 X",redo_align,(redo_align[2]+320))
                 return alignToPos(zone,diffx=redo_align[2]*2) # Realign x pos
             else:
-                print("Realigning 0 Y",redo_align,(redo_align[2]+320))
+                # print("Realigning 0 Y",redo_align,(redo_align[2]+320))
                 return alignToPos(zone,diffy=redo_align[2]*2) # Realign y pos
         elif redo_align[2]>=16343:
             if redo_align[1]=="x":
-                print("Realigning max X",redo_align,(redo_align[2]-320))
+                # print("Realigning max X",redo_align,(redo_align[2]-320))
                 #input()
                 return alignToPos(zone,diffx=redo_align[2]/-2) # Realign x pos
             else:
-                print("Realigning max Y",redo_align,(redo_align[2]-320))
+                # print("Realigning max Y",redo_align,(redo_align[2]-320))
                 return alignToPos(zone,diffy=redo_align[2]/-2) # Realign y pos
         else:
             print("OOB Correction failed", redo_align)
@@ -343,11 +352,18 @@ def corrSprZone(cur_zone):
 # Definitely needs modifying tho
 ######## TODO DUPLICATE REPLACEMNENT FUNCTION NOT DEBUGGED ######## 
 ## btw this is gonna be a hell to debug (and I dont even know an effective way to debug this lol(sign))
-def generate_unique_id(used_ids):
+def generate_unique_id(used_ids, key_prop):
     new_id = 0
+    failsafe_count = 0
     # loop until the id is not duplicated
     while new_id in used_ids:
         new_id += 1
+        # Check if exceed 16
+        # Also have it pass if it already looped around
+        if key_prop in ID_MATCH_LIMIT16 and new_id>15 and failsafe_count<=2:
+            failsafe_count+=1
+            new_id = 0
+    if failsafe_count>1: input("FAILSAFE ACTIVATED")
     return new_id
 
 def update_references(data_list, position, old_id, new_id):
@@ -367,31 +383,6 @@ def corrDupID(areaNo,zone):
     for key_prop, zone_prop_lst in re_zone.items():
         # IF there is stuff inside the list
         if isinstance(zone_prop_lst, list) and len(zone_prop_lst) > 0:
-            """
-                if key == "bound":
-                    id_position = 4
-                    references = ["zone", 7]
-                elif key == "background1":
-                    id_position = 0
-                    references = ["zone", 11]
-                elif key == "background2":
-                    id_position = 0
-                    references = ["zone", 12]
-                elif key == "entrance":
-                    id_position = 2
-                    references = []
-                elif key == "location":
-                    id_position = 4
-                    references = []
-                elif key == "path":
-                    id_position = 0
-                    references = ["path", 2]
-                elif key == "pathNode":
-                    id_position = 0
-                    references = ["path", 2]
-                else:
-                    continue
-                """
             # Check which position is the id
             try:
                 id_position = ID_POS_LOOKUP[key_prop]
@@ -401,19 +392,18 @@ def corrDupID(areaNo,zone):
             references = tuple()
             try:
                 references = ID_REF_LOOKUP[key_prop]
-                print("Reference Found:",references)
             except KeyError:
                 # May not have ref
                 print("Info: Cannot find ref",key_prop)
                 pass
-            if not isinstance(zone_prop_lst[0],list): # Should be "zone"
+            if not isinstance(zone_prop_lst[0],list): # The first item is not another list, Should be "zone"
                 cur_id = zone_prop_lst[6]
                 try:
                     # Check in duplicated list
                     if cur_id in used_ids[areaNo][key_prop]:
                         print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
-                        new_id = generate_unique_id(used_ids[areaNo][key_prop])
-                        zone_prop[id_position] = new_id
+                        new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
+                        zone_item[id_position] = new_id
                         for ref_key, ref_pos in references:
                             if ref_key in re_zone:
                                 update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
@@ -425,44 +415,27 @@ def corrDupID(areaNo,zone):
                 except KeyError:
                     used_ids[areaNo][key_prop] = set()
                     used_ids[areaNo][key_prop].add(cur_id)
-            else: # Anything other than "zone" prop
-                for zone_prop in zone_prop_lst:
-                    cur_id = zone_prop[id_position] % 32 # No way there are 32 entrances
+            else: # First item is another list, Anything other than "zone" prop
+                for zone_item in zone_prop_lst:
+                    cur_id = zone_item[id_position] % 32 # No way there are 32 entrances
                     try:
                         print("AREA NO", areaNo, key_prop, used_ids[areaNo][key_prop], "checking", cur_id)
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
                             # Generate another ID
-                            new_id = generate_unique_id(used_ids[areaNo][key_prop])
+                            new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
                             print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop],"using",new_id)
-                            zone_prop[id_position] = new_id
+                            zone_item[id_position] = new_id
                             # Check linked locations
                             if key_prop=="location":
-                                for spr in re_zone["sprites"]:
-                                    # If is:
-                                    # 138,139,216 liquid / 53 quicksand / 446 Light Cloud /
-                                    # 64,435 Fog effect
-                                    if spr[0] in (138,139,216,53,446,64,435) and spr[3][5]==cur_id:
-                                        # Change Location ID
-                                        spr[3] = changeBytesAt(spr[3],5,new_id)
-                                    # If is 234 Cloud
-                                    elif spr[0]==234 and (spr[3][5]&0x0F)==cur_id:
-                                        spr[3] = changeBytesAt(spr[3],5,(spr[3][5]&0xF0) + new_id) # Preserve the upper 4 bits
+                                #input(f"==================Updated location {cur_id}->{new_id}==========================")
+                                re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Location ID")
                             # Check linked entrance
-                            if key_prop=="entrance":
-                                for spr in re_zone["sprites"]:
-                                    # If is 179 Special Exit
-                                    if spr[0]==179 and ((spr[3][5]&0x0F) | (spr[3][3]&0xF0))==cur_id:
-                                        spr[3] = changeBytesAt(spr[3],5,(spr[3][5]&0xF0) + (new_id&0x0F)) # Preserve the upper 4 bits
-                                        spr[3] = changeBytesAt(spr[3],3,(spr[3][3]&0x0F) + (new_id&0xF0)) # Preserve the lower 4 bits
-                                    # If is 188 Checkpoint
-                                    elif spr[0]==188 and spr[3][3]==cur_id:
-                                        spr[3] = changeBytesAt(spr[3],3,new_id)
-                                    # If it is 360 / 355 Rolling hills w/ pipe
-                                    elif (spr[0]==360 or spr[0]==355) and ((spr[3][4]&0x0F)==cur_id):
-                                        #print("ROLL1 " + str(spr[3]))
-                                        spr[3] = changeBytesAt(spr[3],4,(spr[3][4]&0xF0) + (new_id&0x0F)) # Preserve the lower 4 bits
-                                        #input("ROLL2 " + str(spr[3]))
+                            elif key_prop=="entrance":
+                                re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Entrance ID")
+                            # Check linked path
+                            elif key_prop=="path":
+                                re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Path ID")
 
                             if references!=tuple():
                                 print("Reference",references,re_zone[references[0]])
@@ -470,24 +443,104 @@ def corrDupID(areaNo,zone):
                                 if ref_key in re_zone:
                                     update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
                     except KeyError:
-                        # No set found - no duplicates
+                        # No set found implies no duplicates
                         used_ids[areaNo][key_prop] = set()
-                    addID(areaNo,key_prop,zone_prop_lst)
+
+                    # TODO Check for all sprite IDs
+                    
+                    addID(areaNo,key_prop,cur_id)
+    
+    def update_sprid(spr_pos,id_type, old_val):
+        # Generate a new ID
+        while new_id := new_ids_sprites[id_type]+1 in used_ids_sprites[areaNo][to_check_ids]:
+            pass
+        re_zone["sprites"] = update_spr_value(re_zone["sprites"], old_val, new_id, id_type)
+        used_ids_sprites[areaNo][to_check_ids].append(new_id)
+
+    # Check for sprites shared ID duplicates
+    """"""
+    for i in range(len(re_zone["sprites"])):
+        SPR_ID = re_zone["sprites"][i][0]
+        # if sprite ID is in to-check list
+        if SPR_ID in ID_MATCH_SPRID:
+            # TODO It should works for now, but oh man is this very unoptimised (time complexity wise)
+            # Check for every IDs
+            for to_check_ids in ID_MATCH_TABLE:
+                # If it is in the to-check list
+                if SPR_ID in ID_MATCH_TABLE[to_check_ids] and "_Special" not in to_check_ids:
+                    # Check if has only 1 pos
+                    npos_lst = (ID_MATCH_TABLE[to_check_ids][SPR_ID],) if isinstance(ID_MATCH_TABLE[to_check_ids][SPR_ID][0],int) else ID_MATCH_TABLE[to_check_ids][SPR_ID]
+                    # For every pos pair
+                    for npos in npos_lst:
+                        joined_byte = nibblesToByte(
+                            getNibbleAt(re_zone["sprites"][i][3],npos[0]),
+                            getNibbleAt(re_zone["sprites"][i][3],npos[1])
+                        )
+                        # If ID is used
+                        if joined_byte in used_ids_sprites[areaNo][to_check_ids]:
+                            # Assign new ID
+                            update_sprid(i, to_check_ids, joined_byte)
+                        else:
+                            # Still add it to the used IDs pile
+                            used_ids_sprites[areaNo][to_check_ids].append(joined_byte)
 
     print("USED IDS",used_ids)
     return re_zone
 
+def update_spr_value(re_zone_sprites, old_value, new_value, id_type):
+    # Check if sprite id in ID_MATCH_TABLE[id_type]
+    # Update direct reference
+    for i in range(len(re_zone_sprites)):
+        SPR_ID = str(re_zone_sprites[i][0])
+        # Update value if sprite id is in the relavent match table
+        #print(f"Checking {SPR_ID} : {ID_MATCH_TABLE[id_type]}, {SPR_ID in ID_MATCH_TABLE[id_type]}")
+        if SPR_ID in ID_MATCH_TABLE[id_type]:
+            # Check if has only 1 pos
+            npos_lst = (ID_MATCH_TABLE[id_type][SPR_ID],) if isinstance(ID_MATCH_TABLE[id_type][SPR_ID][0],int) else ID_MATCH_TABLE[id_type][SPR_ID]
+            # For every position
+            for npos in npos_lst:
+                # Check for pos (also checks if only 1 byte needs to change)
+                if len(npos)==2:
+                    joined_byte = nibblesToByte(
+                        getNibbleAt(re_zone_sprites[i][3],npos[0]),
+                        getNibbleAt(re_zone_sprites[i][3],npos[1])
+                    )
+                    #input(f"CHECKING Byte: {re_zone_sprites[i][3]} -- {joined_byte}=={old_value}")
+                    if joined_byte==old_value:
+                        re_zone_sprites[i][3] = changeNibbleAt(re_zone_sprites[i][3],npos[0],new_value)
+                        re_zone_sprites[i][3] = changeNibbleAt(re_zone_sprites[i][3],npos[1],new_value)
+                else: # Only 1 byte needs changing
+                    joined_byte = getNibbleAt(re_zone_sprites[i][3],npos[0])
+                    #input(f"CHECKING Byte: {re_zone_sprites[i][3]} -- {joined_byte}=={old_value}")
+                    if joined_byte==old_value:
+                        re_zone_sprites[i][3] = changeNibbleAt(re_zone_sprites[i][3],npos[0],new_value)
+        elif SPR_ID in ID_MATCH_TABLE["_Special ID"]:
+            for special in ID_MATCH_TABLE["_Special"]:
+                # Check if matching sprite id and the value at the position matches the id type we are processing
+                if SPR_ID in special["ids"] and special["value"][getNibbleAt(re_zone_sprites[i][3],special["pos"][0])]==id_type:
+                    joined_byte = nibblesToByte(
+                        getNibbleAt(re_zone_sprites[i][3],ID_MATCH_TABLE[id_type][f"D{SPR_ID[0]}"]),
+                        getNibbleAt(re_zone_sprites[i][3],ID_MATCH_TABLE[id_type][f"D{SPR_ID[1]}"])
+                    )
+                    if joined_byte==old_value:
+                        changeNibbleAt(re_zone_sprites[i][3],ID_MATCH_TABLE[id_type][f"D{SPR_ID[0]}"],new_value)
+                        changeNibbleAt(re_zone_sprites[i][3],ID_MATCH_TABLE[id_type][f"D{SPR_ID[1]}"],new_value)
+    return re_zone_sprites
+
+
 # Alright but these are written by myself okay?
 # Add the IDs to the list of repeated IDs
-def addID(areaNo,key,zone_prop_lst):
+def addID(areaNo,key,cur_id):
     id_position = ID_POS_LOOKUP[key]
-    for item in zone_prop_lst:
-        cur_id = item[id_position]
-        try:
-            used_ids[areaNo][key].add(cur_id)
-        except KeyError:
-            used_ids[areaNo][key] = set()
-            used_ids[areaNo][key].add(cur_id)
+    # for item in zone_prop_lst:
+    #     cur_id = item[id_position]
+    try:
+        used_ids[areaNo][key].add(cur_id)
+    except KeyError:
+        used_ids[areaNo][key] = set()
+        used_ids[areaNo][key].add(cur_id)
+
+# THIS ISNT USED FOR ANYTHING
 def addIDsFromZone(areaNo,zone):
     for key,value in zone.items():
         try:
@@ -495,3 +548,11 @@ def addIDsFromZone(areaNo,zone):
         except KeyError:
             # No id needed to replace - skip
             continue
+
+
+def reset_vars():
+    global used_ids_sprites, new_ids_sprites, used_ids
+    used_ids_sprites = [defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)]
+    new_ids_sprites = [defaultdict(int),defaultdict(int),defaultdict(int),defaultdict(int)]
+
+    used_ids = [{},{},{},{}]

@@ -332,9 +332,8 @@ class NSMBWLoadSprite:
 
     # Generate Load Sprite List based on sprites list
     def addLoadSprites(sprData):
-        sprLoadList = []
-        sprLoadList = [spr[0] for spr in sprData if spr[0] not in sprLoadList]
-        return sprLoadList
+        sprLoadList = set(spr[0] for spr in sprData)
+        return list(sprLoadList)
             
 
     def toByteData(sprList):
@@ -461,20 +460,9 @@ class NSMBWsprite:
                 for pattern in globalVars.enemyVarList[str(enemyData[0])]:
                     if matches_pattern(varient_string, pattern):
                         new_varient = choice(globalVars.enemyVarList[str(enemyData[0])])
-                        # print(f"Replacing {pattern} with {replacement}")
                         # Replace the pattern
                         enemyData[3] = NSMBWsprite.replace_varient(varient_string, new_varient)
-                        #if enemyData[0]==207: input(enemyData)
                         break  # Exit after first match; remove this if you want to check all patterns
-                # (enemyData[3]) in globalVars.enemyVarList[str(enemyData[0])]: # TODO Find a better way to implement the last statement
-                # varList = globalVars.enemyVarList[str(enemyData[0])]
-                # choice_var = varList[randint(0,len(varList)-1)]
-                # # Replace x with original value
-                # final_var = bytes([o if p=="x" else p for o, p in zip(enemyData[3].hex(), choice_var)])
-                # # Replace the original value
-                # #if enemyData[0]==289: input(final_var)
-                # enemyData[3] = bytes.fromhex(final_var)
-            #if lvName=="01-05.arc": input(enemyData)
             if is_panel and globalVars.panel_rand: # Power-up Panel level
                 #input("PANEL TIME")
                 # Set up matching combo
@@ -496,7 +484,7 @@ class NSMBWsprite:
                         cur_combo_item_idx+=1
                 break
 
-            # Add to load sprite list sst
+            # Add to load sprite list set
             relData.add(enemyData[0])
 
         # Add winds

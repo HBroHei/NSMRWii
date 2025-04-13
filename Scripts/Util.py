@@ -1,3 +1,5 @@
+from math import ceil
+
 def binToUtf(bytesSeq):
     return list(map(lambda l1:chr(l1),bytesSeq))
 
@@ -12,8 +14,26 @@ def tilePosToObjPos(tilePos):
 
 def changeBytesAt(bytesStr:bytes, pos:int, newVal):
     tmp_bytearr = bytearray(bytesStr)
+    print(newVal)
     tmp_bytearr[pos] = newVal
     return bytes(tmp_bytearr)
+
+def changeNibbleAt(bytesStr:bytes, pos_nibble:int, newVal):
+    pos = ceil(pos_nibble/2) - 1
+    print(f"{bytesStr}, {pos_nibble}, {bytesStr[pos]}, {(newVal)} {(bytesStr[pos] & 0b00001111)}")
+    return changeBytesAt(
+        bytesStr,
+        int(ceil(pos_nibble/2) - 1),
+        ((newVal & 0b00001111) | (bytesStr[pos] & 0b11110000)) if pos_nibble%2==0 else ((newVal << 4) | (bytesStr[pos] & 0b00001111))
+    )
+
+def getNibbleAt(bytesStr:bytes, pos_nibble:int):
+    pos = ceil(pos_nibble/2) - 1
+    #print("GETTING at",pos,bytesStr[pos],(bytesStr[pos] & 0b11110000)>>4 if pos_nibble%2==1 else (bytesStr[pos] & 0b00001111))
+    return (bytesStr[pos] & 0b11110000)>>4 if pos_nibble%2==1 else (bytesStr[pos] & 0b00001111)
+
+def nibblesToByte(hnib,lnib):
+    return (int(hnib)<<4) | int(lnib)
 
 # Function to convert hex bytes to a formatted string
 def hex_to_str(hex_bytes):

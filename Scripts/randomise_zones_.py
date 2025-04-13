@@ -79,7 +79,7 @@ def handle_zone_overlap(main_tileset, area_tileset, area_zone: list, main_zone: 
     check_conditions(main_zone)
 
     if overlap_zone_no != -1:
-        print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
+        # print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
         overlap_zone = area_zone[area_id][overlap_zone_no]["zone"]
         
         new_x = 512
@@ -131,7 +131,7 @@ def addRandomZone(types: list):
         # If area tileset is subset or not assigned
         if area_tileset[idx] == "" or gen_zone_tileset in area_tileset[idx] or area_tileset[idx] in gen_zone_tileset:
             if area_tileset[idx] in gen_zone_tileset: area_tileset[idx] = gen_zone_tileset
-            print("Tileset same?", gen_zone_tileset, area_tileset[idx])
+            # print("Tileset same?", gen_zone_tileset, area_tileset[idx])
             # Use handle_zone_overlap to manage overlap
             #print("MAIN",)
             try:
@@ -150,7 +150,6 @@ def addRandomZone(types: list):
 
 # NOTE This will NOT remove the zone from the list
 def getRandomZone(tilesetName:str, zone_type:str) -> dict:
-    print("SELECT",tilesetName,zone_type)
     ret_zone = deepcopy(choice(groupTilesetJson[zone_type][tilesetName]))
     return ret_zone
 
@@ -242,7 +241,6 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     for area_i in range(1,areaNo+1):
         area_arr_i = area_i-1 # To be used in lists
         areaData = lvlData[area_arr_i]
-        print("len",len(areaData))
         # If list len==0, skip
         if len(areaData)==0: continue
 
@@ -266,10 +264,10 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             print("[D] outputting area",area_i,"zone",zoneNo)
             cur_zone = areaData[zoneNo]
             loadSprList += nsmbw.NSMBWLoadSprite.addLoadSprites(cur_zone["sprites"])
-            if areaRawSettings==[]: # Area First-timer, add configs
-                print("[D] Adding configs")
+            # if areaRawSettings==[]: # Area First-timer, add configs
+            #     print("[D] Adding configs")
                 
-                pass
+            #     pass
             ## finished adding config
             # Add properties
             zone_bound += cur_zone["ZoneBound"]
@@ -327,8 +325,8 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             # Add path nodes
             path_node_list += cur_pathzone["pathNode"]
         # Check if len(path_node_list)+len(last_path)==cur_start_node
-        print("[D]final list",path_list)
-        print("[D]final path node",path_node_list)
+        # print("[D]final list",path_list)
+        # print("[D]final path node",path_node_list)
         assert len(path_node_list)==cur_start_node, str(len(path_node_list)) + "!=" + str(cur_start_node)
         # Now they are ready to be added back to the list
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathProperties.toByteData(path_list)))
@@ -527,7 +525,7 @@ def main():
         if have_secret and gen_ent_zone_type=="full": # If have secret and type full, check whether spawn zone has 2 or more enterables
             while len(checks.findExitEnt(generated_ent_zone)[0])<1:
                 generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(["full","entrance"])
-        
+
         spawn_zone = deepcopy(generated_ent_zone)
         # Sprites randomisation
         spawn_zone["sprites"],_dum,__dum =\
@@ -678,8 +676,8 @@ def main():
         # I believe there is a better wauy to do this, but this will do for now
         secret_generated = False
         ent_pipes_cand = []
-        print("NONENT:",area_nonenterable_count)
-        print("   ENT:",area_enterable_count)
+        # print("NONENT:",area_nonenterable_count)
+        # print("   ENT:",area_enterable_count)
         start_over = False
         secret_generated = not have_secret
         for area_no in range(0,4):
@@ -777,7 +775,6 @@ def main():
                 [[] for _ in range(len(entrance_list[2]))],
                 [[] for _ in range(len(entrance_list[3]))]
             ] # Storing randomised entrance ids
-            print("Processed_Ent_Ids",processed_enterable_id)
 
             entrance_assign_list = []
 
@@ -793,13 +790,13 @@ def main():
             for area_id in range(0,4):
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
-                    print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
+                    # print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
                     nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
                 if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
                     for zone_pos in range(0,len(area_zone[area_id])):
-                        print("Dest Ent Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
+                        # print("Dest Ent Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
                         nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
-                print("NONENT LIST", area_id, nonent_list[area_id], len(area_zone[area_id]))
+                # print("NONENT LIST", area_id, nonent_list[area_id], len(area_zone[area_id]))
             nonent_list_backup = deepcopy(nonent_list) # Backup list in case the list got emptied
 
             # Assign entrances
@@ -815,7 +812,6 @@ def main():
                     pass
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
-                    print("ENTLIST",area_zone[area_id][zone_pos]["orgLvl"], entrance_list[area_id][zone_pos], area_zone[area_id][zone_pos]["entrance"])
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
                         print(f"PROCESSING AREA {area_id} ZONE {zone_pos} ENTRANCEID {area_zone[area_id][zone_pos]["entrance"][entrance_pos][2]}")
                         # Find suitable exit
@@ -845,8 +841,6 @@ def main():
                         if len(nonent_list[dest_area_id])!=0:
                             # Exist - choose a nonent
                             exit_key = choice(nonent_list[dest_area_id])
-                            print("Ent key",ent_key)
-                            print("exit key",exit_key)
                             # Set value to exit_key
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
@@ -884,7 +878,7 @@ def main():
                         # Remove available exit from list if there are still other exits available
                         nonent_list[dest_area_id].remove(exit_key)
                         if len(nonent_list[dest_area_id])==0: nonent_list[dest_area_id] = deepcopy(nonent_list_backup[dest_area_id])
-                        print("NONENT LIST", nonent_list[dest_area_id])
+                        # print("NONENT LIST", nonent_list[dest_area_id])
                         entrance_assign_list.append(ent_key)
             
         stg_i += 1
@@ -893,10 +887,11 @@ def main():
         # Well, I wasted my time I guess
         print("Area len",area_len)
         writeToFile(stg_name,area_zone,area_len)
+        # Reset correction variables
+        corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
-        corrections.used_ids = [{},{},{},{}] # Reset duplicate ID list
         globalVars.cp1 = True
-        #if stg_name=="05-24.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
