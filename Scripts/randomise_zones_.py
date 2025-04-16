@@ -142,7 +142,8 @@ def addRandomZone(types: list):
             try:
                 generated_zone = handle_zone_overlap(area_tileset[idx], area_tileset, area_zone, generated_zone, idx)
             except IndexError: # New Area
-                area_len += 1
+                area_len += 1 # TODO Change this
+                continue
             # Check for duplication and add zone
             
             #area_zone[idx].append(generated_zone)
@@ -706,7 +707,8 @@ def main():
                     break
                 if have_secret:
                     # Check if exit type is goal pole
-                    exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1])
+                    print(added_area_no)
+                    exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1]) # TODO
                     if exit_spr[0]==113:
                         area_zone[added_area_no][-1]["sprites"][exit_spr_pos][3] = b"\x00\x00\x10\x00\x00\x00"
                         print("Changed Flagpole")
@@ -895,7 +897,7 @@ def main():
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
