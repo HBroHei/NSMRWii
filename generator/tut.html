@@ -127,18 +127,28 @@
             (For v2.x, the file is located inside the "Scripts" folder)
             </p>
             <h1>6. Play the game</h1>
+            <p>
+                The randomised levels are stored in the "Stage_Shuffled" or "Stage_output" folder.
+                You can copy the .arc files inside the folder, and patch them like what you would do with other NSMBW custom levels.<br>
+                Below lists a few common methods of patching the game.
+            </p>
             <h2>6.1 Method 1: Direct file replacement</h2>
             <p>
             Move the "Stage" folder to its orginal position (inside the game's file)<br>
             (Replace the orginal files)<br>
             Move back to the game's root folder (i.e. the folder that contains "DATA" and "UPDATE" folders) (Not the program's root folder)<br>
-            Navigate to DATA/sys/, and open main.dol with Dolphin Emulator
+            Navigate to DATA/sys/, and open main.dol with Dolphin Emulator.
             </p>
             <h2>6.2 Method 2: Riivolution Patch</h2>
             <p>
                 Riivolution patches is a flexible way of patching the game. You can either set up Riivolution manually, or use the built-in auto copy function.
             </p>
             <strong>NOTE: Riivolution method currently only works for emulators. It may or may not load on real hardware.</strong>
+            Further information on Riivolution and NSMBW:<br>
+            <ol>
+                <li><a href="https://horizon.miraheze.org/wiki/Dolphin_Emulator#Riivolution_Patches">https://horizon.miraheze.org/wiki/Dolphin_Emulator#Riivolution_Patches</a></li>
+                <li><a href="https://horizon.miraheze.org/wiki/Loading_Files_in_Riivolution">https://horizon.miraheze.org/wiki/Loading_Files_in_Riivolution</a></li>
+            </ol>
             <h3>6.2.1 Built-in autocopying</h3>
             <p>
                 This program now have a configuration file for automatically copying the shuffled levels to a desinated folder.<br>
@@ -147,12 +157,13 @@
                 <code>"enable_auto_copy":true,</code><br>
                 3. Set the value of <code>riivolution_folder</code> to the path for the root SD card folder (the folder that contains the riivoluton folder), like so:<br>
                 <code>"riivolution_folder":"PATH/TO/RIIVOLUTION/FOLDER",</code><br>
-                4. Save the file, and run the randomiser. The shuffled levels should be copied to the specified path.
+                (Note: For Dolphin users looking to patch the game with Riivolution, <code>"riivolution_folder"</code> should be <code>"C:/Users/[USERNAME]/AppData/Roaming/Dolphin Emulator/Load/Riivolution/"</code> on Windows.)<br>
+                4. Save the file, and run the randomiser. The shuffled levels should be copied to the specified path.<br>
             </p>
             <h3>6.2.2 Manual copying</h3>
             <p>
                 Follow the guide in the "New Super Mario Bros Wii" section in <a href="https://aerialx.github.io/rvlution.net/wiki/Patch_Templates/index.html#New_Super_Mario_Bros._Wii">here</a><br>
-                (The levels being all the content in the "Stage_Shuffled" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder (v1) or "Stage_output" folder (v2) into the "nsmb" folder)
+                (The levels being all the content in the "Stage_Shuffled" / "Stage_output" folder. Just copy and paste ALL the content in the "Stage_Shuffled" folder (v1) or "Stage_output" folder (v2) into the "nsmb" folder)
             </p>
             <p>
                 DISCLAMER: This project is not affiliated with Nintendo.<br>
