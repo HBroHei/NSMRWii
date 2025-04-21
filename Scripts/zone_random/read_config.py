@@ -14,6 +14,7 @@ randomiseEntrance = []
 skipLvl = []
 lvlGroup = []
 tileGroup = []
+tiles0List = []
 secret_exit = []
 
 STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
@@ -73,6 +74,13 @@ except KeyError:
     log += str("[i] 'Tile Group' not included" + "\n")
     pass
 
+# TIleset 0 rando
+try:
+    tiles0List = rulesDict["Tileset 0"]
+except KeyError:
+    log += str("[i] 'Tileset 0' not included" + "\n")
+    pass
+
 windChance = rulesDict["Wind Chance"]
 darkChance = rulesDict["Dark Chance"]
 rockChance = rulesDict["Rock Chance"]
@@ -88,6 +96,7 @@ globalVars.enemyList = enemyList
 globalVars.enemyVarList = enemyVarList
 globalVars.reduceLag = reduceLag
 globalVars.tileGroup = tileGroup
+globalVars.tiles0List = tiles0List
 globalVars.windChance = windChance
 globalVars.darkChance = darkChance
 globalVars.rockChance = rockChance

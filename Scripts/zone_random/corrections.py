@@ -97,7 +97,7 @@ def alignToPos(zone,nx,ny,use_min = True):
         # We do not care if x + width / y + height exceeds limit as it does not overflow python
         zone["zone"][0] = clamp(zone["zone"][0] - diffx)
         zone["zone"][1] = clamp(zone["zone"][1] - diffy)
-        print("New zone",zone["zone"],diffy)
+        #print("New zone",zone["zone"],diffy)
         zone["sprites"] =\
             [[spr[0],clamp(spr[1] - diffx),clamp(spr[2] - diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
         zone["location"] =\
@@ -206,13 +206,13 @@ def alignToPos_o(zone,nx=0,ny=0, diffx=None, diffy = None, take_min = False):
     if take_min:
         nx = min(zone["zone"][0],nx)
         ny = min(zone["zone"][0],ny)
-    print("OLD - NEW",zone["zone"],nx,ny)
+    #print("OLD - NEW",zone["zone"],nx,ny)
     #input()
     if diffx==None:
         diffx = zone["zone"][0] - nx
     if diffy==None:
         diffy = zone["zone"][1] - ny
-    print("DIFF X,Y =",diffx,diffy)
+    #print("DIFF X,Y =",diffx,diffy)
     # Do not change the order of these 4 statements
     # ^ For future me, my brain liked to swap things
     #print(zone["zone"], x, y, diffx, diffy)
@@ -401,7 +401,7 @@ def corrDupID(areaNo,zone):
                 try:
                     # Check in duplicated list
                     if cur_id in used_ids[areaNo][key_prop]:
-                        print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
+                        #print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
                         new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
                         zone_item[id_position] = new_id
                         for ref_key, ref_pos in references:
@@ -419,12 +419,12 @@ def corrDupID(areaNo,zone):
                 for zone_item in zone_prop_lst:
                     cur_id = zone_item[id_position] % 32 # No way there are 32 entrances
                     try:
-                        print("AREA NO", areaNo, key_prop, used_ids[areaNo][key_prop], "checking", cur_id)
+                        #print("AREA NO", areaNo, key_prop, used_ids[areaNo][key_prop], "checking", cur_id)
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
                             # Generate another ID
                             new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                            print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop],"using",new_id)
+                            #print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop],"using",new_id)
                             zone_item[id_position] = new_id
                             # Check linked locations
                             if key_prop=="location":
@@ -438,7 +438,7 @@ def corrDupID(areaNo,zone):
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Path ID")
 
                             if references!=tuple():
-                                print("Reference",references,re_zone[references[0]])
+                                #print("Reference",references,re_zone[references[0]])
                                 ref_key, ref_pos = references
                                 if ref_key in re_zone:
                                     update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
@@ -484,7 +484,7 @@ def corrDupID(areaNo,zone):
                             # Still add it to the used IDs pile
                             used_ids_sprites[areaNo][to_check_ids].append(joined_byte)
 
-    print("USED IDS",used_ids)
+    #print("USED IDS",used_ids)
     return re_zone
 
 def update_spr_value(re_zone_sprites, old_value, new_value, id_type):

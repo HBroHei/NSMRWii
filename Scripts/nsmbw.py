@@ -131,7 +131,6 @@ class NSMBWbgDat:
             
 
 class NSMBWtileset:
-    # WIP, Only implemented this to fix problematic level
     def phraseByteData(byteData):
         i = 0
         returnList = []
@@ -149,6 +148,13 @@ class NSMBWtileset:
             tilesetName = tilesetName.ljust(32, b"\x00")
             byteArray += tilesetName
         return byteArray
+    
+    def processTileset(tileset_name):
+        # Tileset 0 rando
+        if tileset_name[0].decode() in globalVars.tiles0List:
+            tileset_name[0] = choice(globalVars.tiles0List).encode()
+
+        return tileset_name
 
 # Section 1 Level Properties goes here if necessary
 class NSMBWAreaProp:

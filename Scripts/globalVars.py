@@ -12,7 +12,7 @@ reduceLag = True
 randomiseEntrance = False
 
 tilesData = [[],[],[]]
-
+tiles0List = []
 log = ""
 
 SKIP_SPRITES = [276,259,113]

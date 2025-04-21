@@ -52,7 +52,7 @@ isDebug = False
 def writeArea():
     pass
 
-def check_conditions(main_zone):
+def D_check_conditions(main_zone):
     # if main_zone["orgLvl"]=="04-22.arc": input("1-1 found")
     # if "Pa0_jyotyuPa1_nohara" in area_tileset : input("Org tileset found")
     pass
@@ -73,11 +73,10 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
-def handle_zone_overlap(main_tileset, cur_area_tileset, area_zone: list, main_zone: dict, area_id: int):
-    global area_tileset
+def handle_zone_overlap(main_tileset:str, cur_area_tileset:list, area_zone: list, main_zone: dict, area_id: int):
     overlap_zone_no = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
 
-    check_conditions(main_zone)
+    D_check_conditions(main_zone)
 
     if overlap_zone_no != -1:
         # print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
@@ -99,10 +98,10 @@ def handle_zone_overlap(main_tileset, cur_area_tileset, area_zone: list, main_zo
     # Check and correct duplicated zones
     main_zone = corrections.corrDupID(area_id, main_zone)
     main_zone = corrections.corrSprZone(main_zone)
-    
+    #print("MAIN TILESET",main_tileset,type(main_tileset))
     # Check if more tilesets needed to be loaded
-    if len(main_tileset)>len(cur_area_tileset):
-        area_tileset[area_id] = main_tileset
+    if (cur_zone_tileset := decodeTileset(main_zone))!=cur_area_tileset[area_id] and len(area_zone[area_id])!=0:
+        cur_area_tileset[area_id] = cur_zone_tileset
         area_zone[area_id][0]["tileset"] = main_zone["tileset"]
     area_zone[area_id].append(main_zone)
     # Add entrances in zone to list of entrances
@@ -114,8 +113,13 @@ def handle_zone_overlap(main_tileset, cur_area_tileset, area_zone: list, main_zo
 def addRandomZone(types: list):
     global zoneAddedNo, area_len, area_zone, area_tileset
     print("Determine extra")
-    
-    generated_zone, gen_zone_tileset, gen_zone_type = genZone(types)
+    # Check if all area has been assigned
+    a_tile_list = tuple(a_tile for a_tile in area_tileset if a_tile=="")
+    if len(a_tile_list)==0:
+        # All zones FULL! Please plop the zone into an existing tileset
+        generated_zone, gen_zone_tileset, gen_zone_type = genZone(types, a_tile_list)
+    else:
+        generated_zone, gen_zone_tileset, gen_zone_type = genZone(types)
     if generated_zone is None:
         print("Cannot find suitable zone")
         return None, None, None
@@ -129,6 +133,7 @@ def addRandomZone(types: list):
             generated_zone[f"bgdatL{lay_i}"] = nsmbw.NSMBWbgDat.processTiles(generated_zone[f"bgdatL{lay_i}"])
     
     generated_zone["zone"] = nsmbw.NSMBWZones.processZones(generated_zone["zone"])
+    generated_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(generated_zone["tileset"])
     zoneAddedNo += 1
     gen_zone_prop = generated_zone["zone"]
     
@@ -136,16 +141,13 @@ def addRandomZone(types: list):
         # If area tileset is subset or not assigned
         if area_tileset[idx] == "" or gen_zone_tileset in area_tileset[idx] or area_tileset[idx] in gen_zone_tileset:
             if area_tileset[idx] in gen_zone_tileset: area_tileset[idx] = gen_zone_tileset
-            # print("Tileset same?", gen_zone_tileset, area_tileset[idx])
             # Use handle_zone_overlap to manage overlap
-            #print("MAIN",)
             try:
-                generated_zone = handle_zone_overlap(area_tileset[idx], area_tileset, area_zone, generated_zone, idx)
+                generated_zone = handle_zone_overlap(decodeTileset(generated_zone), area_tileset, area_zone, generated_zone, idx)
             except IndexError: # New Area
                 area_len += 1 # TODO Change this
                 continue
             # Check for duplication and add zone
-            
             #area_zone[idx].append(generated_zone)
             area_tileset[idx] = gen_zone_tileset
             
@@ -160,16 +162,20 @@ def getRandomZone(tilesetName:str, zone_type:str) -> dict:
     return ret_zone
 
 # Unbiased zone chooser
-def genZone(types_list:list):
+def genZone(types_list:list, req_tileset = ()):
     all_zones = []
     # First, get all zones that are a type in types_list
     for cur_zone_type in types_list:
         for tileset_lst in groupTilesetJson[cur_zone_type].values():
             all_zones.extend(tileset_lst)
-    #all_zones = [z for z in [tileset_lst for tileset_lst in [cur_type_zone_lst for cur_type_zone_lst in groupTilesetJson[types_list].values()]]]
+    
     # Then choose a zone from it
     ret_zone = deepcopy(choice(all_zones))
     ret_tileset = decodeTileset(ret_zone)
+    # Loop until a suitable tileset is found
+    while req_tileset!=() and ret_tileset not in req_tileset:
+        ret_zone = deepcopy(choice(all_zones))
+        ret_tileset = decodeTileset(ret_zone)
     #if ret_zone["orgLvl"]=="05-02.arc": input(ret_zone["orgLvl"])
     return ret_zone, ret_tileset, ret_zone["type"]
 
@@ -303,6 +309,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
         # TODO do this for all zones
         loadSprList = tuple(set(loadSprList))
         # Import settings one-by-one, in order from Section 0
+        #print(f"AREA TILESET DEBUG @ {area_i}: {area_tileset}")
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWtileset.toByteData(areaData[0]["tileset"])))
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWAreaProp.toByteData(areaData[0]["AreaSetting"])))
         areaRawSettings.append(nsmbw.generateSectionDef(zone_bound)) # TODO Convert this to list if needed
@@ -398,7 +405,7 @@ def readAndrandomise(i,istr,_u8list):
     # Process the sprites, i.e. randomize it
     if len(spriteData)>0:
         spriteData,sprLoadData,lvlSetting[7]["Size"] = nsmbw.NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
-    print("ZONES",zoneData)
+    #print("ZONES",zoneData)
     zoneData = [nsmbw.NSMBWZones.processZones(z) for z in zoneData]
     lvlSetting[7]["Data"] = nsmbw.NSMBWsprite.toByteData(spriteData)
     lvlSetting[8]["Data"] = nsmbw.NSMBWLoadSprite.toByteData(sprLoadData)
@@ -540,6 +547,7 @@ def main():
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
         spawn_zone["zone"] = nsmbw.NSMBWZones.processZones(spawn_zone["zone"])
+        spawn_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(spawn_zone["tileset"])
         addEntranceData(0,spawn_zone)
         spawn_zone = corrections.alignToPos(spawn_zone,*tilePosToObjPos((32,32)))
         spawn_zone = corrections.corrDupID(0, spawn_zone)
@@ -550,7 +558,7 @@ def main():
         print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
         D_count_levelzone(area_zone[0][-1]["orgLvl"])
 
-        check_conditions(spawn_zone)
+        D_check_conditions(spawn_zone)
         
 
         if gen_ent_zone_type=="entrance":
@@ -574,7 +582,8 @@ def main():
                     exit_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(exit_zone["bgdatL"+str(lay_i)])
             exit_tileset = deepcopy(gen_exit_zone_tileset)
             exit_zone["zone"] = nsmbw.NSMBWZones.processZones(exit_zone["zone"])
-            check_conditions(exit_zone)
+            exit_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(exit_zone["tileset"])
+            D_check_conditions(exit_zone)
             # Check for overlap with zones
             if area_tileset[0]=="" or exit_tileset in area_tileset[0] or area_tileset[0] in exit_tileset:
                 # Check if area_tileset[0] is a subset of exit_tileset
@@ -649,7 +658,8 @@ def main():
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
             print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"], main_tileset)
             main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
-            check_conditions(main_zone)
+            main_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(main_zone["tileset"])
+            D_check_conditions(main_zone)
             D_count_levelzone(main_zone["orgLvl"])
             # Check for overlap with zones
             if area_tileset[0]=="" or area_tileset[0] in main_tileset or main_tileset in area_tileset[0]:
@@ -690,7 +700,7 @@ def main():
             # GEts a list of non-enterables excluding the current one
             lst_nonent_wo_myself = deepcopy(area_nonenterable_count)
             del lst_nonent_wo_myself[area_no]
-            print(area_no,": Checking new zone:",lst_nonent_wo_myself,area_enterable_count[area_no])
+            #print(area_no,": Checking new zone:",lst_nonent_wo_myself,area_enterable_count[area_no])
             # if the sum of non-enterables < enterable, new zone needed
             if sum(lst_nonent_wo_myself)<area_enterable_count[area_no] or\
                 not secret_generated: # Also: if secret exit needed
@@ -707,8 +717,7 @@ def main():
                     break
                 if have_secret:
                     # Check if exit type is goal pole
-                    print(added_area_no)
-                    exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1]) # TODO
+                    exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1])
                     if exit_spr[0]==113:
                         area_zone[added_area_no][-1]["sprites"][exit_spr_pos][3] = b"\x00\x00\x10\x00\x00\x00"
                         print("Changed Flagpole")
@@ -811,7 +820,7 @@ def main():
                 try:
                     # Set default level entrance
                     area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
-                    # Set timer to a reasonable amount
+                    # Set timer to a reasonable amount (700 for now)
                     area_zone[area_id][0]["AreaSetting"][0][3] = 500
                     # Set ambush flag off
                     area_zone[area_id][0]["AreaSetting"][0][7] = False
@@ -897,7 +906,7 @@ def main():
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        #if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="08-02.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
