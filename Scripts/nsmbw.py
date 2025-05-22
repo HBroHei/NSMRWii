@@ -493,8 +493,8 @@ class NSMBWsprite:
             # Add to load sprite list set
             relData.add(enemyData[0])
 
-        # Add winds
-        if randint(0,100)<globalVars.windChance:
+        # Add winds - excluding p-up panels
+        if randint(0,100)<globalVars.windChance and not is_panel:
             # Gets the pos of first sprite
             first_spr = reData[0]
             # Add wind effect
@@ -587,11 +587,10 @@ class NSMBWZones:
     def processZones(z_data):
         # Set level dark or not
         if randint(0,100) <= globalVars.darkChance:
-            #TODO
             if z_data[10] & 0xF0 == 0x19: # Check for layer 0 spotlight
                 z_data[10] = 0x30 # Always 0x30
             elif z_data[10] & 0x0F == 0x00: # No set - start randomising!
-                z_data[10] = randint(0x20,0x25)
+                z_data[10] = choice(globalVars.darkTypes)
             else:
                 z_data[10] = 0x01 # Set to layer 1 on top
         # Randomise music and ambient

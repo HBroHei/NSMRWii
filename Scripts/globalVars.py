@@ -21,6 +21,9 @@ windChance = 0.0
 darkChance = 0.0
 rockChance = 0.0
 
+windTypes = []
+darkTypes = []
+
 panel_rand = False
 
 cp1 = True

@@ -40,6 +40,8 @@ area_zone_size = [[],[],[],[]]
 area_tileset = ["","","",""]
 area_len = 1
 
+rando_priority_lst = []
+
 tileData = [[],[],[]]
 u8_files_list = []
 
@@ -70,6 +72,7 @@ def addEntranceData(areaNo : int, zoneToFind:list):
         "enterable" : allEnt,
         "nonenterable" : allNonEnt
     })
+    print(f'ENTRANCE DATAS {areaNo}: {allEnt} {allNonEnt}')
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
@@ -106,7 +109,9 @@ def handle_zone_overlap(main_tileset:str, cur_area_tileset:list, area_zone: list
     area_zone[area_id].append(main_zone)
     # Add entrances in zone to list of entrances
     addEntranceData(area_id, main_zone)
-    
+    print(f"Zone added to {area_id}")
+    rando_priority_lst.insert(-1,area_id)
+
     return main_zone
 
 # Adds a zone to the level
@@ -422,7 +427,7 @@ def D_count_levelzone(org_lvl):
         count_distri[org_lvl] = 1
 
 def main():
-    global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count
+    global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count, rando_priority_lst
 
     with open(OUTJSON_PATH, 'r') as f:
         json_orginal = json.load(f)
@@ -473,23 +478,6 @@ def main():
                     cur_zone["type"] = "exit"
                     groupTilesetJson["exit"][cur_tileset_str].append(cur_zone)
 
-    ##### NOTE DEBUG #####
-    ## RE-COMMENT WHEN NOT IN USED FOR PROGRAM TO FUNCTION ##
-    # with open("./dist.json","w") as df:
-    #     df.write(json.dumps(groupTilesetJson))
-    # out_dejson = {}
-    # with open("./testdejson.csv","w") as df:
-    #     first_line = ""
-    #     for t in lst_tileset:
-    #         # df.write(t + ",")
-    #         for k, v in groupTilesetJson.items():
-    #             if k!="count":
-    #                 # out_dejson[t][k] = len(v[t])
-    #                 df.write(t + "," + k + "," + str(len(v[t])) + "\n")
-    #     df.write(json.dumps(out_dejson, indent=4))
-    # input("OUT END")
-    
-
     # These will always be area 1, with exit zone as zone 0 in the level
     """
         FOR EACH LEVEL
@@ -510,6 +498,7 @@ def main():
     stg_i = 0
     while stg_i<len(stg_lst):
         stg_name = stg_lst[stg_i]
+        rando_priority_lst = []
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture" or stg_name in globalVars.skipLvl :
             #log += str("Processing [S]"+ "Stage_temp" + "/" + stg_name +"to" + "Stage_output/" + stg_name + "\n")
@@ -553,9 +542,10 @@ def main():
         spawn_zone = corrections.corrDupID(0, spawn_zone)
         spawn_zone = corrections.corrSprZone(spawn_zone)
         area_zone[0].append(spawn_zone)
+        #rando_priority_lst.append(0)
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
-        print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"])
+        print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"], decodeTileset(spawn_zone))
         D_count_levelzone(area_zone[0][-1]["orgLvl"])
 
         D_check_conditions(spawn_zone)
@@ -600,6 +590,7 @@ def main():
                 normal_exit_area_id = 1
                 area_len+=1
                 added_zone_area_no = 1
+                rando_priority_lst.append(1)
 
             cutscene_zone_pos = (-1,-1)
             if exit_spr[0] in (406,407):
@@ -678,6 +669,7 @@ def main():
                 # Add entrances in zone to list of entrances
                 addEntranceData(2, main_zone)
                 area_len += 1
+                rando_priority_lst.insert(-1,2)
 
             zoneAddedNo += 1
         else:
@@ -745,6 +737,8 @@ def main():
                             if checks.checkPosInSpecificPos([zone_ent_x,zone_ent_y-160,96,160],tilePosToObjPos(til[1:3]),*tilePosToObjPos(til[3:])):
                                 print("Removing tile")
                                 area_zone[added_area_no][-1]["bgdatL1"].remove(til)
+                        # Add tiles to prevent falling
+                        area_zone[added_area_no][-1]["bgdatL1"].append([53, zone_ent_x, zone_ent_y+2, 25,1])
 
                         print("ADDED New Flagpole")
                     # Randomise sprite
@@ -778,6 +772,7 @@ def main():
         print("***START OF Entrance Randomisation***")
         print("Nonenterable list",area_nonenterable_count)
         print("   enterable list",area_enterable_count)
+        print(f"PRIORITY LIST: {rando_priority_lst}")
         #### CALCULATE THE NECESSARRY ENTRANCES / EXITS, AND ADDITIONAL ZONES ####
         # Well first, if there are no enterables, we can skip all "these codes"
         if sum(area_enterable_count)!=0:
@@ -793,13 +788,6 @@ def main():
             ] # Storing randomised entrance ids
 
             entrance_assign_list = []
-
-            if only_main:
-                rando_priority_lst = []
-            elif have_secret:
-                rando_priority_lst = [2,1,secret_exit_area_id,1]
-            else:
-                rando_priority_lst = [2,1,1]
 
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
@@ -851,11 +839,26 @@ def main():
                             # Have priority
                             dest_area_id = rando_priority_lst.pop(0)
                             print("Priority: Area set to",dest_area_id)
+                            print(f"Area has {nonent_list[dest_area_id]} entrances")
                         
                         # Check area have nonent
                         if len(nonent_list[dest_area_id])!=0:
                             # Exist - choose a nonent
                             exit_key = choice(nonent_list[dest_area_id])
+                            # Set value to exit_key
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
+                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
+                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                            
+                            exit_found = True
+                        # Check if it is priority. If true, choose ANY (enterable in this case) entrance in the area
+                        elif len(rando_priority_lst)!=0:
+                            exit_key=[]
+                            available_zones = tuple(zpos for zpos in range(len(area_zone[dest_area_id])) if len(area_zone[dest_area_id][zpos]["entrance"])!=0)
+                            for zpos in available_zones:
+                                for epos in range(len(area_zone[dest_area_id][zpos]["entrance"])):
+                                    exit_key.append((zpos, epos))
+                            print("EXIT KEY",exit_key)
                             # Set value to exit_key
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
@@ -906,7 +909,7 @@ def main():
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="08-02.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="08-02.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

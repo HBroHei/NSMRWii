@@ -13,9 +13,11 @@ ID_POS_LOOKUP = {
     "path" : 0
 }
 ID_REF_LOOKUP = {
+    # Orgin type : (To replace type, pos)
     "ZoneBound" : ("zone", 7),
     "topBackground" : ("zone", 11),
     "bottomBackground" : ("zone", 12),
+    "zone" : {"entrance" , 6},
 }
 
 ID_MATCH_TABLE = load(open("./zone_random/id_match.json" if "id_match.json" in listdir(getcwd()) else "./Scripts/zone_random/id_match.json"))
@@ -367,7 +369,6 @@ def generate_unique_id(used_ids, key_prop):
     return new_id
 
 def update_references(data_list, position, old_id, new_id):
-    #item[position] = (new_id for item in data_list if item[position] == old_id else item[position])
     if isinstance(data_list[0],list):
         for item in data_list:
             if item[position] == old_id:
@@ -396,20 +397,18 @@ def corrDupID(areaNo,zone):
                 # May not have ref
                 print("Info: Cannot find ref",key_prop)
                 pass
-            if not isinstance(zone_prop_lst[0],list): # The first item is not another list, Should be "zone"
+            if key_prop=="zone": # The first item is not another list, Should be "zone"
                 cur_id = zone_prop_lst[6]
-                try:
+                # Check if there is any zone exist
+                if key_prop in used_ids[areaNo] and cur_id in used_ids[areaNo][key_prop]:
                     # Check in duplicated list
-                    if cur_id in used_ids[areaNo][key_prop]:
-                        #print("duplicated",key_prop,cur_id,used_ids[areaNo][key_prop])
-                        new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                        zone_item[id_position] = new_id
-                        for ref_key, ref_pos in references:
-                            if ref_key in re_zone:
-                                update_references(re_zone[ref_key], ref_pos, cur_id, new_id)
-                except KeyError:
-                    # No set found - no duplicates
-                    used_ids[areaNo][key_prop] = set()
+                    #input(f"duplicated {key_prop,cur_id,used_ids[areaNo][key_prop]}")
+                    new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
+                    zone_item[id_position] = new_id
+                    # Change other referenced items
+                    ref_type, ref_pos = references
+                    update_references(re_zone[ref_type], ref_pos, cur_id, new_id)
+                    cur_id = new_id # In the future make this better
                 try:
                     used_ids[areaNo][key_prop].add(cur_id)
                 except KeyError:

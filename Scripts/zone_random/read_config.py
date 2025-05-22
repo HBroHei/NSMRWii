@@ -81,15 +81,23 @@ except KeyError:
     log += str("[i] 'Tileset 0' not included" + "\n")
     pass
 
-windChance = rulesDict["Wind Chance"]
-darkChance = rulesDict["Dark Chance"]
+windChance = max(0, min(rulesDict["Wind Chance"], 100))
+darkChance = max(0, min(rulesDict["Dark Chance"], 100))
+if darkChance>0:
+    darkTypes = rulesDict["Dark Types"]
 rockChance = rulesDict["Rock Chance"]
 
 panel_rand = rulesDict["Power-up Panel Shuffle"]
 
 # Sound related config
-musicList = rulesDict["Music"]
-ambientList = rulesDict["Ambient"]
+try:
+    musicList = rulesDict["Music"]
+except KeyError:
+    pass
+try:
+    ambientList = rulesDict["Ambient"]
+except KeyError:
+    pass
 
 # Add them all to the global vars list
 globalVars.enemyList = enemyList
@@ -99,6 +107,7 @@ globalVars.tileGroup = tileGroup
 globalVars.tiles0List = tiles0List
 globalVars.windChance = windChance
 globalVars.darkChance = darkChance
+globalVars.darkTypes = darkTypes
 globalVars.rockChance = rockChance
 globalVars.panel_rand = panel_rand
 globalVars.musicList = musicList
