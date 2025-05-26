@@ -1,0 +1,23 @@
+Information quoted from Reggie (reggie.py)
+
+0.  'None',
+1.  'Cavern Echo',
+2.  'Cavern Echo 2',
+3.  'Underwater Echo',
+4.  'Boss Room Echo',
+5.  'Tower Echo',
+6.  'Castle Echo',
+7.  'Ghost House Indoor Echo',
+8.  'Sewer Echo',
+9.  'Mountain Echo',
+10. 'Item House/Credits Echo',
+11. 'Cavern Echo*',
+12. 'Airship Indoor Echo',
+13. 'River Cavern Echo',
+14. 'Lava Cavern Echo',
+15. 'None*'
+
+
+
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+[0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240]
