@@ -395,6 +395,7 @@ function toJson(){
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
             "Dark Chance": Number(document.getElementById("exp_darkRand").value),
+            "Dark Types" : [32,33,34,35,36],
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
             "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
             "Patches" : {
