@@ -90,10 +90,12 @@ rockChance = rulesDict["Rock Chance"]
 panel_rand = rulesDict["Power-up Panel Shuffle"]
 
 # Sound related config
+musicList = []
 try:
     musicList = rulesDict["Music"]
 except KeyError:
     pass
+ambientList = []
 try:
     ambientList = rulesDict["Ambient"]
 except KeyError:
