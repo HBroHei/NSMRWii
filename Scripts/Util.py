@@ -14,13 +14,11 @@ def tilePosToObjPos(tilePos):
 
 def changeBytesAt(bytesStr:bytes, pos:int, newVal):
     tmp_bytearr = bytearray(bytesStr)
-    print(newVal)
     tmp_bytearr[pos] = newVal
     return bytes(tmp_bytearr)
 
 def changeNibbleAt(bytesStr:bytes, pos_nibble:int, newVal):
     pos = ceil(pos_nibble/2) - 1
-    print(f"{bytesStr}, {pos_nibble}, {bytesStr[pos]}, {(newVal)} {(bytesStr[pos] & 0b00001111)}")
     return changeBytesAt(
         bytesStr,
         int(ceil(pos_nibble/2) - 1),

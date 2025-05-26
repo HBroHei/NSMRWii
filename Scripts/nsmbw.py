@@ -399,7 +399,7 @@ class NSMBWsprite:
     
     # Function to replace org_item with replacement, retaining original values for 'x'
     def replace_varient(org_item, replacement):
-        hex_str = hex_to_str(org_item)
+        hex_str = str(org_item)
         new_hex = []
         hex_str_clean = hex_str.replace(' ', '')  # Clean hex string
         
