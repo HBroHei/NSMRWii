@@ -185,9 +185,10 @@
                 <select id="enemy_presets" title="Presets for the enemy raandomization" onchange="changeOpt(this)">
                     <option id="r_type"  value="r_type">Same species</option>
                     <option id="r_world" value="r_world">Same world</option>
-                    <option id="r_all_b" value="r_all_b" selected>Controlled Chaos</option>
-                    <option id="r_all"   value="r_all"  >Everyone is here!</option>
-                    <option id="r_none"  value="r_none"  >Do not randomise</option>
+                    <option id="r_all_t" value="r_all_t" selected>Balanced Chaos</option>
+                    <option id="r_all_b" value="r_all_b">Challenging Chaos</option>
+                    <option id="r_all"   value="r_all"  >Chaotic Chaos</option>
+                    <option id="r_none"  value="r_none" >Do not randomise</option>
                 </select>
                 <br>
                 <div id="enemy_presets_explain"></div>
@@ -200,7 +201,7 @@
                         <label>Koopa Troopa</label>
                         <ul>
                             <li>
-                                <label for="#ev_k_red" class="no_label_style">Randomise Rad and Green Varients</label><input id="ev_k_red" type="checkbox" title="Randomise red and green Koopa" checked><br>
+                                <label for="#ev_k_red" class="no_label_style">Randomise Red and Green Varients</label><input id="ev_k_red" type="checkbox" title="Randomise red and green Koopa" checked><br>
                             </li>
                         </ul>
                     </li>
@@ -317,13 +318,13 @@
                 </p>
                 <label for="exp_v2enable">Enable</label><input id="exp_v2enable" type="checkbox" title="Enable V2 features" onchange="enableV2()">
                 <br><br>
-                <label for="#exp_windRand">Wind Chance (n/100), n = 0-100</label><br><input id="exp_windRand" type="number" min="0" max="100" value="7" title="Probability of an area having wind (sandstorm)" disabled>
+                <label for="#exp_windRand">Wind Chance (n/100), n = 0-100</label><br><input id="exp_windRand" type="number" min="0" max="100" value="4" title="Probability of an area having wind (sandstorm)" disabled>
                 <br><br>
                 <label for="#exp_panelRand">Power-up Panel items shuffling</label><br><input id="exp_panelRand" type="checkbox" title="Randomise items of Power-up Panels minigame, instead of the base game sets" checked disabled>
                 <br><br>
-                <label for="#exp_darkRand">Darkness Chance (n/100), n = 0-100</label><br><input id="exp_darkRand" type="number" min="0" max="100" value="5" title="Probability of an area is dark (Degraded visibility, hard mode)" disabled>
+                <label for="#exp_darkRand">Darkness Chance (n/100), n = 0-100</label><br><input id="exp_darkRand" type="number" min="0" max="100" value="1" title="Probability of an area is dark (Degraded visibility, hard mode)" disabled>
                 <br><br>
-                <label for="#exp_rockRand">Volcano Rock Spawning Chance (n/100), n = 0-100</label><br><input id="exp_rockRand" type="number" min="0" max="100" value="15" title="Probability of an area have falling volcano rocks" disabled>
+                <label for="#exp_rockRand">Volcano Rock Spawning Chance (n/100), n = 0-100</label><br><input id="exp_rockRand" type="number" min="0" max="100" value="10" title="Probability of an area have falling volcano rocks" disabled>
                 <br><br>
                 <label for="#exp_lvlRand">Do not randomise zones (Keep other things random)</label><br><input id="exp_lvlRand" type="checkbox" title="Skip randomising areas and zones, but remain randomising others like sprites / tiles" disabled>
                 <br><br>

@@ -25,12 +25,13 @@ const valueLookup = {
         "r_type": "Randomise the enemies in groups of their species. (e.g. Normal Goomba -> Paragoomba)",
         "r_world": "Randomise the enemies in groups of each worlds.",
         "r_all_b": "Randomise ALL enemies to be different, except those that are immovable (like munchers). *Sometimes cause lag / crash*",
+        "r_all_t": "Same as 'Challenging Chaos', with some annoying enemies removed from the randomisation.",
         "r_all": "Randomise ALL enemies. This also includes immovable enemies like muncher. *OFTEN cause lag / crash, ESPECIALLY in base game 9-7*",
         "r_none": "Randomise NO enemy. Keep the enemy types vanilla."
     },
     "block_blockRando":{
         "block_none": "No blocks will be randomised",
-        "block_same": "Blocks will be randomised, but would still visually looks the same. (? blocks would remain as ? blocks, brick blocks woukd still be brick blocks, etc.)",
+        "block_same": "Blocks will be randomised, but would still visually looks the same. (? blocks would remain as ? blocks, brick blocks would still be brick blocks, etc.)",
         "block_all": "All blocks will be randomised. *May cause inaccessible area*"
     }
 };
