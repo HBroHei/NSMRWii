@@ -168,7 +168,7 @@ def main():
             outJson[filename][i][zone[6]]["path"] = [path for path in pathProp if pathNode[path[1]] in outJson[filename][i][zone[6]]["pathNode"]]
             # print(outJson[filename][i][zone[6]]["path"])
         # Read tiles
-        for j in range(0,2): #Loop through every layers
+        for j in range(0,3): #Loop through every layers
             #print(u8list.keys(),"course"+ str(i) +"_bgdatL" + str(j) + ".bin")
             #print("course"+ str(i) +"_bgdatL" + str(j) + ".bin")
             if ("course"+ str(i) +"_bgdatL" + str(j) + ".bin") in u8list.keys(): # if layer (j) exist

@@ -180,9 +180,6 @@ def main():
                     for tile in globalVars.tilesData[j]:
                         # Zones are in sprite coordinate system
                         zoneNo = checkPosInZone(zoneData,tilePosToObjPos((tile[1],tile[2])),*tilePosToObjPos((tile[3],tile[4])))
-                        # if filename=="08-06.arc" and zoneNo==0:
-                        #     print("Tile",tile,"(Spr Pos:",tilePosToObjPos((tile[1],tile[2])),",",tilePosToObjPos((tile[3],tile[4])),")")
-                        #     print("is in",zoneNo,":",zoneData[zoneNo])
                         if zoneNo!=-1:
                             if "bgdatL" + str(j) not in outJson[filename][i][zoneNo]:
                                 outJson[filename][i][zoneNo]["bgdatL" + str(j)] = []

@@ -1,5 +1,5 @@
 import json
-from shutil import move
+from shutil import move, copyfile, copytree, rmtree
 
 from dolphinAutoTransfer import dolphinAutoTransfer
 import u8_m
@@ -46,7 +46,7 @@ tileData = [[],[],[]]
 u8_files_list = []
 
 STAGE_OUT_DIR = "./Stage_output/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_output/"
-STAGE_TMP_DIR = "./Stage_temp/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_temp/"
+STAGE_TMP_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
 OUTJSON_PATH = "./out.json" if "out.json" in listdir(getcwd()) else "./Scripts/out.json"
 
 isDebug = False
@@ -279,10 +279,6 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             print("[D] outputting area",area_i,"zone",zoneNo)
             cur_zone = areaData[zoneNo]
             loadSprList += nsmbw.NSMBWLoadSprite.addLoadSprites(cur_zone["sprites"])
-            # if areaRawSettings==[]: # Area First-timer, add configs
-            #     print("[D] Adding configs")
-                
-            #     pass
             ## finished adding config
             # Add properties
             zone_bound += cur_zone["ZoneBound"]
@@ -299,7 +295,7 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             # TODO Add them to file
             
             # Add tiles data
-            for i in range(0,2): # Loop through each layer
+            for i in range(0,3): # Loop through each layer
                 if "bgdatL"+str(i) in cur_zone.keys():
                     for tiles in cur_zone["bgdatL" + str(i)]:
                         tileData[i].append(tiles)
@@ -427,6 +423,12 @@ def D_count_levelzone(org_lvl):
 def main():
     global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count, rando_priority_lst
 
+    # Delete previous run
+    try:
+        rmtree(STAGE_OUT_DIR)
+    except FileNotFoundError:
+        pass
+
     with open(OUTJSON_PATH, 'r') as f:
         json_orginal = json.load(f)
     inJson = convertToDict(json_orginal)
@@ -490,8 +492,6 @@ def main():
     """
     # tilesetList = list(groupTilesetJson.keys())
     zoneAddedNo = 0
-    normal_exit_area_id = -1
-    secret_exit_area_id = -1
     stg_lst = read_config.listdir(STAGE_TMP_DIR)
     stg_i = 0
     while stg_i<len(stg_lst):
@@ -500,7 +500,7 @@ def main():
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture" or stg_name in globalVars.skipLvl :
             #log += str("Processing [S]"+ "Stage_temp" + "/" + stg_name +"to" + "Stage_output/" + stg_name + "\n")
-            move(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name)
+            copyfile(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name) if stg_name!="Texture" else copytree(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name)
             stg_i += 1
             continue # Skip that folder
         elif stg_name in globalVars.skip_but_rando:
@@ -576,7 +576,7 @@ def main():
             if area_tileset[0]=="" or exit_tileset in area_tileset[0] or area_tileset[0] in exit_tileset:
                 # Check if area_tileset[0] is a subset of exit_tileset
                 if area_tileset[0] in exit_tileset: area_tileset[0] = exit_tileset
-                exit_zone = handle_zone_overlap(exit_tileset, area_tileset, area_zone, exit_zone, 0)
+                exit_zone = handle_zone_overlap(area_tileset[0] in exit_tileset, area_tileset, area_zone, exit_zone, 0)
             else:
                 exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((32,32)))
                 exit_zone = corrections.corrDupID(1, exit_zone) # Still needed to add IDs in this zone
@@ -654,10 +654,10 @@ def main():
             if area_tileset[0]=="" or area_tileset[0] in main_tileset or main_tileset in area_tileset[0]:
                 # check subset tileset
                 if area_tileset[0] in main_tileset: area_tileset[0] = main_tileset
-                main_zone = handle_zone_overlap(main_tileset, area_tileset, area_zone, main_zone, 0)
+                main_zone = handle_zone_overlap(area_tileset[0] in main_tileset, area_tileset, area_zone, main_zone, 0)
             elif area_tileset[1]=="" or area_tileset[1] in main_tileset or main_tileset in area_tileset[1]:
                 if area_tileset[1] in main_tileset: area_tileset[1] = main_tileset
-                main_zone = handle_zone_overlap(main_tileset, area_tileset, area_zone, main_zone, 1)
+                main_zone = handle_zone_overlap(area_tileset[0] in main_tileset, area_tileset, area_zone, main_zone, 1)
             else:  # Esort to Area 3 I guess
                 main_zone = corrections.alignToPos(main_zone, *tilePosToObjPos((32, 32)))
                 main_zone = corrections.corrDupID(2, main_zone)
@@ -866,9 +866,9 @@ def main():
                             print("RESORTING.", nonent_list[dest_area_id])
                             print("3. Area ID", dest_area_id)
                             exit_key = choice(nonent_list[dest_area_id])
-                            print("3. ENT key",ent_key)
-                            print("3. EXIT key",exit_key)
-                            print("3. AREA LEN", len(area_zone[dest_area_id]))
+                            # print("3. ENT key",ent_key)
+                            # print("3. EXIT key",exit_key)
+                            # print("3. AREA LEN", len(area_zone[dest_area_id]))
                             # Set value to exit_key
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
                             area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
@@ -903,7 +903,7 @@ def main():
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
+        #if stg_name=="01-36.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

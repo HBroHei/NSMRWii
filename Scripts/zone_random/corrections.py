@@ -18,7 +18,7 @@ ID_REF_LOOKUP = {
     "ZoneBound" : ("zone", 7),
     "topBackground" : ("zone", 11),
     "bottomBackground" : ("zone", 12),
-    "zone" : {"entrance" , 6},
+    "zone" : ("entrance" , 6),
 }
 
 ID_MATCH_TABLE = load(open("./zone_random/id_match.json" if "id_match.json" in listdir(getcwd()) else "./Scripts/zone_random/id_match.json"))
