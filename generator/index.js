@@ -373,7 +373,7 @@ function toJson(){
 
     const e_rand_sel = document.getElementById(("enemy_presets"))
     let eList = e_presets_data[e_rand_sel.options[e_rand_sel.options.selectedIndex].value];
-    if(blocksRando!=[] || blocksRando!=null){eList.push(blocksRando);}
+    if(blocksRando!==null && blocksRando!==undefined && blocksRando.length!=0){eList.push(blocksRando);}
     //let tileRan = t_presets_data[t_rand_sel.options[t_rand_sel.options.selectedIndex].value];
     let tileRan = includeTilesList;
 
