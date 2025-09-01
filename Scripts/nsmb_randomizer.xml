@@ -1,4 +1,4 @@
-<wiidisc version="1" shiftfiles="true" log="true">
+<wiidisc version="1" shiftfiles="true" root="/nsmb_randomized" log="true">
     <id game="SMN">
 		<region type="P"/>
 		<region type="E"/>
