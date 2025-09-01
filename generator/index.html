@@ -42,7 +42,10 @@
             <div id="win_global" class="tab_win" style="background-color: #c9f8ff;">
                 <label for="#seed">Seed</label><br><input id="seed" title="The seed that will be used or randomization. Same seed will always yield same randomization result.">
                 <br>
-                <div id="changelog_box"></div>
+                <div id="changelog_box">
+                    <h2>For Players trying out Version 2</h2>
+                    <p>Please make sure to have "Version 2" Checked inside the "Experimental" Tab.</p>
+                </div>
             </div>
 
             <div id="win_map_o" class="tab_win_default_hidden tab_win">
@@ -323,6 +326,16 @@
                 <label for="#exp_panelRand">Power-up Panel items shuffling</label><br><input id="exp_panelRand" type="checkbox" title="Randomise items of Power-up Panels minigame, instead of the base game sets" checked disabled>
                 <br><br>
                 <label for="#exp_darkRand">Darkness Chance (n/100), n = 0-100</label><br><input id="exp_darkRand" type="number" min="0" max="100" value="1" title="Probability of an area is dark (Degraded visibility, hard mode)" disabled>
+                <br><br>
+                <label>Darkness Types</label><br>
+                <div id="exp_div_darkTypes" style="display:none">
+                    <label for="#exp_dark32" class="no_label_style">Large Foglight</label><input id="exp_dark32" type="checkbox" title="Determine the dark types to appear" checked><br>
+                    <label for="#exp_dark33" class="no_label_style">Lightbeam</label><input id="exp_dark33" type="checkbox" title="Determine the dark types to appear" checked><br>
+                    <label for="#exp_dark34" class="no_label_style">Large Circle light</label><input id="exp_dark34" type="checkbox" title="Determine the dark types to appear" checked><br>
+                    <label for="#exp_dark35" class="no_label_style">Small Foglight</label><input id="exp_dark35" type="checkbox" title="Determine the dark types to appear"><br>
+                    <label for="#exp_dark36" class="no_label_style">Small Circle light</label><input id="exp_dark36" type="checkbox" title="Determine the dark types to appear"><br>
+                    <label for="#exp_dark37" class="no_label_style">Full Darkness (EXTRA HARD)</label><input id="exp_dark37" type="checkbox" title="Determine the dark types to appear"><br>
+                </div>
                 <br><br>
                 <label for="#exp_rockRand">Volcano Rock Spawning Chance (n/100), n = 0-100</label><br><input id="exp_rockRand" type="number" min="0" max="100" value="10" title="Probability of an area have falling volcano rocks" disabled>
                 <br><br>

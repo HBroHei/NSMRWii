@@ -51,6 +51,12 @@ function enableV2(){
     document.getElementById("exp_darkRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_lvlRand").disabled = !document.getElementById("exp_v2enable").checked;
+    if(document.getElementById("exp_v2enable").checked){
+        document.getElementById("exp_div_darkTypes").style.display = "block";
+    }
+    else{
+        document.getElementById("exp_div_darkTypes").style.display = "none";
+    }
 }
 
 function toJson(){
@@ -65,10 +71,6 @@ function toJson(){
         var seeds = document.getElementById("seed").value
     }
 
-    /* LEGACY CODES
-    if(document.getElementById("S08-24").checked){
-        lvList_skip.push("08-24.arc");
-    }*/
     // Get skipping special levels
     for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_03-05","map_06-24","map_08-03","map_08-24"]){
         if(document.getElementById(lvl_skip_item).checked){
@@ -377,6 +379,14 @@ function toJson(){
     //let tileRan = t_presets_data[t_rand_sel.options[t_rand_sel.options.selectedIndex].value];
     let tileRan = includeTilesList;
 
+    // Dark Types randomisation
+    let darkTypes = [];
+    for(let i=32;i<38;i++){
+        if(document.getElementById(`exp_dark${i}`).checked){
+            darkTypes.push(i);
+        }
+    }
+
     // V2 checks
     if(document.getElementById("exp_v2enable").checked){
         let skipRandoList = ["03-05.arc"] // Skip but randomise list
@@ -395,7 +405,7 @@ function toJson(){
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
             "Dark Chance": Number(document.getElementById("exp_darkRand").value),
-            "Dark Types" : [32,33,34,35,36],
+            "Dark Types" : darkTypes,
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
             "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
             "Patches" : {
