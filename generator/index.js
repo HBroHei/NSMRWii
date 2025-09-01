@@ -51,6 +51,9 @@ function enableV2(){
     document.getElementById("exp_darkRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_lvlRand").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_music").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_amb").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_patch").disabled = !document.getElementById("exp_v2enable").checked;
     if(document.getElementById("exp_v2enable").checked){
         document.getElementById("exp_div_darkTypes").style.display = "block";
     }
@@ -387,6 +390,12 @@ function toJson(){
         }
     }
 
+    // Music
+    let musicList = document.getElementById("exp_music").checked ? Array.from({length: 27}, (_, i) => i+1) : [];
+
+    // Ambient
+    let ambList = document.getElementById("exp_music").checked ? [0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240] : [];
+
     // V2 checks
     if(document.getElementById("exp_v2enable").checked){
         let skipRandoList = ["03-05.arc"] // Skip but randomise list
@@ -408,8 +417,10 @@ function toJson(){
             "Dark Types" : darkTypes,
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
             "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
+            "Music" : musicList,
+            "Ambient" : ambList,
             "Patches" : {
-                "09-05 Pipe" : true
+                "09-05 Pipe" : document.getElementById("exp_patch").checked
             },
         }
     }
