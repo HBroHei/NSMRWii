@@ -21,7 +21,7 @@ ID_REF_LOOKUP = {
     "zone" : ("entrance" , 6),
 }
 
-ID_MATCH_TABLE = load(open("./zone_random/id_match.json" if "id_match.json" in listdir(getcwd()) else "./Scripts/zone_random/id_match.json"))
+ID_MATCH_TABLE = load(open("./zone_random/id_match.json" if "zone_random" in listdir(getcwd()) else "./Scripts/zone_random/id_match.json"))
 # Extract a tuple of sprite IDs included
 ID_MATCH_SPRID = set(key.replace("D","") for inner_dict in ID_MATCH_TABLE.values() if isinstance(inner_dict, dict) for key in inner_dict.keys() if "_Special" not in key)
 # TODO /\ Untested
