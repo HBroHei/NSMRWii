@@ -417,8 +417,8 @@ function toJson(){
             "Dark Types" : darkTypes,
             "Rock Chance": Number(document.getElementById("exp_rockRand").value),
             "Power-up Panel Shuffle": document.getElementById("exp_panelRand").checked,
-            "Music" : musicList,
-            "Ambient" : ambList,
+            "Music" : [musicList],
+            "Ambient" : [ambList],
             "Patches" : {
                 "09-05 Pipe" : document.getElementById("exp_patch").checked
             },
