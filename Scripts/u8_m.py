@@ -7,6 +7,10 @@ nodesList = []
 
 template_u8 = {"Raw Data":b"","File Name List":[],"Number of area":-1}
 
+class U8ProcessError(Exception):
+    def __init__(self, *args):
+        super().__init__(*args)
+
 """
 A class used to store individual properties of U8 archives
 @param {Boolean} isFile True if the object is a file, False if it is a directory
@@ -33,7 +37,7 @@ class U8Arc:
 
 def errMsgFilevaild(msg):
     print("Not a valid ARC file: " + msg)
-    exit(0)
+    raise U8ProcessError(msg)
 
 # Obsolute function since I did not know b"\x00"*8 is a thing
 def genx00(num):

@@ -42,28 +42,17 @@ def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
     return -1
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
-    # for every zone, Check X pos, then Y pos
-    #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
-    #              Min X                       Max X = min x + width
-    #       Spr min X   Zone min X            Spr max X          Zone max X
-    # if sprPos[0]==656 and sprPos[1]==640:
-    #     print(sprPos[0] , (zoneDat[0]-(160)) , sprPos[0]+width , (zoneDat[0]+zoneDat[2]+(160))\
-    #     , sprPos[1] , (zoneDat[1]-(160)) , sprPos[1]+height , zoneDat[1]+zoneDat[3]+(160))
-    #     input()
     # Check for 4 corners and see either one touches the zone
     return ((sprPos[0]>=(zoneDat[0]-160) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+160))\
         or (sprPos[0]+width>=(zoneDat[0]-160) and sprPos[0]+width<=(zoneDat[0]+zoneDat[2]+160)))\
         and ((sprPos[1]+height>=(zoneDat[1]-160) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+160))\
-        or (sprPos[1]>=(zoneDat[1]-160) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+160)))\
-    # return  (sprPos[0]>=(zoneDat[0]-(160)) and sprPos[0]+width <=(zoneDat[0]+zoneDat[2]+(160)))\
-    #     and (sprPos[1]>=(zoneDat[1]-(160)) and sprPos[1]+height<=(zoneDat[1]+zoneDat[3]+(160)))
+        or (sprPos[1]>=(zoneDat[1]-160) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+160)))
 
 
 def readAllSettings(raw_setting):
     # The function name lied. Only nessary settings will be read and stored.
     # Inseerted global here since IDK when the variable will disfunction like a local variable
     global tileset, areaSetting, zoneBound, topBackground, bottomBackground, entrances, spriteData, sprLoadData, zoneData, locData, camProfile, pathProp, pathNode
-    # TODO Add phrasing function to the following sections
 
     # Section 0
     tileset = nsmbw.NSMBWtileset.phraseByteData(raw_setting[0]["Data"])
@@ -71,7 +60,7 @@ def readAllSettings(raw_setting):
     areaSetting = nsmbw.NSMBWAreaProp.phraseByteData(raw_setting[1]["Data"])
     # Section 2
     zoneBound = nsmbw.NSMBWZoneBound.phraseByteData(raw_setting[2]["Data"])
-    # zoneBound = raw_setting[2]["Data"] # Apperantly Python struct don't like long val stored in JSON sooo... Raw data it is
+    # zoneBound = raw_setting[2]["Data"] # Apperantly Python struct don't like long val stored in JSON sooo... Raw data it is  # NEVERMIND!
     # Section 4
     topBackground = nsmbw.NSMBWZoneBG.phraseByteData(raw_setting[4]["Data"])
     # Section 5
@@ -92,36 +81,33 @@ def readAllSettings(raw_setting):
     # Section 13
     pathNode = nsmbw.NSMBWPathNode.phraseByteData(raw_setting[13]["Data"])
 
-def main():
-    global lvlSetting_arr
+def process(rulesDict, stage_path = "./Stage"):
+    global lvlSetting_arr, jsonBeauty
 
-    rf = open("config.json")
-    rulesDict = json.loads(rf.read())
-    rf.close()
+    SKIP_LIST = rulesDict["Skip Level"]
 
-    SKIP_LIST = rulesDict["Skip Level"]#["Texture","01-41.arc","01-42.arc"]
-
-    for filename in listdir("./Stage"):
+    for filename in listdir(stage_path):
         if filename in SKIP_LIST:
             continue
         outJson[filename] = {}
         if isDebug:
             if filename!="01-01.arc":
                 continue
-        print(filename)
-        u8list = u8_m.openFile("Stage/" + filename)
+        print("Adding",filename)
+        try:
+            u8list = u8_m.openFile(stage_path + "/" + filename)
+        except u8_m.U8ProcessError:
+            continue
         u8FileList = u8list["File Name List"]
         areaNo = u8list["Number of area"]
-        #print("AREANO",areaNo)
         areaNo %= 4
         if areaNo==0:
             areaNo = 4
         
         lvlSetting_arr = []
 
-        #Loop through every area
+        # Loop through every area
         for i in range(1,areaNo+1):
-            #print("\nREADING AREA",i,"of",areaNo)
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
             if rulesDict["Patches"]["09-05 Pipe"] and filename=="09-05.arc":
@@ -160,7 +146,6 @@ def main():
                 #                         start node    start_node      path len
                     for node_pos in range(added_path[1],added_path[1] + added_path[2]):
                         outJson[filename][i][zone[6]]["pathNode"].append(pathNode[node_pos])
-                # outJson[filename][i][zone[6]]["pathNode"] = list(outJson[filename][i][zone[6]]["pathNode"])
                 # Special case where entrance for 179 is not in zone:
                 _sprData = deepcopy(outJson[filename][i][zone[6]]["sprites"]) # Only need the added sprites
                 ent_179_lst = []
@@ -186,7 +171,17 @@ def main():
                             # Add to respective zone
                             outJson[filename][i][zoneNo]["bgdatL" + str(j)].append(tile)
 
-    with open('out.json', 'w', encoding='utf-8') as f:
+    return outJson
+    
+
+
+def main():
+    rf = open("config.json")
+    rulesDict = json.loads(rf.read())
+    rf.close()
+
+    outJson = process(rulesDict)
+    with open('stage.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)
         else:

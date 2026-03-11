@@ -240,9 +240,8 @@ def update_references(data_list, position, old_id, new_id):
         if data_list[position] == old_id:
             data_list[position] = new_id
 
-def corrDupID(areaNo,zone):
+def corrDupID(areaNo,re_zone):
     global used_ids_sprites
-    re_zone = zone
 
     # For each property in zones
     for key_prop, zone_prop_lst in re_zone.items():
@@ -298,7 +297,7 @@ def corrDupID(areaNo,zone):
                         if cur_id in used_ids[areaNo][key_prop]:
                             # Generate another ID
                             new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                            #print(f"Duplicated {key_prop} ,ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
+                            print(f"Duplicated {key_prop}, ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
                             zone_item[id_position] = new_id
                             # Check linked locations
                             if key_prop=="location":

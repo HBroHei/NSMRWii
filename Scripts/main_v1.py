@@ -156,7 +156,7 @@ def readAndrandomise(i,istr,_u8list):
     sprLoadData = NSMBWLoadSprite.phraseByteData(lvlSetting[8]["Data"])
     # Process the sprites, i.e. randomize it
     if len(spriteData)>0:
-        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
+        spriteData,sprLoadData,lvlSetting[7]["Size"] = NSMBWsprite.processSprites(spriteData,sprLoadData)
     if globalVars.randomiseEntrance:
         # Phrase and randomise Entrance Info (Section 6)
         entrances = NSMBWEntrances.phraseByteData(lvlSetting[6]["Data"])

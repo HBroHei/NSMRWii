@@ -15,11 +15,14 @@ class dolphinAutoTransfer:
     def __init__(self):
         pass
 
-    def readAutoCopyConfig():
+    def readAutoCopyConfig(defConfig = {}):
         global config
-        rf = open(CONFIG_PATH)
-        config = loads(rf.read())
-        rf.close()
+        if defConfig=={}:
+            rf = open(CONFIG_PATH)
+            config = loads(rf.read())
+            rf.close()
+        else:
+            config = defConfig
     
     def verify_autotransfer_status():
         if "enable_auto_copy" in config and (config["enable_auto_copy"]):
@@ -51,7 +54,7 @@ class dolphinAutoTransfer:
                 print("The key 'riivolution_folder' is missing in the configuration file")
                 return False
             
-    def start_transfer(STG_NEW):
+    def start_transfer(STG_NEW, xml_path):
         # Load Auto Copying Config File
         print("Auto Copying : Starting File Transfer to Riivolution Folder...")
         # Verify if randomized files already exist
@@ -65,14 +68,11 @@ class dolphinAutoTransfer:
             try:
                 os.mkdir(config["riivolution_folder"] + "/riivolution")
             except:
-                # if this directory didn't existe the script cannot continue, abort the transfer
+                # if this directory didn't exist the script cannot continue, abort the transfer
                 print("Auto Copying : Unable to create riivolution subfolder, cannot transfer")
                 return False
         # Trying to transfer necessary files
-        try:  
-            shutil.copytree(STG_NEW, config["riivolution_folder"] + "/nsmb_randomized") #Copy Shuffled NSMB Files
-            shutil.copyfile("nsmb_randomizer.xml", config["riivolution_folder"] + "/riivolution/nsmb_randomizer.xml") #Copy Riivolution XML
-            return True
-        except:
-            return False
+        shutil.copytree(STG_NEW, config["riivolution_folder"] + "/nsmb_randomized") #Copy Shuffled NSMB Files
+        shutil.copyfile(xml_path, config["riivolution_folder"] + "/riivolution/nsmb_randomizer.xml") #Copy Riivolution XML
+        return True
         

@@ -204,7 +204,7 @@ class NSMBWZoneBound:
         returnList = []
         while i<len(byteData):
             #print(byteData[0+i:2+i])
-            returnList.append(unpack(">4lHHhh",byteData[i:i+24]))
+            returnList.append(list(unpack(">4lHHhh",byteData[i:i+24])))
             i+=24 #Entry length
 
         return returnList
@@ -222,7 +222,7 @@ class NSMBWZoneBG:
         i = 0
         returnList = []
         while i<len(byteData):
-            returnList.append(unpack(">xBhhhhHHHxxxBxxxx",byteData[i:i+24]))
+            returnList.append(list(unpack(">xBhhhhHHHxxxBxxxx",byteData[i:i+24])))
             i+=24 #Entry length
 
         return returnList
@@ -415,7 +415,7 @@ class NSMBWsprite:
         return bytes.fromhex(''.join(new_hex))
 
     ################## RANDO ####################
-    def processSprites(eData:list,leData:list,lvName):
+    def processSprites(eData:list,leData:list):
         reData = deepcopy(eData)
         relData = set(deepcopy(leData))
         # relData = set()  # Temp disabled for temp bug fixing
@@ -704,7 +704,7 @@ class NSMBWPathNode: #TODO Untested
         returnList = []
         while i<len(byteData):
             # due to struct being the only way vanilla python can read byte array to float, here is the struct
-            returnList_item = unpack(">HHffhxx",byteData[i:i+16])
+            returnList_item = list(unpack(">HHffhxx",byteData[i:i+16]))
             returnList.append(returnList_item)
             
             i+=16 #Entry length

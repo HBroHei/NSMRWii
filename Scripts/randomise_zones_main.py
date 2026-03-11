@@ -46,8 +46,12 @@ tileData = [[],[],[]]
 u8_files_list = []
 
 STAGE_OUT_DIR = "./Stage_output/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_output/"
-STAGE_TMP_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
+STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
 OUTJSON_PATH = "./out.json" if "out.json" in listdir(getcwd()) else "./Scripts/out.json"
+XML_PATH = "nsmb_randomizer.xml" if "nsmb_randomizer.xml" in listdir(getcwd()) else "./Scripts/nsmb_randomizer.xml"
+
+#STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
+CONFIG_PATH = "./config.json" if "config.json" in listdir(getcwd()) else "./Scripts/config.json"
 
 isDebug = False
 
@@ -134,7 +138,7 @@ def addRandomZone(types: list):
     
     print("[D] Extra zone =", generated_zone["orgLvl"], generated_zone["zone"])
     D_count_levelzone(generated_zone["orgLvl"])
-    generated_zone["sprites"], _dum, __dum = nsmbw.NSMBWsprite.processSprites(generated_zone["sprites"], [], "")
+    generated_zone["sprites"], _dum, __dum = nsmbw.NSMBWsprite.processSprites(generated_zone["sprites"], [])
     
     for lay_i in range(3):
         if f"bgdatL{lay_i}" in generated_zone:
@@ -143,7 +147,6 @@ def addRandomZone(types: list):
     generated_zone["zone"] = nsmbw.NSMBWZones.processZones(generated_zone["zone"])
     generated_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(generated_zone["tileset"])
     zoneAddedNo += 1
-    gen_zone_prop = generated_zone["zone"]
     
     for idx in range(4):  # Loop through the areas (0 to 3)
         # If area tileset is subset or not assigned
@@ -337,8 +340,6 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
             # Add path nodes
             path_node_list += cur_pathzone["pathNode"]
         # Check if len(path_node_list)+len(last_path)==cur_start_node
-        # print("[D]final list",path_list)
-        # print("[D]final path node",path_node_list)
         assert len(path_node_list)==cur_start_node, str(len(path_node_list)) + "!=" + str(cur_start_node)
         # Now they are ready to be added back to the list
         areaRawSettings.append(nsmbw.generateSectionDef(nsmbw.NSMBWPathProperties.toByteData(path_list)))
@@ -358,12 +359,12 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     print("============= Processed",lvlName,"=================")
 
 # Code below are basically a copy of editArcFile()
-def vanilla_processLvl(istr):
+def vanilla_processLvl(istr, old_stg_path):
     newName = istr
     globalVars.tileData = [[],[],[]]
 
     #Read the U8 archive content
-    u8list = u8_m.openFile("Stage_temp/"+newName)
+    u8list = u8_m.openFile(old_stg_path + newName)
     u8FileList = u8list["File Name List"]
     areaNo = u8list["Number of area"]
     areaNo %= 4
@@ -372,7 +373,7 @@ def vanilla_processLvl(istr):
     
     #Loop through every area
     for i in range(1,areaNo+1):
-        u8list = readAndrandomise(i,istr,u8list)
+        u8list = readAndrandomise(i,u8list)
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
@@ -381,7 +382,7 @@ def vanilla_processLvl(istr):
         f.write(u8n)
             
 
-def readAndrandomise(i,istr,_u8list):
+def readAndrandomise(i,_u8list):
     u8list = _u8list
     # Main area settings file
     lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
@@ -403,7 +404,7 @@ def readAndrandomise(i,istr,_u8list):
     zoneData = nsmbw.NSMBWZones.phraseByteData(lvlSetting[9]["Data"])
     # Process the sprites, i.e. randomize it
     if len(spriteData)>0:
-        spriteData,sprLoadData,lvlSetting[7]["Size"] = nsmbw.NSMBWsprite.processSprites(spriteData,sprLoadData,istr)
+        spriteData,sprLoadData,lvlSetting[7]["Size"] = nsmbw.NSMBWsprite.processSprites(spriteData,sprLoadData)
     #print("ZONES",zoneData)
     zoneData = [nsmbw.NSMBWZones.processZones(z) for z in zoneData]
     lvlSetting[7]["Data"] = nsmbw.NSMBWsprite.toByteData(spriteData)
@@ -420,8 +421,10 @@ def D_count_levelzone(org_lvl):
     except KeyError:
         count_distri[org_lvl] = 1
 
-def main():
+def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_DIR, autocopy_config = {}):
     global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count, rando_priority_lst
+
+    read_config.read(config_f=config_f, stage_f=stage_f)
 
     # Delete previous run
     try:
@@ -429,8 +432,11 @@ def main():
     except FileNotFoundError:
         pass
 
-    with open(OUTJSON_PATH, 'r') as f:
-        json_orginal = json.load(f)
+    if isinstance(out_json_path, str):
+        with open(out_json_path, 'r') as f:
+            json_orginal = json.load(f)
+    else:
+        json_orginal = out_json_path
     inJson = convertToDict(json_orginal)
 
     lst_tileset = set()
@@ -492,7 +498,7 @@ def main():
     """
     # tilesetList = list(groupTilesetJson.keys())
     zoneAddedNo = 0
-    stg_lst = read_config.listdir(STAGE_TMP_DIR)
+    stg_lst = read_config.listdir(stage_f)
     stg_i = 0
     while stg_i<len(stg_lst):
         stg_name = stg_lst[stg_i]
@@ -500,12 +506,12 @@ def main():
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture" or stg_name in globalVars.skipLvl :
             #log += str("Processing [S]"+ "Stage_temp" + "/" + stg_name +"to" + "Stage_output/" + stg_name + "\n")
-            copyfile(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name) if stg_name!="Texture" else copytree(STAGE_TMP_DIR + stg_name,STAGE_OUT_DIR + stg_name)
+            copyfile(stage_f + stg_name,STAGE_OUT_DIR + stg_name) if stg_name!="Texture" else copytree(stage_f + stg_name,STAGE_OUT_DIR + stg_name)
             stg_i += 1
             continue # Skip that folder
         elif stg_name in globalVars.skip_but_rando:
             # Randomise that level
-            vanilla_processLvl(stg_name)
+            vanilla_processLvl(stg_name, stage_f)
             stg_i += 1
             continue # Skip zone rando nonsense
 
@@ -529,7 +535,7 @@ def main():
         spawn_zone = deepcopy(generated_ent_zone)
         # Sprites randomisation
         spawn_zone["sprites"],_dum,__dum =\
-            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],[],stg_name)
+            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],[])
         for lay_i in range(0,3):
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
@@ -564,7 +570,7 @@ def main():
                 print("Changed Flagpole")
             # Sprites randomisation
             exit_zone["sprites"],_dum,__dum =\
-                nsmbw.NSMBWsprite.processSprites(exit_zone["sprites"],[],stg_name)
+                nsmbw.NSMBWsprite.processSprites(exit_zone["sprites"],[])
             for lay_i in range(0,3):
                 if "bgdatL"+str(lay_i) in exit_zone:
                     exit_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(exit_zone["bgdatL"+str(lay_i)])
@@ -641,7 +647,7 @@ def main():
                 #if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset)
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
-                nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[],stg_name)
+                nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[])
             for lay_i in range(0,3):
                 if "bgdatL"+str(lay_i) in main_zone:
                     main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
@@ -739,7 +745,7 @@ def main():
                         print("ADDED New Flagpole")
                     # Randomise sprite
                     area_zone[added_area_no][-1]["sprites"],_dum,__dum =\
-                        nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],[],stg_name)
+                        nsmbw.NSMBWsprite.processSprites(area_zone[added_area_no][-1]["sprites"],[])
                     area_zone[added_area_no][-1]["zone"] = nsmbw.NSMBWZones.processZones(area_zone[added_area_no][-1]["zone"])
                     for lay_i in range(0,3):
                         if "bgdatL"+str(lay_i) in area_zone[added_area_no][-1]:
@@ -909,14 +915,14 @@ def main():
     
     print(json.dumps(dict(sorted(count_distri.items(), key=lambda item: item[1]))))
     #print("*****All levels have been generated. Please move the stages into the respective folder*****")
-    dolphinAutoTransfer.readAutoCopyConfig()
+    dolphinAutoTransfer.readAutoCopyConfig(autocopy_config)
 
     # Starting Transfer to dolphin
     if dolphinAutoTransfer.verify_autotransfer_status(): 
         print("Auto Copying : Beginning transfer setting verification")
         if dolphinAutoTransfer.verify_transfer_settings():
             print("Auto Copying : Transfer settings are valid, beginning transfer...")
-            if dolphinAutoTransfer.start_transfer("./Stage_output"):
+            if dolphinAutoTransfer.start_transfer(STAGE_OUT_DIR, XML_PATH):
                 print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
             else:
                 print("Auto Copying : An error occurred during files transfer")
