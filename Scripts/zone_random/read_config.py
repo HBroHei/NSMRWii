@@ -103,6 +103,8 @@ def read(config_f, stage_f: str):
     except KeyError:
         pass
 
+    groupTags = rulesDict["Group Tag"]
+
     # Add them all to the global vars list
     globalVars.enemyList = enemyList
     globalVars.enemyVarList = enemyVarList
@@ -116,6 +118,8 @@ def read(config_f, stage_f: str):
     globalVars.panel_rand = panel_rand
     globalVars.musicList = musicList
     globalVars.ambientList = ambientList
+
+    globalVars.groupTag = groupTags
 
     globalVars.skipLvl = skipLvl
     globalVars.skip_but_rando = skip_but_rando

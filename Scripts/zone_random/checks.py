@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 """
     Sprite IDs:
     203 Chest
@@ -59,6 +57,35 @@ def checkEntSpawn(zone):
 
 def checkOnlyOneEnt(zone):
     return len(zone["entrance"])==1
+
+# Get all zones that satisfy the condition
+def find_zone_with_type(item_types, query):
+    # Only string - only 1 requirment
+    if isinstance(query, str): return query in item_types
+
+    operator = query[0].upper()
+    operands = query[1:]
+
+    if operator == "AND":
+        # All type must be there
+        return all(find_zone_with_type(item_types, op) for op in operands)
+    elif operator == "OR":
+        # At least one type must be True
+        return any(find_zone_with_type(item_types, op) for op in operands)
+    elif operator == "TILE":
+        # Tileset special handling
+        set_op = operands if isinstance(operands, set) else operands[0]
+        for type_i in item_types:
+            if isinstance(type_i, set):
+                return set_op.issubset(type_i) or type_i.issubset(set_op)
+    # elif operator == "NOT":
+    #     return not find_zone_with_type(item_tags, operands[0])
+    else:
+        raise ValueError(f"Unknown operator: {operator}")
+
+# Get list of zones based on the requested types
+def filter_zone(data, query):
+    return [item for item in data if find_zone_with_type(item.get("type", []), query)]
 
 # Find all the enterables and non-enterables
 def findExitEnt(zone):

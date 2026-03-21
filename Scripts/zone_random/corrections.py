@@ -223,12 +223,12 @@ def generate_unique_id(used_ids, key_prop):
     # loop until the id is not duplicated
     while new_id in used_ids:
         new_id += 1
-        # Check if exceed 16
+        # Check if the requested ID has a limit of 16 max IDs and the new ID exceed 16
         # Also have it pass if it already looped around
         if key_prop in ID_MATCH_LIMIT16 and new_id>15 and failsafe_count<=2:
             failsafe_count+=1
             new_id = 0
-    if failsafe_count>1: input("FAILSAFE ACTIVATED")
+    if failsafe_count>1: input(f"FAILSAFE ACTIVATED {failsafe_count} TIMES")
     return new_id
 
 def update_references(data_list, position, old_id, new_id):

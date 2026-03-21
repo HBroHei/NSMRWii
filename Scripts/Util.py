@@ -19,7 +19,7 @@ def changeBytesAt(bytesStr:bytes, pos:int, newVal):
 
 def changeNibbleAt(bytesStr:bytes, pos_nibble:int, newVal):
     pos = ceil(pos_nibble/2) - 1
-    print(f"Npos {pos_nibble}, {newVal}/{newVal:08b}, {bytesStr[pos]:08b}, {((newVal << 4) | (bytesStr[pos] & 0b00001111)):08b}")
+    # print(f"Npos {pos_nibble}, {newVal}/{newVal:08b}, {bytesStr[pos]:08b}, {((newVal << 4) | (bytesStr[pos] & 0b00001111)):08b}")
     return changeBytesAt(
         bytesStr,
         int(ceil(pos_nibble/2) - 1),

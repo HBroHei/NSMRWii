@@ -15,7 +15,7 @@ from pathlib import Path
 from os import listdir, getcwd
 
 inJson = {}
-
+"""
 groupTilesetJson = {
     "normal" : defaultdict(list) , # No Entrance / Exit
     "entrance" : defaultdict(list), # Have  Level entrance only
@@ -26,6 +26,8 @@ groupTilesetJson = {
     "bonus" : defaultdict(list), # Only 1 entrance / same ent and exit
     "count" : 0
 }
+"""
+all_stage_zones = []
 addedZone = {}
 
 levelToImport = "01-01.arc"
@@ -37,7 +39,7 @@ area_enterable_count = [0,0,0,0]
 area_nonenterable_count = [0,0,0,0]
 area_zone = [[],[],[],[]]
 area_zone_size = [[],[],[],[]]
-area_tileset = ["","","",""]
+area_tileset = [set(),set(),set(),set()]
 area_len = 1
 
 rando_priority_lst = []
@@ -80,7 +82,7 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     area_enterable_count[areaNo] += len(allEnt)
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
-def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:list, area_zone: list, main_zone: dict, area_id: int):
+def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:set, area_zone: list, main_zone: dict, area_id: int):
     overlap_zone_no = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
 
     D_check_conditions(main_zone)
@@ -107,7 +109,7 @@ def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:list, area_zon
     main_zone = corrections.corrSprEntZone(main_zone)
     #print("MAIN TILESET",main_tileset,type(main_tileset))
     # Check if more tilesets needed to be loaded
-    cur_zone_tileset = decodeTileset(main_zone)
+    cur_zone_tileset = set(ba.decode() for ba in main_zone["tileset"][1:])
     # Check if tileset name needs to be replaced
     if do_replace_tileset and len(area_zone[area_id])>0:#(cur_zone_tileset!=cur_area_tileset[area_id] and len(area_zone[area_id])!=0):
         cur_area_tileset[area_id] = cur_zone_tileset
@@ -125,13 +127,15 @@ def addRandomZone(types: list):
     global zoneAddedNo, area_len, area_zone, area_tileset
     print("Determine extra")
     # Check if all area has been assigned
-    a_tile_list = tuple(a_tile for a_tile in area_tileset if a_tile!="")
+    a_tile_list = [("TILE", a_tile) for a_tile in area_tileset if a_tile]
     if len(a_tile_list)<4:
-        generated_zone, gen_zone_tileset, gen_zone_type = genZone(types)
+        query_param = types
     else:
         # All zones FULL! Please plop the zone into an existing tileset
-        generated_zone, gen_zone_tileset, gen_zone_type = genZone(types, a_tile_list)
-        
+        query_param = ["AND", ["OR"] + a_tile_list, types]
+    generated_zone, gen_zone_tileset, gen_zone_type = genZone(query_param)
+
+
     if generated_zone is None:
         print("Cannot find suitable zone")
         return None, False
@@ -147,29 +151,37 @@ def addRandomZone(types: list):
     generated_zone["zone"] = nsmbw.NSMBWZones.processZones(generated_zone["zone"])
     generated_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(generated_zone["tileset"])
     zoneAddedNo += 1
+
     
     for idx in range(4):  # Loop through the areas (0 to 3)
         # If area tileset is subset or not assigned
-        if (area_tileset[idx] == "") or (gen_zone_tileset in area_tileset[idx]) or (area_tileset[idx] in gen_zone_tileset):
+        if (not area_tileset[idx]) or (gen_zone_tileset.issubset(area_tileset[idx])) or (area_tileset[idx].issubset(gen_zone_tileset)):
             # Check if overrride needed
-            if area_tileset[idx] in gen_zone_tileset: area_tileset[idx] = gen_zone_tileset
+            # TODO This is already being done in handle_zone_overlap so ???
+            if area_tileset[idx].issubset(gen_zone_tileset): area_tileset[idx] = gen_zone_tileset
             # Use handle_zone_overlap to manage overlap
-            generated_zone = handle_zone_overlap(area_tileset[idx] in gen_zone_tileset, area_tileset, area_zone, generated_zone, idx)
+            generated_zone = handle_zone_overlap(area_tileset[idx].issubset(gen_zone_tileset), area_tileset, area_zone, generated_zone, idx)
             
             return idx, area_tileset[idx] in gen_zone_tileset
     
     # Failsafe?
     return -1, False
     
-
+"""
 # NOTE This will NOT remove the zone from the list
 def getRandomZone(tilesetName:str, zone_type:str) -> dict:
     ret_zone = deepcopy(choice(groupTilesetJson[zone_type][tilesetName]))
     return ret_zone
-
+"""
 # Unbiased zone chooser
-def genZone(types_list:list, req_tileset = tuple()):
-    all_zones = []
+def genZone(query:list):
+    all_chosen_zones =  checks.filter_zone(all_stage_zones, query) # List of all suitable types
+    if all_chosen_zones:
+        chosen_zone = choice(all_chosen_zones)
+        return chosen_zone, set(ba.decode() for ba in chosen_zone["tileset"][1:]), chosen_zone["type"]
+    return None, None, None
+
+    """
     # First, get all zones that are a type in types_list
     for cur_zone_type in types_list:
         for tileset_lst in groupTilesetJson[cur_zone_type].values():
@@ -182,9 +194,9 @@ def genZone(types_list:list, req_tileset = tuple()):
     while req_tileset!=tuple() and ret_tileset not in req_tileset:
         ret_zone = deepcopy(choice(all_zones))
         ret_tileset = decodeTileset(ret_zone)
-    #if ret_zone["orgLvl"]=="05-02.arc": input(ret_zone["orgLvl"])
+    """
     return ret_zone, ret_tileset, ret_zone["type"]
-
+"""
 def getRandomTileset(types_list:list):
     type_used = choice(types_list)
     return_tileset = []
@@ -194,7 +206,7 @@ def getRandomTileset(types_list:list):
     print("Using",type_used,return_tileset)
     # Seperating return statement since I never know I would be seperating them in the future
     return return_tileset, type_used
-
+"""
 def getRandomEntrance(area_zone:list):
     area = choice(area_zone)
     while len(area)==0:
@@ -208,49 +220,6 @@ def checkDictListEmpty(d:dict):
     for i_lst in d.values():
         if len(i_lst)!=0: return False
     return True
-
-# Generates a random zone from existing pool
-# NOTE OLD / DEPRECATED
-def genZone_O(types:list):
-    # Get which types of zone to use
-    type_used = ""
-    cur_tileset = ""
-    rep_counts = 0
-    # Prevent:
-    # - area without an entrance
-    # - All area used, and generated tileset not in area tilesets
-    # - no suitable place to place the zone
-    while type_used == "" or (checkDictListEmpty(groupTilesetJson[type_used]) or\
-        cur_tileset=="" or\
-        (cur_tileset not in area_tileset and "" not in area_tileset)) and\
-        rep_counts <= 100: # Failsafe, a hacky one
-
-        cur_tileset, type_used = getRandomTileset(types)
-        rep_counts+=1
-    
-    if rep_counts>100:
-        return None,None,None
-    
-    zone_ent_type = type_used
-    #zone_ent_type = "full" ### DEBUG
-
-    assert type(cur_tileset)==str, "Type mismatch: " + type(cur_tileset) + " " + type(zone_ent_type)
-    # Add the entrance zone
-    ret_zone = deepcopy(getRandomZone(cur_tileset, zone_ent_type))
-    assert ret_zone != None
-    #area_zone[0].append(ret_zone)
-
-    # Adjust coordinates relative to the new level
-    ret_zone = corrections.alignToPos(ret_zone,*tilePosToObjPos((32,32)))
-    assert ret_zone!=None
-    ret_zone = corrections.corrSprEntZone(ret_zone)
-
-    # Add info
-    #ret_zone["tileset"] = cur_tileset
-    ret_zone["type"] = zone_ent_type
-
-    # Return: zone, tileset, type
-    return ret_zone, cur_tileset, ret_zone["type"]
 
 def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     no_of_areas = 0
@@ -373,7 +342,7 @@ def vanilla_processLvl(istr, old_stg_path):
     
     #Loop through every area
     for i in range(1,areaNo+1):
-        u8list = readAndrandomise(i,u8list)
+        u8list = readAndRandomise(i,u8list)
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
@@ -382,7 +351,7 @@ def vanilla_processLvl(istr, old_stg_path):
         f.write(u8n)
             
 
-def readAndrandomise(i,_u8list):
+def readAndRandomise(i,_u8list):
     u8list = _u8list
     # Main area settings file
     lvlSetting = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
@@ -440,49 +409,57 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
     inJson = convertToDict(json_orginal)
 
     lst_tileset = set()
-    # Group similar tilesets
+    
+    ####   ZONES GROUPING   ####
+
     for key_lvl in inJson:
         for key_area in inJson[key_lvl]:
             for key_zone in inJson[key_lvl][key_area]:
-                cur_zone = deepcopy(inJson[key_lvl][key_area][key_zone])
+                cur_zone = (inJson[key_lvl][key_area][key_zone])
                 cur_zone["orgLvl"] = key_lvl
-                cur_tileset_str = ",".join([ba.decode() for ba in cur_zone["tileset"][1:]])# All tilesets exclude 1st one, added "," to identify unique tileset name
-                
+                cur_tileset_str = ",".join([ba.decode() for ba in cur_zone["tileset"][1:]]) # All tilesets exclude 1st one, added "," to identify unique tileset name
+                cur_zone["type"] = [set(ba.decode() for ba in cur_zone["tileset"][1:])]
+
                 # Calculate number of zones for each tilesets
-                #groupTilesetJson[cur_tileset_str]["count"] += len(inJson[key_lvl][key_area].keys())
                 lst_tileset.add(cur_tileset_str)
                 cutscene_spr = checks.checkisCutsceneZone(cur_zone)
+                # Check if zone is a cutscene zone
                 if cutscene_spr!=-1:
                     if cutscene_spr[0]==408 or checks.checkBossSprite(cur_zone)[0]==-1:
-                        cur_zone["type"] = "after_boss"
-                        groupTilesetJson["after_boss"][cur_tileset_str].append(cur_zone) # Add to the cutscene list
+                        cur_zone["type"].append("after_boss")
+                        all_stage_zones.append(cur_zone)
                         continue # Skip the zone
 
                 # Check zone has exit / entrances
                 exit_flag,_dum = checks.checkExitSprite(cur_zone)
-                ent_flag = checks.checkEntSpawn(cur_zone)
+                ent_flag = checks.checkEntSpawn(cur_zone) # Check if entrance is the area entrance
                 boss_flag,_dum = checks.checkBossSprite(cur_zone)
                 oneent_flag = checks.checkOnlyOneEnt(cur_zone)
+                zone_len_x = cur_zone["zone"][2]
+                zone_len_y = cur_zone["zone"][3]
                 # Add the zone to its category
-                if boss_flag==-1:
-                    if exit_flag!=-1 and ent_flag!=-1:
-                        cur_zone["type"] = "full"
-                        groupTilesetJson["full"][cur_tileset_str].append(cur_zone)
-                    elif exit_flag!=-1:
-                        cur_zone["type"] = "exit"
-                        groupTilesetJson["exit"][cur_tileset_str].append(cur_zone)
-                    elif oneent_flag:
-                        cur_zone["type"] = "bonus"
-                        groupTilesetJson["bonus"][cur_tileset_str].append(cur_zone)
-                    elif ent_flag!=-1:
-                        cur_zone["type"] = "entrance"
-                        groupTilesetJson["entrance"][cur_tileset_str].append(cur_zone)
-                    else:
-                        cur_zone["type"] = "normal"
-                        groupTilesetJson["normal"][cur_tileset_str].append(cur_zone)
+                lvl_type = ""
+                if boss_flag!=-1:
+                    lvl_type = "exit"
+                elif exit_flag!=-1 and zone_len_x<=2000 and zone_len_y<=1000:
+                    lvl_type = "exit"
+                elif exit_flag!=-1 and ent_flag!=-1:
+                    lvl_type = "full"
+                elif oneent_flag:
+                    lvl_type = "bonus"
+                elif zone_len_x>2000 or zone_len_y>1000:
+                    lvl_type = "normal"
                 else:
-                    cur_zone["type"] = "exit"
-                    groupTilesetJson["exit"][cur_tileset_str].append(cur_zone)
+                    lvl_type = "entrance"
+                cur_zone["type"].append(lvl_type)
+
+                # NOTE Add other types here
+                # Add group tags
+                cur_zone["type"] += globalVars.groupTag.get(key_lvl, [])
+
+                # Add to the list of all zones
+                all_stage_zones.append(cur_zone)
+                #groupTilesetJson[lvl_type][cur_tileset_str].append(cur_zone)
 
     # These will always be area 1, with exit zone as zone 0 in the level
     """
@@ -520,33 +497,41 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         area_nonenterable_count = [0,0,0,0] 
         area_zone = [[],[],[],[]]
         area_zone_size = [[],[],[],[]]
-        area_tileset = ["","","",""]
+        area_tileset = [set(),set(),set(),set()]
+
         area_len = 1
         only_main = False
         have_secret = stg_name in read_config.secret_exit
 
         # Generate the entrance zone
-        generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(["full","entrance"])
-        #genZone(tilesetList,["full","entrance"])
-        if have_secret and gen_ent_zone_type=="full": # If have secret and type full, check whether spawn zone has 2 or more enterables
+        generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(("OR", "full", "entrance"))
+        if have_secret and "full" in gen_ent_zone_type: # If have secret and type full, check whether spawn zone has 2 or more enterables
             while len(checks.findExitEnt(generated_ent_zone)[0])<1:
-                generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(["full","entrance"])
+                generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(("OR", "full", "entrance"))
 
         spawn_zone = deepcopy(generated_ent_zone)
         # Sprites randomisation
-        spawn_zone["sprites"],_dum,__dum =\
-            nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],[])
+        spawn_zone["sprites"],_dum,__dum = nsmbw.NSMBWsprite.processSprites(spawn_zone["sprites"],[])
         for lay_i in range(0,3):
             if "bgdatL"+str(lay_i) in spawn_zone:
                 spawn_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(spawn_zone["bgdatL"+str(lay_i)])
+        
+        # Zone-related randomisaton (Music, dark)
         spawn_zone["zone"] = nsmbw.NSMBWZones.processZones(spawn_zone["zone"])
+
+        # Tileset 0 rando
         spawn_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(spawn_zone["tileset"])
+        
+        # Record entrances data
         addEntranceData(0,spawn_zone)
+
+        # Correcting incorrect positions and IDs
         spawn_zone = corrections.alignToPos(spawn_zone,*tilePosToObjPos((32,32)))
         spawn_zone = corrections.corrDupID(0, spawn_zone)
         spawn_zone = corrections.corrSprEntZone(spawn_zone)
+
+        # Add to list
         area_zone[0].append(spawn_zone)
-        #rando_priority_lst.append(0)
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
         print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"], decodeTileset(spawn_zone))
@@ -555,10 +540,12 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         D_check_conditions(spawn_zone)
         
 
-        if gen_ent_zone_type=="entrance":
+        if "entrance" in gen_ent_zone_type:
+            # TODO LARGELY duplicated from above (TWICE!). Clean up pls
+            # Also please make use of addRandomZone, it is capable of this stuff
             print("Determine exit")
             # Need an exit zone, and a "main" zone
-            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(["full","exit"])
+            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(("OR","full","exit"))
         
             exit_zone = deepcopy(generated_exit_zone)
             print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset)
@@ -579,10 +566,12 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             exit_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(exit_zone["tileset"])
             D_check_conditions(exit_zone)
             # Check for overlap with zones
-            if area_tileset[0]=="" or exit_tileset in area_tileset[0] or area_tileset[0] in exit_tileset:
+            if (not area_tileset[0]) or exit_tileset.issubset(area_tileset[0]) or area_tileset[0].issubset(exit_tileset):
                 # Check if area_tileset[0] is a subset of exit_tileset
-                if area_tileset[0] in exit_tileset: area_tileset[0] = exit_tileset
-                exit_zone = handle_zone_overlap(area_tileset[0] in exit_tileset, area_tileset, area_zone, exit_zone, 0)
+                # TODO again, this is already being done in the following function so even more ?????
+                if area_tileset[0].issubset(exit_tileset): area_tileset[0] = exit_tileset
+                exit_zone = handle_zone_overlap(area_tileset[0].issubset(exit_tileset), area_tileset, area_zone, exit_zone, 0)
+                added_zone_area_no = 0
             else:
                 exit_zone = corrections.alignToPos(exit_zone,*tilePosToObjPos((32,32)))
                 exit_zone = corrections.corrDupID(1, exit_zone) # Still needed to add IDs in this zone
@@ -599,9 +588,10 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             cutscene_zone_pos = (-1,-1)
             if exit_spr[0] in (406,407):
                 # Gets the linked cutscene zone
-                cutscene_zone = deepcopy(groupTilesetJson["after_boss"][gen_exit_zone_tileset][0])
+                # cutscene_zone = deepcopy(groupTilesetJson["after_boss"][gen_exit_zone_tileset][0])
+                print(f"After boss: {gen_exit_zone_tileset}")
+                cutscene_zone, _dummy, __dummy = genZone(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)])
                 cutscene_zone["cutscene"] = ""
-                #cutscene_zone_pos = (added_area_no,len(area_zone[added_zone_area_no]))
                 overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
                     overlap_zone = area_zone[added_zone_area_no][overlap_zone_no]["zone"]
@@ -630,7 +620,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
 
             # # Gets the random zone
             # main_zone = deepcopy(getRandomZone(main_tileset,"normal"))
-            generated_main_zone, gen_main_zone_tileset, gen_main_zone_type = genZone(["normal"])
+            generated_main_zone, gen_main_zone_tileset, gen_main_zone_type = genZone("normal")
         
             main_zone = deepcopy(generated_main_zone)
             main_tileset = gen_main_zone_tileset
@@ -639,11 +629,14 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 # If have secret, check whether main_zone has 2 or more enterables
                 # Or have 1 enterable and 1 exit, that works too
                 zone_type = ""
+                """
                 while len(checks.findExitEnt(main_zone)[0])<2 or (len(checks.findExitEnt(main_zone)[0])<1 and zone_type=="exit"):
-                    main_tileset, zone_type = getRandomTileset(["normal","exit"])
+                    main_tileset, zone_type = getRandomTileset("normal","exit")
                     # Prevent area without exit
                     main_zone = deepcopy(getRandomZone(main_tileset,zone_type))
-                    
+                """
+                while len(checks.findExitEnt(main_zone)[0])<2 or (len(checks.findExitEnt(main_zone)[0])<1 and zone_type=="exit"):
+                    main_zone, main_tileset, gen_main_zone_type = genZone(("OR", "normal","exit"))
                 #if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset)
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
@@ -657,13 +650,14 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             D_check_conditions(main_zone)
             D_count_levelzone(main_zone["orgLvl"])
             # Check for overlap with zones
-            if area_tileset[0]=="" or area_tileset[0] in main_tileset or main_tileset in area_tileset[0]:
+            if (not area_tileset[0]) or area_tileset[0].issubset(main_tileset) or main_tileset.issubset(area_tileset[0]):
                 # check subset tileset
-                if area_tileset[0] in main_tileset: area_tileset[0] = main_tileset
-                main_zone = handle_zone_overlap(area_tileset[0] in main_tileset, area_tileset, area_zone, main_zone, 0)
-            elif area_tileset[1]=="" or area_tileset[1] in main_tileset or main_tileset in area_tileset[1]:
-                if area_tileset[1] in main_tileset: area_tileset[1] = main_tileset
-                main_zone = handle_zone_overlap(area_tileset[0] in main_tileset, area_tileset, area_zone, main_zone, 1)
+                # TODO AGAIN????????????
+                if area_tileset[0].issubset(main_tileset): area_tileset[0] = main_tileset
+                main_zone = handle_zone_overlap(area_tileset[0].issubset(main_tileset), area_tileset, area_zone, main_zone, 0)
+            elif (not area_tileset[1]) or area_tileset[1].issubset(main_tileset) or main_tileset.issubset(area_tileset[1]):
+                if area_tileset[1].issubset(main_tileset): area_tileset[1] = main_tileset # TODO yes, it is this again
+                main_zone = handle_zone_overlap(area_tileset[0].issubset(main_tileset), area_tileset, area_zone, main_zone, 1)
             else:  # Esort to Area 3 I guess
                 main_zone = corrections.alignToPos(main_zone, *tilePosToObjPos((32, 32)))
                 main_zone = corrections.corrDupID(2, main_zone)
@@ -702,11 +696,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 print("NEW ZONE NEEDED, PLEASE ADD CODE HERE")
                 print("Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
                 # If there is an secret exit in this level, set type to "exit", and "full" otherwise
-                (added_area_no, is_new_tileset) = addRandomZone(["exit"] if have_secret else ["normal","bonus"])
-                # Check if tileset override is needed
-                # if is_new_tileset:
-                #     print(area_zone[added_area_no][0]["tileset"] , area_zone[added_area_no][-1]["tileset"])
-                #     area_zone[added_area_no][0]["tileset"] = area_zone[added_area_no][-1]["tileset"]
+                (added_area_no, is_new_tileset) = addRandomZone("exit" if have_secret else ["OR","entrance","bonus"])
                 if added_area_no==None:
                     # Lets start over
                     # TODO Is this necessary anymore?
@@ -909,7 +899,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        #if stg_name=="01-36.arc":input("PRESS ENTER TO CONTINUE...")
+        # if stg_name=="08-06.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

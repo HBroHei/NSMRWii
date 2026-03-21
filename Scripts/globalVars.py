@@ -7,6 +7,8 @@ skip_but_rando = []
 musicList = []
 ambientList = []
 
+groupTag = {}
+
 reduceLag = True
 
 randomiseEntrance = False
