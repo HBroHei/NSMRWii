@@ -1,12 +1,14 @@
-var eList = []
-var lvList = ["Texture","02-24.arc"]
+var eList = [];
+var lvList = ["Texture","02-24.arc"];
 var e_rand_sel = document.getElementById("e_rand_sel");
 var t_rand_sel = document.getElementById("t_rand_sel");
 
 var prevTab = "global";
 
+var lvlTypeList = {};
+
 loadChangelog();
-document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647
+document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647;
 
 /*
 document.getElementById("e_rand_sel").onchange = function(evt) {
@@ -95,15 +97,13 @@ function toJson(){
     // getSkipOption("Secret",document.getElementById("SSE"))
     // getSkipOption("Cannon",document.getElementById("SCannon"))
     // getSkipOption("Toad",document.getElementById("SToadHse"))
-    getGroupOption("secret");
-    getGroupOption("castle");
-    getGroupOption("tower");
-    getGroupOption("airship");
-    getGroupOption("ambush");
-    getGroupOption("cannon");
-    getGroupOption("toads");
-
-    console.log(lvList_same)
+    getGroupOption("secret" , document.getElementById("exp_v2enable").checked);
+    getGroupOption("castle" , document.getElementById("exp_v2enable").checked);
+    getGroupOption("tower"  , document.getElementById("exp_v2enable").checked);
+    getGroupOption("airship", document.getElementById("exp_v2enable").checked);
+    getGroupOption("ambush" , document.getElementById("exp_v2enable").checked);
+    getGroupOption("cannon" , document.getElementById("exp_v2enable").checked);
+    getGroupOption("toads"  , document.getElementById("exp_v2enable").checked);
 
     var enemyVarients = {
         "60":["0000 0000 0000","0000 0000 0001"], // Spike top rando direction
@@ -411,6 +411,7 @@ function toJson(){
             "Enemy Variation": enemyVarients,
             "Secret Exit List": ["01-03.arc","02-04.arc","02-06.arc","03-04.arc","03-05.arc","03-21.arc","04-21.arc","04-22.arc","05-21.arc","06-05.arc","06-06.arc","07-21.arc","07-22.arc","08-02.arc"],
             "Skip But Randomise" : skipRandoList,
+            "Group Tag" : lvlTypeList,
             "Tile Group": tileRan,
             "Wind Chance": Number(document.getElementById("exp_windRand").value),
             "Dark Chance": Number(document.getElementById("exp_darkRand").value),

@@ -10,12 +10,20 @@ function getSkipOption(name,ele){
     }
 }
 
-function getGroupOption(name){
-    const selectedVal = document.querySelector('input[name="skip_' + name + '"]:checked').value
+function getGroupOption(name, isV2){
+    const selectedVal = document.querySelector(`input[name="skip_${name}"]:checked`).value;
     if(selectedVal=="skip"){
-        lvList_skip.push(...lvlJson_n[name]) // append(lvl) for lvl in lvlJson_n[name]
+        lvList_skip.push(...lvlJson_n[name]); // append(lvl) for lvl in lvlJson_n[name]
     }
     else if(selectedVal=="same"){
-        lvList_same.push(lvlJson_n[name]) // append array to array
+        if(isV2){
+            for(let lvlName of lvlJson_n[name]){
+                if(!(lvlName in lvlTypeList)) lvlTypeList[lvlName] = [name];
+                else lvlTypeList[lvlName].push(name);
+            }
+        }
+        else{
+            lvList_same.push(lvlJson_n[name]); // append array to array
+        }
     }
 }
