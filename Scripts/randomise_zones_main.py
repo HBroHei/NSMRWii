@@ -760,13 +760,16 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                     for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]:
                         # Check if nonent is the main entrance
                         if processing_area[zone_pos]["AreaSetting"][0][6]!=processing_area[zone_pos]["entrance"][exit_pos][2]:
+                            print(f"Area Zone Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
                             nonent_list[area_id].append((zone_pos, exit_pos))
                         else:
                             zone_main_ent = (zone_pos, exit_pos)
                     # Shuffle the nonent list
                     shuffle(nonent_list[area_id])
                     # Add zone main entrance to the top of the list
-                    if zone_main_ent: nonent_list[area_id].append(zone_main_ent)
+                    if zone_main_ent:
+                        print("zone_main_ent", processing_area[zone_main_ent[0]]["entrance"][zone_main_ent[1]])
+                        nonent_list[area_id].append(zone_main_ent)
                     
                 if not nonent_list[area_id]: # Failsafe to assign enterables for nonenterable in case there are no nonenterable
                     for zone_pos in range(0,len(processing_area)):
@@ -858,7 +861,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        # if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     

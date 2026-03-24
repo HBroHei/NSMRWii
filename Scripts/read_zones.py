@@ -114,6 +114,10 @@ def process(rulesDict, stage_path = "./Stage"):
                 print("Patching 09-05.arc")
                 for ent in entrances:
                     if ent[2]==2: ent[5] = 4
+            elif rulesDict["Patches"]["07-21 Door"] and filename=="07-21.arc" and i==3:
+                print("Patching 07-21.arc")
+                for ent in entrances:
+                    if ent[2]==0: ent[9] = 0x80
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
