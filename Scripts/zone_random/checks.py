@@ -30,8 +30,23 @@ def checkAmbushSprite(zone):
             return spr,i
     return -1,-1
 
+def checkCannonSprite(zone):
+    for i in range(0,len(zone["sprites"])):
+        spr = zone["sprites"][i]
+        if spr[0]==434:
+            return True
+    return False
+
 def checkExitSprite(zone):
-    EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
+    EXIT_SPRITES = [203,113,412,428,211,363,383,405,406,407,479]
+    for i in range(0,len(zone["sprites"])):
+        spr = zone["sprites"][i]
+        if spr[0] in EXIT_SPRITES:
+            return spr,i
+    return -1,-1
+
+def checkAllExitSprite(zone):
+    EXIT_SPRITES = [434,454,185,203,113,412,428,211,363,383,405,406,407,479]
     for i in range(0,len(zone["sprites"])):
         spr = zone["sprites"][i]
         if spr[0] in EXIT_SPRITES:
@@ -95,8 +110,10 @@ def find_zone_with_type(item_types, query):
 def filter_zone(data, query):
     return [item for item in data if find_zone_with_type(item.get("type", []), query)]
 
-def simplify_query(base_query, bonus_query):
-    if bonus_query:
+def simplify_query(base_query, bonus_query, bonus_override_base=False):
+    if bonus_override_base:
+        return bonus_query
+    elif bonus_query:
         return ("AND", base_query, bonus_query)
     return base_query
 
