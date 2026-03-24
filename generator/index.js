@@ -60,6 +60,7 @@ function enableV2(){
     document.getElementById("exp_music").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_amb").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_patch").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_patch7g").disabled = !document.getElementById("exp_v2enable").checked;
     if(document.getElementById("exp_v2enable").checked){
         document.getElementById("exp_div_darkTypes").style.display = "block";
     }
@@ -425,7 +426,8 @@ function toJson(){
             "Music" : [musicList],
             "Ambient" : [ambList],
             "Patches" : {
-                "09-05 Pipe" : document.getElementById("exp_patch").checked
+                "09-05 Pipe" : document.getElementById("exp_patch").checked,
+                "07-21 Door" : document.getElementById("exp_patch7g").checked
             },
         }
     }
