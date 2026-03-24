@@ -5,7 +5,11 @@ var t_rand_sel = document.getElementById("t_rand_sel");
 
 var prevTab = "global";
 
-var lvlTypeList = {};
+var lvlTypeList = {
+    "World" : {},
+    "Stage" : {},
+    "Full" : {}
+};
 
 loadChangelog();
 document.getElementById("seed").value = Math.floor(Math.random()*(2147483647+2147483647))-2147483647;

@@ -18,8 +18,8 @@ function getGroupOption(name, isV2){
     else if(selectedVal=="same"){
         if(isV2){
             for(let lvlName of lvlJson_n[name]){
-                if(!(lvlName in lvlTypeList)) lvlTypeList[lvlName] = [name];
-                else lvlTypeList[lvlName].push(name);
+                if(!Object.hasOwn(lvlTypeList.Full, lvlName)){ lvlTypeList.Full[lvlName] = [name]; }
+                else{ lvlTypeList.Full[lvlName].push(name); }
             }
         }
         else{
