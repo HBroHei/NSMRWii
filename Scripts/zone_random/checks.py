@@ -22,6 +22,14 @@ def checkisCutsceneZone(zone):
             return spr
     return -1
 
+def checkAmbushSprite(zone):
+    AMBUSH_SPRITE = [185, 454]
+    for i in range(0,len(zone["sprites"])):
+        spr = zone["sprites"][i]
+        if spr[0] in AMBUSH_SPRITE:
+            return spr,i
+    return -1,-1
+
 def checkExitSprite(zone):
     EXIT_SPRITES = [203,113,434,412,428,211,363,383,405,406,407,479]
     for i in range(0,len(zone["sprites"])):
@@ -86,6 +94,11 @@ def find_zone_with_type(item_types, query):
 # Get list of zones based on the requested types
 def filter_zone(data, query):
     return [item for item in data if find_zone_with_type(item.get("type", []), query)]
+
+def simplify_query(base_query, bonus_query):
+    if bonus_query:
+        return ("AND", base_query, bonus_query)
+    return base_query
 
 # Find all the enterables and non-enterables
 def findExitEnt(zone):

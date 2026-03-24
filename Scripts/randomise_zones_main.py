@@ -51,6 +51,10 @@ def D_check_conditions(main_zone):
     # if "Pa0_jyotyuPa1_nohara" in area_tileset : input("Org tileset found")
     pass
 
+class NoSuitableZoneError(Exception):
+    def __init__(self, query):
+        super().__init__(f"Cannot find a suitable zone with requirment {query}")
+
 # Add data to the list of enterables / nonenterables
 def addEntranceData(areaNo : int, zoneToFind:list):
     assert type(zoneToFind)==list or type(zoneToFind)==dict
@@ -159,23 +163,7 @@ def genZone(query:list):
     if all_chosen_zones:
         chosen_zone = choice(all_chosen_zones)
         return chosen_zone, set(ba.decode() for ba in chosen_zone["tileset"][1:]), chosen_zone["type"]
-    return None, None, None
-
-    """
-    # First, get all zones that are a type in types_list
-    for cur_zone_type in types_list:
-        for tileset_lst in groupTilesetJson[cur_zone_type].values():
-            all_zones.extend(tileset_lst)
-    
-    # Then choose a zone from it
-    ret_zone = deepcopy(choice(all_zones))
-    ret_tileset = decodeTileset(ret_zone)
-    # Loop until a suitable tileset is found
-    while req_tileset!=tuple() and ret_tileset not in req_tileset:
-        ret_zone = deepcopy(choice(all_zones))
-        ret_tileset = decodeTileset(ret_zone)
-    """
-    return ret_zone, ret_tileset, ret_zone["type"]
+    raise NoSuitableZoneError(query)
 
 def getRandomEntrance(area_zone:list):
     area = choice(area_zone)
@@ -401,6 +389,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                         continue # Skip the zone
 
                 # Check zone has exit / entrances
+                ambush_flag, _dum = checks.checkAmbushSprite(cur_zone)
                 exit_flag,_dum = checks.checkExitSprite(cur_zone)
                 ent_flag = checks.checkEntSpawn(cur_zone) # Check if entrance is the area entrance
                 boss_flag,_dum = checks.checkBossSprite(cur_zone)
@@ -411,6 +400,8 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 lvl_type = ""
                 if boss_flag!=-1:
                     lvl_type = "exit"
+                elif ambush_flag!=-1:
+                    lvl_type = "ambush"
                 elif exit_flag!=-1 and zone_len_x<=2000 and zone_len_y<=1000:
                     lvl_type = "exit"
                 elif exit_flag!=-1 and ent_flag!=-1:
@@ -425,7 +416,9 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
 
                 # NOTE Add other types here
                 # Add group tags
-                cur_zone["type"] += globalVars.groupTag["full"].get(key_lvl, [])
+                cur_zone["type"] += globalVars.groupTag["Full"].get(key_lvl, [])
+                cur_zone["type"] += globalVars.groupTag["World"].get(key_lvl[0:2], [])
+                cur_zone["type"] += globalVars.groupTag["Stage"].get(key_lvl[3:5], [])
 
                 # Add to the list of all zones
                 all_stage_zones.append(cur_zone)
@@ -472,11 +465,21 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         only_main = False
         have_secret = stg_name in read_config.secret_exit
 
+        # Get the type the stage should be (Generate the query)
+        stage_query = []
+        if globalVars.groupTag["Full"].get(stg_name, []):
+            stage_query.append(["OR"] + globalVars.groupTag["Full"][stg_name])
+        if globalVars.groupTag["World"].get(stg_name, []):
+            stage_query.append(["OR"] + globalVars.groupTag["World"][stg_name])
+        if globalVars.groupTag["Stage"].get(stg_name, []):
+            stage_query.append(["OR"] + globalVars.groupTag["Stage"][stg_name])
+        if stage_query: stage_query.insert(0, "OR")
+
         # Generate the entrance zone
-        generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(("OR", "full", "entrance"))
+        generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query))
         if have_secret and "full" in gen_ent_zone_type: # If have secret and type full, check whether spawn zone has 2 or more enterables
             while len(checks.findExitEnt(generated_ent_zone)[0])<1:
-                generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(("OR", "full", "entrance"))
+                generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query))
 
         spawn_zone = deepcopy(generated_ent_zone)
         # Sprites randomisation
@@ -514,7 +517,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             # Also please make use of addRandomZone, it is capable of this stuff
             print("Determine exit")
             # Need an exit zone, and a "main" zone
-            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(("OR","full","exit"))
+            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(checks.simplify_query(("OR","full","exit","ambush"), stage_query))
         
             exit_zone = deepcopy(generated_exit_zone)
             print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset)
@@ -548,18 +551,15 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 area_zone[1].append(exit_zone)
                 area_tileset[1] = exit_tileset
                 addEntranceData(1,exit_zone)
-                normal_exit_zone_id = len(area_zone[1])-1
-                normal_exit_area_id = 1
                 area_len+=1
                 added_zone_area_no = 1
                 rando_priority_lst.append(1)
 
-            cutscene_zone_pos = (-1,-1)
             if exit_spr[0] in (406,407):
                 # Gets the linked cutscene zone
                 # cutscene_zone = deepcopy(groupTilesetJson["after_boss"][gen_exit_zone_tileset][0])
                 print(f"After boss: {gen_exit_zone_tileset}")
-                cutscene_zone, _dummy, __dummy = genZone(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)])
+                cutscene_zone, _dummy, __dummy = genZone(checks.simplify_query(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)], stage_query))
                 cutscene_zone["cutscene"] = ""
                 overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
@@ -572,10 +572,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                         new_y = overlap_zone[1]+overlap_zone[3]+480
                     if x_tot < y_tot: # Vertical zone
                         new_x = overlap_zone[0]+overlap_zone[2]+480
-
                     cutscene_zone = corrections.alignToPos(cutscene_zone,new_x,new_y,False)
-                # Check and correct duplicated zones
-                # cutscene_zone = corrections.corrDupID(added_zone_area_no,cutscene_zone)
                 # Surely this boss-dedicated scene would not have any other duplicates IDs
                 cutscene_zone = corrections.corrSprEntZone(cutscene_zone)
                 area_zone[added_zone_area_no].append(cutscene_zone)
@@ -589,7 +586,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
 
             # # Gets the random zone
             # main_zone = deepcopy(getRandomZone(main_tileset,"normal"))
-            generated_main_zone, gen_main_zone_tileset, gen_main_zone_type = genZone("normal")
+            generated_main_zone, gen_main_zone_tileset, gen_main_zone_type = genZone(checks.simplify_query("normal", stage_query))
         
             main_zone = deepcopy(generated_main_zone)
             main_tileset = gen_main_zone_tileset
@@ -598,15 +595,9 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 # If have secret, check whether main_zone has 2 or more enterables
                 # Or have 1 enterable and 1 exit, that works too
                 zone_type = ""
-                """
                 while len(checks.findExitEnt(main_zone)[0])<2 or (len(checks.findExitEnt(main_zone)[0])<1 and zone_type=="exit"):
-                    main_tileset, zone_type = getRandomTileset("normal","exit")
-                    # Prevent area without exit
-                    main_zone = deepcopy(getRandomZone(main_tileset,zone_type))
-                """
-                while len(checks.findExitEnt(main_zone)[0])<2 or (len(checks.findExitEnt(main_zone)[0])<1 and zone_type=="exit"):
-                    main_zone, main_tileset, gen_main_zone_type = genZone(("OR", "normal","exit"))
-                #if "Pa0_jyotyuPa1_noharaPa2_doukutu" in main_tileset: input(main_tileset)
+                    main_zone, main_tileset, gen_main_zone_type = genZone(checks.simplify_query(("OR", "normal","exit","ambush"), stage_query))
+
             # Sprites randomisation
             main_zone["sprites"],_dum,__dum =\
                 nsmbw.NSMBWsprite.processSprites(main_zone["sprites"],[])
@@ -665,7 +656,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 print("NEW ZONE NEEDED, PLEASE ADD CODE HERE")
                 print("Length of area_zone:",len(area_zone[0]),len(area_zone[1]),len(area_zone[2]),len(area_zone[3]))
                 # If there is an secret exit in this level, set type to "exit", and "full" otherwise
-                (added_area_no, is_new_tileset) = addRandomZone("exit" if have_secret else ["OR","entrance","bonus"])
+                (added_area_no, is_new_tileset) = addRandomZone(checks.simplify_query("exit" if have_secret else ["OR","entrance","bonus"], stage_query))
                 if added_area_no==None:
                     # Lets start over
                     # TODO Is this necessary anymore?
