@@ -20,7 +20,6 @@ rii_path = ""
 
 root = tk.Tk()
 root.title("NSMRW GUI")
-#root.geometry("500x300")
 
 # Override Exception handling
 def show_exception(*args):
@@ -51,6 +50,11 @@ def btn_config_onclick():
     f = filedialog.askopenfile()
     if f is None: return
     config_json = load(f)
+    if "Skip But Randomise" not in config_json or "Group Tag" not in config_json:
+        mb.showwarning("Missing parameters",'"Skip Bur Randomise" and / or "Group Tag" is missing from the config.json. ' \
+        'Make sure you have enabled "Version 2" in the generator. Try re-generating config.json from the generator above.')
+        config_json = {}
+        return
     lbl_config_sv.set(f"2. Loaded {f.name} as config.json")
     tb_seed_sv.set(config_json["Seed"])
     f.close()
@@ -92,6 +96,9 @@ def btn_userii_onclick():
 btn_userii = ttk.Button(root, text="Set Riivolution Path", state=tk.DISABLED, command=btn_userii_onclick)
 btn_userii.grid(row=4, column=1, sticky="e", padx=10, pady=5)
 
+frame_stage = tk.Frame(root)
+frame_stage.grid(row=5, column=1, padx=10)
+
 # Stage folder selection
 lbl_stage_sv = tk.StringVar()
 lbl_stage_sv.set("3. Select the \"Stage\" folder: ")
@@ -101,11 +108,23 @@ def btn_stage_onclick():
     global stage_path
     # Select directory for the "Stage" folder
     stage_path = filedialog.askdirectory() + "/"
-    lbl_stage_sv.set(f"3. Stage folder set to {stage_path}")
-    check_enable_start()
-    if config_json!={} and stage_path!="": btn_jsongen["state"] = "normal"
-btn_stage = ttk.Button(root, text="Select", command=btn_stage_onclick)
-btn_stage.grid(row=5, column=1, sticky="e", padx=10, pady=(10, 0))
+    if stage_path!="/":
+        lbl_stage_sv.set(f"3. Stage folder set to {stage_path}")
+        check_enable_start()
+        if config_json!={} and stage_path!="": btn_jsongen["state"] = "normal"
+btn_stage = ttk.Button(frame_stage, text="Select", command=btn_stage_onclick)
+btn_stage.pack(side="right")
+def btn_stagehelp_onclick():
+    mb.showinfo("What's this?", "This is a required folder that contains all the stages files (that can be edited using level-editing softwares).\n\n" \
+    "It can be obtained in various ways. As the process is the same as obtaining those files for level-editing in \"Reggie\" Level Editor," \
+    "\"Stage\" folder obtained for Reggie Level Editing can be used directly here.\n\n" \
+    "If the folder has not been obtained yet, follow the guide by clicking the \"Guide\"button. (No need to follow the next tutorial in that page.)")
+btn_stagehelp = ttk.Button(frame_stage, text="What is this?", command=btn_stagehelp_onclick)
+btn_stagehelp.pack(side="left")
+def btn_stageguide_onclick():
+    webbrowser.open("https://horizon.miraheze.org/wiki/Obtain_Original_Game_Files")
+btn_stageguide = ttk.Button(frame_stage, text="Guide", command=btn_stageguide_onclick)
+btn_stageguide.pack(side="left")
 
 lbl_stageinfo = ttk.Label(root,text="4. Choose one of a or b:")
 lbl_stageinfo.grid(row=6, columnspan=2, pady=(10,0))
@@ -167,6 +186,8 @@ def btn_start_onclick():
     pbar_dialog = tk.Toplevel(root)
     pbar_dialog.title("Randomising...")
     pbar_dialog.resizable(False,False)
+    lbl_loading = ttk.Label(pbar_dialog, text="Once the dialog is dismissed and no error occurs, your files will be ready.")
+    lbl_loading.pack()
     pbar = ttk.Progressbar(pbar_dialog, mode="indeterminate", length=200)
     config_json["Seed"] = int(tb_seed_sv.get())
 

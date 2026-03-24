@@ -102,7 +102,7 @@ def read(config_f, stage_f: str):
         ambientList = rulesDict["Ambient"]
     except KeyError:
         pass
-
+    
     groupTags = rulesDict["Group Tag"]
 
     # Add them all to the global vars list

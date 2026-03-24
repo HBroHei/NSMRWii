@@ -15,18 +15,7 @@ from pathlib import Path
 from os import listdir, getcwd
 
 inJson = {}
-"""
-groupTilesetJson = {
-    "normal" : defaultdict(list) , # No Entrance / Exit
-    "entrance" : defaultdict(list), # Have  Level entrance only
-    "full" : defaultdict(list), # Have both Level entrance and exit
-    "exit" : defaultdict(list), # Have Level exit only
-    "boss" : defaultdict(list), # Have Boss in zone
-    "after_boss" : defaultdict(list), # Castle / Airship Boss cutscene
-    "bonus" : defaultdict(list), # Only 1 entrance / same ent and exit
-    "count" : 0
-}
-"""
+
 all_stage_zones = []
 addedZone = {}
 
@@ -56,9 +45,6 @@ XML_PATH = "nsmb_randomizer.xml" if "nsmb_randomizer.xml" in listdir(getcwd()) e
 CONFIG_PATH = "./config.json" if "config.json" in listdir(getcwd()) else "./Scripts/config.json"
 
 isDebug = False
-
-def writeArea():
-    pass
 
 def D_check_conditions(main_zone):
     # if main_zone["orgLvl"]=="04-22.arc": input("1-1 found")
@@ -167,12 +153,6 @@ def addRandomZone(types: list):
     # Failsafe?
     return -1, False
     
-"""
-# NOTE This will NOT remove the zone from the list
-def getRandomZone(tilesetName:str, zone_type:str) -> dict:
-    ret_zone = deepcopy(choice(groupTilesetJson[zone_type][tilesetName]))
-    return ret_zone
-"""
 # Unbiased zone chooser
 def genZone(query:list):
     all_chosen_zones =  checks.filter_zone(all_stage_zones, query) # List of all suitable types
@@ -196,17 +176,7 @@ def genZone(query:list):
         ret_tileset = decodeTileset(ret_zone)
     """
     return ret_zone, ret_tileset, ret_zone["type"]
-"""
-def getRandomTileset(types_list:list):
-    type_used = choice(types_list)
-    return_tileset = []
-    # print("USE",groupTilesetJson[type_used])
-    while return_tileset==[]:
-        return_tileset = choice(tuple(groupTilesetJson[type_used].keys()))
-    print("Using",type_used,return_tileset)
-    # Seperating return statement since I never know I would be seperating them in the future
-    return return_tileset, type_used
-"""
+
 def getRandomEntrance(area_zone:list):
     area = choice(area_zone)
     while len(area)==0:
@@ -455,11 +425,10 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
 
                 # NOTE Add other types here
                 # Add group tags
-                cur_zone["type"] += globalVars.groupTag.get(key_lvl, [])
+                cur_zone["type"] += globalVars.groupTag["full"].get(key_lvl, [])
 
                 # Add to the list of all zones
                 all_stage_zones.append(cur_zone)
-                #groupTilesetJson[lvl_type][cur_tileset_str].append(cur_zone)
 
     # These will always be area 1, with exit zone as zone 0 in the level
     """
@@ -759,7 +728,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         #############################################
         ######## START RANDOMISING ENTRANCES ########
         #############################################
-        print("***START OF Entrance Randomisation***")
+        print("*** START OF Entrance Randomisation ***")
         print("Nonenterable list",area_nonenterable_count)
         print("   enterable list",area_enterable_count)
         print(f"PRIORITY LIST: {rando_priority_lst}")
@@ -767,9 +736,6 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         # Well first, if there are no enterables, we can skip all "these codes"
         if sum(area_enterable_count)!=0:
             # First is Area 1 (0), which is always the spawn of the level
-            cur_start_area = 0
-            cur_start_zone = 0
-            #cur_start_ent_pos = entrance_list[cur_start_area][cur_start_zone]["enterable"][-1]
             processed_enterable_id = [
                 [[] for _ in range(len(entrance_list[0]))],
                 [[] for _ in range(len(entrance_list[1]))],
@@ -782,28 +748,28 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             # Add nonents to the nonent list
             nonent_list = [[],[],[],[]]
             for area_id in range(0,4):
-                for zone_pos in range(0,len(area_zone[area_id])):
-                    if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
-                    # print("Dest Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
-                    nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]]
-                if len(nonent_list[area_id])==0: # FAilsafe to assign enterables for nonenterable in case there are no nonenterable
-                    for zone_pos in range(0,len(area_zone[area_id])):
-                        # print("Dest Ent Area",area_id,"Len",len(area_zone[area_id]),"Zone pos =",zone_pos)
+                processing_area = area_zone[area_id]
+                for zone_pos in range(0,len(processing_area)):
+                    if "cutscene" in processing_area[zone_pos]: continue # Skip cutscene zones
+                    zone_main_ent = tuple()
+                    for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]:
+                        # Check if nonent is the main entrance
+                        if processing_area[zone_pos]["AreaSetting"][0][6]!=processing_area[zone_pos]["entrance"][exit_pos][2]:
+                            nonent_list[area_id].append((zone_pos, exit_pos))
+                        else:
+                            zone_main_ent = (zone_pos, exit_pos)
+                    # Shuffle the nonent list
+                    shuffle(nonent_list[area_id])
+                    # Add zone main entrance to the top of the list
+                    if zone_main_ent: nonent_list[area_id].append(zone_main_ent)
+                    
+                if not nonent_list[area_id]: # Failsafe to assign enterables for nonenterable in case there are no nonenterable
+                    for zone_pos in range(0,len(processing_area)):
                         nonent_list[area_id] += [(zone_pos, exit_pos) for exit_pos in entrance_list[area_id][zone_pos]["enterable"]]
-                # print("NONENT LIST", area_id, nonent_list[area_id], len(area_zone[area_id]))
             nonent_list_backup = deepcopy(nonent_list) # Backup list in case the list got emptied
 
             # Assign entrances
             for area_id in (0,2,1,3):
-                try:
-                    # Set default level entrance
-                    area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
-                    # Set timer to a reasonable amount (700 for now)
-                    area_zone[area_id][0]["AreaSetting"][0][3] = 500
-                    # Set ambush flag off
-                    area_zone[area_id][0]["AreaSetting"][0][7] = False
-                except IndexError:
-                    pass
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
@@ -811,8 +777,8 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                         exit_found = False
                         # Check assigned
                         ent_key = str(area_id) + "_" + str(zone_pos) + "_" + str(entrance_pos)
-                        if ent_key in entrance_assign_list:
-                            continue
+                        if ent_key in entrance_assign_list: continue
+
                         # Get the dest area id
                         # Check if there are priority
                         if len(rando_priority_lst)==0:
@@ -834,61 +800,49 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                         # Check area have nonent
                         if len(nonent_list[dest_area_id])!=0:
                             # Exist - choose a nonent
-                            exit_key = choice(nonent_list[dest_area_id])
-                            # Set value to exit_key
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-                            
+                            exit_key = nonent_list[dest_area_id].pop()
                             exit_found = True
-                        # Check if it is priority. If true, choose ANY (enterable in this case) entrance in the area
+
+                        """# Check if it is priority. If true, choose ANY (enterable in this case) entrance in the area
                         elif len(rando_priority_lst)!=0:
                             exit_key=[]
-                            available_zones = tuple(zpos for zpos in range(len(area_zone[dest_area_id])) if len(area_zone[dest_area_id][zpos]["entrance"])!=0)
+                            available_zones = tuple(zpos for zpos in range(len(area_zone[dest_area_id])) if area_zone[dest_area_id][zpos]["entrance"])
                             for zpos in available_zones:
                                 for epos in range(len(area_zone[dest_area_id][zpos]["entrance"])):
                                     exit_key.append((zpos, epos))
-                            print("EXIT KEY",exit_key)
-                            # Set value to exit_key
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-                            
-                            exit_found = True
+                            print("2. EXIT KEY",exit_key)
+                            exit_found = True"""
+
                         # 3. Any Area (Last Resort)
                         if not exit_found:
                             available_choose_area = [a for a in range(0,4) if len(nonent_list[a])!=0]
                             dest_area_id = choice(available_choose_area if len(available_choose_area)!=0 else (0,))
                             print("RESORTING.", nonent_list[dest_area_id])
                             print("3. Area ID", dest_area_id)
-                            exit_key = choice(nonent_list[dest_area_id])
-                            # print("3. ENT key",ent_key)
-                            # print("3. EXIT key",exit_key)
-                            # print("3. AREA LEN", len(area_zone[dest_area_id]))
-                            # Set value to exit_key
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
-                            area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
-                            #             Area ID   Zone Pos                  Ent Pos
-                            exit_found = True
+                            exit_key = nonent_list[dest_area_id].pop()
 
-                            ## \/ TODO TO BE DELETED (code not reachable)
-                            if not exit_found:
-                                # Handle no exit found (e.g., add a new exit, adjust entrance, raise error)
-                                print(f"No suitable exit found for entrance: {ent_key}")
-                                # Esort to a random entrance at the exit area
-                                # TODO I wish there is a better way to handle this situation
-                                dest_area_id = 0
-                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
-                                area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
-                                    choice(area_zone[dest_area_id][0]["entrance"])[2]
-                            ## /\
+                        # Set value to exit_key
+                        area_zone[area_id][zone_pos]["entrance"][entrance_pos][3] = dest_area_id+1
+                        area_zone[area_id][zone_pos]["entrance"][entrance_pos][4] =\
+                            area_zone[dest_area_id][exit_key[0]]["entrance"][exit_key[1]][2]
+                        #             Area ID   Zone Pos                  Ent Pos
+
+                        # Check if it is set to Area entrance
+
                         # Remove available exit from list if there are still other exits available
-                        nonent_list[dest_area_id].remove(exit_key)
+                        # nonent_list[dest_area_id].remove(exit_key)
                         if len(nonent_list[dest_area_id])==0: nonent_list[dest_area_id] = deepcopy(nonent_list_backup[dest_area_id])
-                        # print("NONENT LIST", nonent_list[dest_area_id])
                         entrance_assign_list.append(ent_key)
-            
+                try:
+                    # Set default level entrance
+                    area_zone[area_id][0]["AreaSetting"][0][6] = area_zone[area_id][0]["entrance"][0][2]
+                    # Set timer to a reasonable amount (700 for now)
+                    area_zone[area_id][0]["AreaSetting"][0][3] = 500
+                    # Set ambush flag off
+                    area_zone[area_id][0]["AreaSetting"][0][7] = False
+                except IndexError:
+                    pass
+
         stg_i += 1
         # Why keeping track of area_len when I can just do this?
         area_len = len([area_add for area_add in area_zone if len(area_add)!=0])
@@ -899,7 +853,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        # if stg_name=="08-06.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
