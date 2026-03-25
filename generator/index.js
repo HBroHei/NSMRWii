@@ -58,6 +58,7 @@ function enableV2(){
     document.getElementById("exp_rockRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_lvlRand").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_music").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_progressive").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_amb").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_patch").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_patch7g").disabled = !document.getElementById("exp_v2enable").checked;
@@ -109,6 +110,19 @@ function toJson(){
     getGroupOption("ambush" , document.getElementById("exp_v2enable").checked);
     getGroupOption("cannon" , document.getElementById("exp_v2enable").checked);
     getGroupOption("toads"  , document.getElementById("exp_v2enable").checked);
+
+    // Progressive difficulty
+    if(document.getElementById("exp_v2enable").checked && document.getElementById("exp_progressive").checked){
+        createListIfNotExist(lvlTypeList.World, "01", ["easy"])
+        createListIfNotExist(lvlTypeList.World, "02", ["easy"])
+        createListIfNotExist(lvlTypeList.World, "03", ["easy","medium"])
+        createListIfNotExist(lvlTypeList.World, "04", ["medium"])
+        createListIfNotExist(lvlTypeList.World, "05", ["medium"])
+        createListIfNotExist(lvlTypeList.World, "06", ["medium","hard"])
+        createListIfNotExist(lvlTypeList.World, "07", ["hard"])
+        createListIfNotExist(lvlTypeList.World, "08", ["hard"])
+        createListIfNotExist(lvlTypeList.World, "09", ["hard"])
+    }
 
     var enemyVarients = {
         "60":["0000 0000 0000","0000 0000 0001"], // Spike top rando direction

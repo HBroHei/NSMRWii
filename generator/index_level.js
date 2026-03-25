@@ -10,6 +10,11 @@ function getSkipOption(name,ele){
     }
 }
 
+function createListIfNotExist(obj, prop, val){
+    if(Object.hasOwn(obj, prop)){ obj[prop].push(...val); }
+    else{ obj[prop] = val}
+}
+
 function getGroupOption(name, isV2){
     const selectedVal = document.querySelector(`input[name="skip_${name}"]:checked`).value;
     if(selectedVal=="skip"){
