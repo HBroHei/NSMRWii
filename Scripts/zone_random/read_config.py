@@ -65,9 +65,6 @@ def read(config_f, stage_f: str):
         print("Make sure you have enabled 'Version 2' in the Generator's Experimential Tab.")
         print("Levels not randomised. Exiting...")
         exit() # TODO Remove all of the above when V2 officially comes out
-    # for istr in rulesDict["Skip Level"]:
-    #     log += str("Processing [S]"+STG_TEMP + "/" + istr+"to"+STG_TEMP + "/" + istr + "\n")
-    #     shutil.move(STG_TEMP + "/" + istr,STG_OUT + "/" + istr)
 
     # Group blocks(Tiles)
     try:

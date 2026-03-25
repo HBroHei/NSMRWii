@@ -18,8 +18,10 @@ copy ..\process.html ..\..\release\
 copy randomise_zones_.py ..\..\release\Scripts\
 copy read_zones.py ..\..\release\Scripts\
 copy ..\README.md ..\..\release\
-copy start.bat ..\..\release\Scripts\
-copy start.sh ..\..\release\Scripts\
+copy start_cli.bat ..\..\release\Scripts\
+copy start_gui.bat ..\..\release\Scripts\
+copy start_cli.sh ..\..\release\Scripts\
+copy start_gui.sh ..\..\release\Scripts\
 copy u8_m.py ..\..\release\Scripts\
 copy Util.py ..\..\release\Scripts\
 copy nsmb_randomizer.xml ..\..\release\Scripts\
