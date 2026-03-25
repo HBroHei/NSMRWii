@@ -26,9 +26,16 @@ function getGroupOption(name, isV2){
                 if(!Object.hasOwn(lvlTypeList.Full, lvlName)){ lvlTypeList.Full[lvlName] = [name]; }
                 else{ lvlTypeList.Full[lvlName].push(name); }
             }
+            // TODO make it dynamic
+            if(name=="cannon"){ lvlTypeList["Zone Number Limit"][name] = 1; }
+            if(name=="toads"){ lvlTypeList["Zone Number Limit"][name] = 2; }
         }
         else{
             lvList_same.push(lvlJson_n[name]); // append array to array
         }
+    }
+    else if(selectedVal=="spec" && !isV2){
+        // Must be "secret" for now
+        lvList_same.push(lvlJson_n[name]);
     }
 }

@@ -8,7 +8,8 @@ var prevTab = "global";
 var lvlTypeList = {
     "World" : {},
     "Stage" : {},
-    "Full" : {}
+    "Full" : {},
+    "Zone Number Limit" : {}
 };
 
 loadChangelog();
