@@ -58,17 +58,7 @@ def alignToPos(zone,nx,ny,use_min = True):
                     break
         return []
     def clamp(val):
-        # if max(0, min(val, 16343))!=val:
-        #     print("Clamp used" + str(val))
-        #     input("This should not have beem called. Copy the last ~100 lines and report")
-        # return max(0, min(val, 16343))
         return val
-        if val<0:
-            return val + 16343
-        elif val>16343:
-            return val - 16343
-        else:
-            return val
     passes = 0
 
     if use_min:
@@ -90,23 +80,17 @@ def alignToPos(zone,nx,ny,use_min = True):
 
     while passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone
         or check_tile!=[]):
-        # for spr in zone["sprites"]:
-        #     if not (0<=spr[1]<=16384 and 0<=spr[2]<=16384):
-        #         print(spr,"failed")
-        #         break
-        # else:
-        #     print("All good")
-
         # We do not care if x + width / y + height exceeds limit as it does not overflow python
         zone["zone"][0] = clamp(zone["zone"][0] - diffx)
         zone["zone"][1] = clamp(zone["zone"][1] - diffy)
-        #print("New zone",zone["zone"],diffy)
+
         zone["sprites"] =\
             [[spr[0],clamp(spr[1] - diffx),clamp(spr[2] - diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
         zone["location"] =\
             [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
         zone["pathNode"] =\
             [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
+        
         for i in range(len(zone["entrance"])):
             zone["entrance"][i][0] = clamp(zone["entrance"][i][0] - diffx)
             zone["entrance"][i][1] = clamp(zone["entrance"][i][1] - diffy)
@@ -118,27 +102,18 @@ def alignToPos(zone,nx,ny,use_min = True):
             #  - Pipe: Check if divisible by 16: -8 if no
             if zone["entrance"][i][5] in (27,2): # Type == door
                 # Gets the door behind that ent (DISABLED)
-                # for j in door_lists:
-                #     print("Checking ", j, ":", zone["sprites"][j])
                 pass
             elif zone["entrance"][i][5] in (3,4,5,6,16,17,18,19): # Type==pipe
                 if zone["entrance"][i][0]%16 != 0:
                     zone["entrance"][i][0] -= 8
                 if zone["entrance"][i][1]%16 != 0:
                     zone["entrance"][i][1] -= 8
-        for layerNo in range(0,2):
+        for layerNo in range(0,3):
             curLayerStr = "bgdatL" + str(layerNo)
-            #print("checking",curLayerStr)
             if curLayerStr in zone:
-                #print("adjusting",curLayerStr)
                 zone[curLayerStr] =\
                     [[til[0],clamp(til[1] - diffx_tiles),clamp(til[2] - diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
         passes += 1
-        # if passes==1:
-        #     diffx = 160
-        #     diffy = 160
-        #     diffx_tiles = 10
-        #     diffy_tiles = 10
         if passes==100:
             print("Failed to align pos")
             exit()
@@ -306,6 +281,9 @@ def corrDupID(areaNo,re_zone):
                             # Check linked entrance
                             elif key_prop=="entrance":
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Entrance ID")
+                                if re_zone["AreaSetting"][0][6]==cur_id:
+                                    # input(f"Area SETTING Changing {re_zone["AreaSetting"][0][6]} to {new_id}")
+                                    re_zone["AreaSetting"][0][6] = new_id
                             # Check linked path
                             elif key_prop=="path":
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Path ID")

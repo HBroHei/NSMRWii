@@ -199,8 +199,9 @@ def btn_start_onclick():
         else:
             pbar_dialog.destroy()
             # This is so jank but it will do for now
-            if no_exception: mb.showinfo("Completed", f"Randomised stages has been saved to {rii_path if check_var.get() else "Stage_output"}")
+            if no_exception: mb.showinfo("Completed", f"If there is no error, randomised stages has been saved to {rii_path if check_var.get() else "Stage_output"}")
             else: no_exception = True
+            exit()
     # Function to start randomising, ran on a thread.
     def start_randomise(stage_json, config_json, stage_path, autocopy_config):
         try:
