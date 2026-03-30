@@ -254,8 +254,9 @@ def corrDupID(areaNo,re_zone):
                     used_ids[areaNo][key_prop] = set()
                     used_ids[areaNo][key_prop].add(cur_id)
             else: # First item is another list, Anything other than "zone" prop
+                area_setting_set = False # Special variable to track if AreaSetting Entrance has been set
                 for zone_item in zone_prop_lst:
-                    cur_id = zone_item[id_position] % 32 # No way there are 32 entrances
+                    cur_id = zone_item[id_position]# % 32 # No way there are 32 entrances
                     keyErrored = False
 
                     # Check if set is found
@@ -267,12 +268,11 @@ def corrDupID(areaNo,re_zone):
                         keyErrored = True
                     # Set found - check for potential duplicates
                     if not keyErrored:
-                        #print("AREA NO", areaNo, key_prop, used_ids[areaNo][key_prop], "checking", cur_id)
                         # Check in duplicated list
                         if cur_id in used_ids[areaNo][key_prop]:
                             # Generate another ID
                             new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                            print(f"Duplicated {key_prop}, ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
+                            # print(f"Duplicated {key_prop}, ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
                             zone_item[id_position] = new_id
                             # Check linked locations
                             if key_prop=="location":
@@ -281,9 +281,10 @@ def corrDupID(areaNo,re_zone):
                             # Check linked entrance
                             elif key_prop=="entrance":
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Entrance ID")
-                                if re_zone["AreaSetting"][0][6]==cur_id:
-                                    # input(f"Area SETTING Changing {re_zone["AreaSetting"][0][6]} to {new_id}")
+                                if re_zone["AreaSetting"][0][6]==cur_id and not area_setting_set:
+                                    print(f"Area SETTING Changing {re_zone["AreaSetting"][0][6]} to {new_id}")
                                     re_zone["AreaSetting"][0][6] = new_id
+                                    area_setting_set = True
                             # Check linked path
                             elif key_prop=="path":
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Path ID")

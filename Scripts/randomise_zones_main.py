@@ -91,7 +91,6 @@ def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:set, area_zone
         elif x_tot < y_tot:  # Vertical zone
             new_x = overlap_zone[0] + overlap_zone[2] + 480
         
-        #print("Is X , Y", x_tot, y_tot)
         main_zone = corrections.alignToPos(main_zone, new_x, new_y, False)
         
     # Check and correct duplicated zones
@@ -101,9 +100,10 @@ def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:set, area_zone
     # Check if more tilesets needed to be loaded
     cur_zone_tileset = set(ba.decode() for ba in main_zone["tileset"][1:])
     # Check if tileset name needs to be replaced
-    if do_replace_tileset and len(area_zone[area_id])>0:#(cur_zone_tileset!=cur_area_tileset[area_id] and len(area_zone[area_id])!=0):
+    if do_replace_tileset:
         cur_area_tileset[area_id] = cur_zone_tileset
-        area_zone[area_id][0]["tileset"] = deepcopy(main_zone["tileset"])
+        # If there aready exist a zone in the area, update it as well
+        if area_zone[area_id]: area_zone[area_id][0]["tileset"] = deepcopy(main_zone["tileset"])
     area_zone[area_id].append(main_zone)
     # Add entrances in zone to list of entrances
     addEntranceData(area_id, main_zone)
@@ -130,7 +130,7 @@ def addRandomZone(types: list):
         print("Cannot find suitable zone")
         return None, False
     
-    print("[D] Extra zone =", generated_zone["orgLvl"], generated_zone["zone"])
+    print("[D] Extra zone =", generated_zone["orgLvl"], generated_zone["zone"], gen_zone_tileset)
     D_count_levelzone(generated_zone["orgLvl"])
     generated_zone["sprites"], _dum, __dum = nsmbw.NSMBWsprite.processSprites(generated_zone["sprites"], [])
     
@@ -148,7 +148,7 @@ def addRandomZone(types: list):
         if (not area_tileset[idx]) or (gen_zone_tileset.issubset(area_tileset[idx])) or (area_tileset[idx].issubset(gen_zone_tileset)):
             # Check if overrride needed
             # TODO This is already being done in handle_zone_overlap so ???
-            if area_tileset[idx].issubset(gen_zone_tileset): area_tileset[idx] = gen_zone_tileset
+            # if area_tileset[idx].issubset(gen_zone_tileset): area_tileset[idx] = gen_zone_tileset
             # Use handle_zone_overlap to manage overlap
             generated_zone = handle_zone_overlap(area_tileset[idx].issubset(gen_zone_tileset), area_tileset, area_zone, generated_zone, idx)
             
@@ -552,7 +552,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             if (not area_tileset[0]) or exit_tileset.issubset(area_tileset[0]) or area_tileset[0].issubset(exit_tileset):
                 # Check if area_tileset[0] is a subset of exit_tileset
                 # TODO again, this is already being done in the following function so even more ?????
-                if area_tileset[0].issubset(exit_tileset): area_tileset[0] = exit_tileset
+                # if area_tileset[0].issubset(exit_tileset): area_tileset[0] = exit_tileset
                 exit_zone = handle_zone_overlap(area_tileset[0].issubset(exit_tileset), area_tileset, area_zone, exit_zone, 0)
                 added_zone_area_no = 0
             else:
@@ -627,11 +627,11 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 if (not area_tileset[0]) or area_tileset[0].issubset(main_tileset) or main_tileset.issubset(area_tileset[0]):
                     # check subset tileset
                     # TODO AGAIN????????????
-                    if area_tileset[0].issubset(main_tileset): area_tileset[0] = main_tileset
+                    # if area_tileset[0].issubset(main_tileset): area_tileset[0] = main_tileset
                     main_zone = handle_zone_overlap(area_tileset[0].issubset(main_tileset), area_tileset, area_zone, main_zone, 0)
                 elif (not area_tileset[1]) or area_tileset[1].issubset(main_tileset) or main_tileset.issubset(area_tileset[1]):
-                    if area_tileset[1].issubset(main_tileset): area_tileset[1] = main_tileset # TODO yes, it is this again
-                    main_zone = handle_zone_overlap(area_tileset[0].issubset(main_tileset), area_tileset, area_zone, main_zone, 1)
+                    # if area_tileset[1].issubset(main_tileset): area_tileset[1] = main_tileset # TODO yes, it is this again
+                    main_zone = handle_zone_overlap(area_tileset[1].issubset(main_tileset) or not area_tileset[1], area_tileset, area_zone, main_zone, 1)
                 else:  # Esort to Area 3 I guess
                     main_zone = corrections.alignToPos(main_zone, *tilePosToObjPos((32, 32)))
                     main_zone = corrections.corrDupID(2, main_zone)
@@ -754,22 +754,24 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             nonent_list = [[],[],[],[]]
             for area_id in range(0,4):
                 processing_area = area_zone[area_id]
+                zone_main_ent = []
                 for zone_pos in range(0,len(processing_area)):
                     if "cutscene" in processing_area[zone_pos]: continue # Skip cutscene zones
-                    zone_main_ent = tuple()
                     for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]:
+                        print(f"Area {area_id+1} Zone {zone_pos} Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
                         # Check if nonent is the main entrance
-                        if processing_area[zone_pos]["AreaSetting"][0][6]!=processing_area[zone_pos]["entrance"][exit_pos][2]:
-                            print(f"Area Zone Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
-                            nonent_list[area_id].append((zone_pos, exit_pos))
+                        if (area_id!=0 or (area_id==0 and zone_pos!=0)) and processing_area[zone_pos]["AreaSetting"][0][6]==processing_area[zone_pos]["entrance"][exit_pos][2]:
+                            print("APPEND")
+                            zone_main_ent.append((zone_pos, exit_pos))
                         else:
-                            zone_main_ent = (zone_pos, exit_pos)
-                    # Shuffle the nonent list
-                    shuffle(nonent_list[area_id])
-                    # Add zone main entrance to the top of the list
-                    if zone_main_ent:
-                        print("zone_main_ent", processing_area[zone_main_ent[0]]["entrance"][zone_main_ent[1]])
-                        nonent_list[area_id].append(zone_main_ent)
+                            nonent_list[area_id].append((zone_pos, exit_pos))
+                # Shuffle the nonent list
+                shuffle(nonent_list[area_id])
+                # Add zone main entrance to the top of the list
+                if zone_main_ent:
+                    # print("zone_main_ent", zone_main_ent)
+                    nonent_list[area_id] += zone_main_ent
+                    print(f"{area_id} list is {nonent_list[area_id]}")
                     
                 if not nonent_list[area_id]: # Failsafe to assign enterables for nonenterable in case there are no nonenterable
                     for zone_pos in range(0,len(processing_area)):
@@ -861,7 +863,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="01-01.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
