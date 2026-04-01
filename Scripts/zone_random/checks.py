@@ -166,14 +166,22 @@ def checkPosInSpecificPos(hostPos, sprPos, width=0, height=0) -> int: # May also
 
 def checkPosInSpecificZone(zoneDat, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
     # for every zone, Check X pos, then Y pos
-    #print("POS",zoneDat[1]+zoneDat[3]+16,sprPos[1])
     #              Min X                       Max X = min x + width
-    return sprPos[0]+width>=(zoneDat[0]-(16**2)) and sprPos[0]<=(zoneDat[0]+zoneDat[2]+(16**2))\
-        and sprPos[1]+height>=(zoneDat[1]-(16**2)) and sprPos[1]<=(zoneDat[1]+zoneDat[3]+(16**2))
-def checkPosInZone(zoneData, sprPos, width=0, height=0) -> int:
+    #      Zone 1 occupies  Zone 2 + padding         Zone 1     Zone 2 + padding
+    return sprPos[0]+width>=(zoneDat[0]-(16**2)), sprPos[0]<=(zoneDat[0]+zoneDat[2]+(16**2)),\
+        sprPos[1]+height>=(zoneDat[1]-(16**2)), sprPos[1]<=(zoneDat[1]+zoneDat[3]+(16**2))
+
+def checkPosInZone(zoneData, sprPos, width=0, height=0) -> list:
+    new_pos = sprPos + [width, height]
     # for every zone, Check X pos, then Y pos
     for i in range(0,len(zoneData)):
         zoneDat = zoneData[i]["zone"]
-        if checkPosInSpecificZone(zoneDat,sprPos,width,height):
-            return i
-    return -1
+        oxmin, oxmax, oymin, oymax = checkPosInSpecificZone(zoneDat,new_pos[0:2],new_pos[2],new_pos[3])
+        if oxmin and oxmax and oymin and oymax:
+            y_tot = zoneDat[1] + zoneDat[3] + 64 + new_pos[3]
+            x_tot = zoneDat[0] + zoneDat[2] + 64 + new_pos[2]
+            if x_tot >= y_tot:  # Horizontal zone
+                new_pos[1] = zoneDat[1] + zoneDat[3] + 480 # Place under old zone
+            else:  # Vertical zone
+                new_pos[0] = zoneDat[0] + zoneDat[2] + 480 # Place next to old zone
+    return new_pos

@@ -73,25 +73,25 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     area_nonenterable_count[areaNo] += len(allNonEnt)
 
 def handle_zone_overlap(do_replace_tileset:bool, cur_area_tileset:set, area_zone: list, main_zone: dict, area_id: int):
-    overlap_zone_no = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
+    # Check which zone it overlaps
+    new_zone_pos = checks.checkPosInZone(area_zone[area_id], main_zone["zone"][0:2], *main_zone["zone"][2:4])
 
     D_check_conditions(main_zone)
-
+    """
     if overlap_zone_no != -1:
-        # print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
+        print("Overlap with ZONE", overlap_zone_no, len(area_zone[area_id]))
         overlap_zone = area_zone[area_id][overlap_zone_no]["zone"]
         
-        new_x = 512
-        new_y = 512
-        y_tot = overlap_zone[1] + overlap_zone[3] + 64 + main_zone["zone"][3]
-        x_tot = overlap_zone[0] + overlap_zone[2] + 64 + main_zone["zone"][2]
-        
         if x_tot > y_tot:  # Horizontal zone
-            new_y = overlap_zone[1] + overlap_zone[3] + 480
+            new_y = overlap_zone[1] + overlap_zone[3] + 480 # Place under old zone
+            print(f"X>Y {overlap_zone[1]} + {overlap_zone[3]} = {overlap_zone[1] + overlap_zone[3]}")
         elif x_tot < y_tot:  # Vertical zone
-            new_x = overlap_zone[0] + overlap_zone[2] + 480
-        
-        main_zone = corrections.alignToPos(main_zone, new_x, new_y, False)
+            new_x = overlap_zone[0] + overlap_zone[2] + 480 # Place next to old zone
+    """
+
+    print(f"New Pos: {new_zone_pos}")
+
+    main_zone = corrections.alignToPos(main_zone, new_zone_pos[0], new_zone_pos[1], False)
         
     # Check and correct duplicated zones
     main_zone = corrections.corrDupID(area_id, main_zone)
@@ -473,10 +473,10 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         zone_limit = 10 # Temp number
         if globalVars.groupTag["Full"].get(stg_name, []):
             stage_query.append(["OR"] + globalVars.groupTag["Full"][stg_name])
-        if globalVars.groupTag["World"].get(stg_name, []):
-            stage_query.append(["OR"] + globalVars.groupTag["World"][stg_name])
-        if globalVars.groupTag["Stage"].get(stg_name, []):
-            stage_query.append(["OR"] + globalVars.groupTag["Stage"][stg_name])
+        if globalVars.groupTag["World"].get(stg_name[0:2], []):
+            stage_query.append(["OR"] + globalVars.groupTag["World"][stg_name[0:2]])
+        if globalVars.groupTag["Stage"].get(stg_name[3:4], []):
+            stage_query.append(["OR"] + globalVars.groupTag["Stage"][stg_name[3:4]])
         if stage_query:
             # Check zone limit
             for t in [t2 for tl in stage_query for t2 in tl]:
@@ -485,7 +485,9 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                     stage_query = t
                     break
             else:
-                stage_query.insert(0, "OR")
+                stage_query.insert(0, "AND")
+
+        print(stage_query)
 
         # Generate the entrance zone
         generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query, zone_limit==1))
@@ -518,7 +520,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         area_zone[0].append(spawn_zone)
         area_tileset[0] = gen_ent_zone_tileset
         zoneAddedNo += 1 # Number of zones added
-        print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"], decodeTileset(spawn_zone))
+        print("[D] Ent zone from", area_zone[0][-1]["orgLvl"] ,"data =",area_zone[0][-1]["zone"], decodeTileset(spawn_zone), area_zone[0][-1]["type"])
         D_count_levelzone(area_zone[0][-1]["orgLvl"])
 
         D_check_conditions(spawn_zone)
@@ -531,7 +533,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(checks.simplify_query(("OR","full","exit","ambush","cannon"), stage_query))
         
             exit_zone = deepcopy(generated_exit_zone)
-            print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset)
+            print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset, exit_zone["type"])
             D_count_levelzone(exit_zone["orgLvl"])
             # Change Flagpole type to normal
             exit_spr,exit_spr_pos = checks.checkAllExitSprite(exit_zone)
@@ -570,7 +572,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 # Gets the linked cutscene zone
                 # cutscene_zone = deepcopy(groupTilesetJson["after_boss"][gen_exit_zone_tileset][0])
                 print(f"After boss: {gen_exit_zone_tileset}")
-                cutscene_zone, _dummy, __dummy = genZone(checks.simplify_query(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)], stage_query))
+                cutscene_zone, _dummy, __dummy = genZone(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)])
                 cutscene_zone["cutscene"] = ""
                 overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
                 if overlap_zone_no!=-1:
@@ -618,7 +620,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 for lay_i in range(0,3):
                     if "bgdatL"+str(lay_i) in main_zone:
                         main_zone["bgdatL"+str(lay_i)] = nsmbw.NSMBWbgDat.processTiles(main_zone["bgdatL"+str(lay_i)])
-                print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"], main_tileset)
+                print("[D] Main zone from", main_zone["orgLvl"] , "data =",main_zone["zone"], main_tileset, main_zone["type"])
                 main_zone["zone"] = nsmbw.NSMBWZones.processZones(main_zone["zone"])
                 main_zone["tileset"] = nsmbw.NSMBWtileset.processTileset(main_zone["tileset"])
                 D_check_conditions(main_zone)
@@ -758,10 +760,9 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 for zone_pos in range(0,len(processing_area)):
                     if "cutscene" in processing_area[zone_pos]: continue # Skip cutscene zones
                     for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]:
-                        print(f"Area {area_id+1} Zone {zone_pos} Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
+                        # print(f"Area {area_id+1} Zone {zone_pos} Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
                         # Check if nonent is the main entrance
                         if (area_id!=0 or (area_id==0 and zone_pos!=0)) and processing_area[zone_pos]["AreaSetting"][0][6]==processing_area[zone_pos]["entrance"][exit_pos][2]:
-                            print("APPEND")
                             zone_main_ent.append((zone_pos, exit_pos))
                         else:
                             nonent_list[area_id].append((zone_pos, exit_pos))
@@ -863,7 +864,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="01-03.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
