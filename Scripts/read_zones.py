@@ -1,13 +1,17 @@
 ##### FILE FOR TESTING ONLY. NEW FILE WILL BE CREATED FOR ACTUAL USE #####
 
 import json
-from os import listdir
+from os import listdir, getcwd
 from copy import deepcopy
 
 import u8_m
 import nsmbw
 import globalVars
 from Util import tilePosToObjPos, convertToJson
+
+CONFIG_PATH = "./config.json" if "config.json" in listdir(getcwd()) else "./Scripts/config.json"
+STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
+# OUTJSON_PATH = "./stage.json" if "stage.json" in listdir(getcwd()) else "./Scripts/stage.json"
 
 outJson = dict()
 lvlSetting_arr = []
@@ -110,10 +114,14 @@ def process(rulesDict, stage_path = "./Stage"):
         for i in range(1,areaNo+1):
             lvlSetting_raw = nsmbw.readDef(u8list["course"+ str(i) +".bin"]["Data"])
             readAllSettings(lvlSetting_raw)
-            if rulesDict["Patches"]["09-05 Pipe"] and filename=="09-05.arc":
-                print("Patching 09-05.arc")
+            if rulesDict["Patches"]["Pipe Normal Correction"] and filename in ("09-05.arc", "02-05.arc"):
                 for ent in entrances:
-                    if ent[2]==2: ent[5] = 4
+                    if ent[2]==2 and filename=="09-05.arc":
+                        print(f"Patching Pipes in {filename}")
+                        ent[5] = 4
+                    elif ent[2]==1 and i==2 and filename=="02-05.arc":
+                        print(f"Patching Pipes in {filename}")
+                        ent[5] = 4
             elif rulesDict["Patches"]["07-21 Door"] and filename=="07-21.arc" and i==3:
                 print("Patching 07-21.arc")
                 for ent in entrances:
@@ -180,11 +188,11 @@ def process(rulesDict, stage_path = "./Stage"):
 
 
 def main():
-    rf = open("config.json")
+    rf = open(CONFIG_PATH)
     rulesDict = json.loads(rf.read())
     rf.close()
 
-    outJson = process(rulesDict)
+    outJson = process(rulesDict, STAGE_DIR)
     with open('stage.json', 'w', encoding='utf-8') as f:
         if not jsonBeauty:
             json.dump(convertToJson(outJson), f)

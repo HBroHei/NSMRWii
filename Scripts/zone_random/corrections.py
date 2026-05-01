@@ -31,6 +31,7 @@ used_ids_sprites = [defaultdict(list),defaultdict(list),defaultdict(list),defaul
 new_ids_sprites = [defaultdict(int),defaultdict(int),defaultdict(int),defaultdict(int)]
 
 used_ids = [{},{},{},{}]
+conflict_ids = [{},{},{},{}]
 
 DOOR_TYPE_3X2 = 0
 DOOR_TYPE_BOSS = 1
@@ -179,13 +180,8 @@ def alignToPos(zone,nx,ny,use_min = True):
 def corrSprEntZone(cur_zone):
     for j in range(0,len(cur_zone["sprites"])):
         cur_zone["sprites"][j][4] = cur_zone["zone"][6]
-    # for j in range(0,len(cur_zone["entrance"])):
-    #     print(f"Corrected from {cur_zone["entrance"][j]} to {cur_zone["zone"]}")
-    #     cur_zone["entrance"][j][6] = cur_zone["zone"][6]
-    #     print(f"Corrected to {cur_zone["entrance"][j]}")
     return cur_zone
     
-
 
 ### DUPLICATE REMOVAL THINGS ###
 # I can't decide if using AI or thinking abt the algorithm and writing code by myself is faster lol but still, thanks AI
@@ -198,12 +194,13 @@ def generate_unique_id(used_ids, key_prop):
     # loop until the id is not duplicated
     while new_id in used_ids:
         new_id += 1
+        # print(f"{key_prop} - New ID: is {new_id} in {used_ids}?")
         # Check if the requested ID has a limit of 16 max IDs and the new ID exceed 16
         # Also have it pass if it already looped around
         if key_prop in ID_MATCH_LIMIT16 and new_id>15 and failsafe_count<=2:
             failsafe_count+=1
             new_id = 0
-    if failsafe_count>1: input(f"FAILSAFE ACTIVATED {failsafe_count} TIMES")
+    if failsafe_count>1: print(f"FAILSAFE ACTIVATED {failsafe_count} TIMES")
     return new_id
 
 def update_references(data_list, position, old_id, new_id):
@@ -218,75 +215,78 @@ def update_references(data_list, position, old_id, new_id):
 def corrDupID(areaNo,re_zone):
     global used_ids_sprites
 
+    # For each property in zones, add all the IDs
+    for key_prop, zone_prop_lst in re_zone.items():
+        # IF there is stuff inside the list
+        if isinstance(zone_prop_lst, list) and len(zone_prop_lst) > 0:
+            # Check which position is the id
+            if key_prop not in ID_POS_LOOKUP: continue # No id need to replace - skip
+            id_position = ID_POS_LOOKUP[key_prop]
+
+            if key_prop=="zone": # The first item is not another list, Should be "zone"
+                cur_id = zone_prop_lst[id_position]
+                addID(areaNo, key_prop, cur_id)
+            else: # First item is another list, Anything other than "zone" prop
+                for zone_item in zone_prop_lst:
+                    cur_id = zone_item[id_position]
+                    # Add id to the list of used IDs
+                    addID(areaNo,key_prop,cur_id)
+
     # For each property in zones
     for key_prop, zone_prop_lst in re_zone.items():
         # IF there is stuff inside the list
         if isinstance(zone_prop_lst, list) and len(zone_prop_lst) > 0:
             # Check which position is the id
-            try:
-                id_position = ID_POS_LOOKUP[key_prop]
-            except KeyError:
-                # No id needed to replace - skip
-                continue
-            references = tuple()
-            try:
-                references = ID_REF_LOOKUP[key_prop]
-            except KeyError:
-                # May not have ref
-                print("Info: Cannot find ref",key_prop)
-                pass
+            if key_prop not in ID_POS_LOOKUP: continue # No id need to replace - skip
+            id_position = ID_POS_LOOKUP[key_prop]
+            
+            references = ID_REF_LOOKUP.get(key_prop, tuple())
+            # try:
+            #     references = ID_REF_LOOKUP[key_prop]
+            # except KeyError:
+            #     # May not have ref
+            #     print("Info: Cannot find ref",key_prop)
+            #     pass
+
             if key_prop=="zone": # The first item is not another list, Should be "zone"
                 cur_id = zone_prop_lst[id_position]
                 # Check if there is any zone exist
-                if key_prop in used_ids[areaNo] and cur_id in used_ids[areaNo][key_prop]:
+                if key_prop in conflict_ids[areaNo] and cur_id in conflict_ids[areaNo][key_prop]:
                     # Check in duplicated list
                     new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                    print(f"duplicated {key_prop,cur_id,used_ids[areaNo][key_prop]}, new ID = {new_id}")
                     zone_prop_lst[id_position] = new_id
                     # Change other referenced items 
                     (ref_type, ref_pos) = references
-                    print("REFERENCE", references)
                     update_references(re_zone[ref_type], ref_pos, cur_id, new_id)
                     cur_id = new_id # In the future make this better
-                try:
-                    used_ids[areaNo][key_prop].add(cur_id)
-                except KeyError:
-                    used_ids[areaNo][key_prop] = set()
-                    used_ids[areaNo][key_prop].add(cur_id)
+                addID(areaNo, key_prop, cur_id)
+                    
             else: # First item is another list, Anything other than "zone" prop
                 area_setting_set = False # Special variable to track if AreaSetting Entrance has been set
                 for zone_item in zone_prop_lst:
-                    cur_id = zone_item[id_position]# % 32 # No way there are 32 entrances
-                    keyErrored = False
+                    cur_id = zone_item[id_position]
 
                     # Check if set is found
-                    try:
-                        used_ids[areaNo][key_prop]
-                    except KeyError:
-                        # No set found implies no duplicates
-                        used_ids[areaNo][key_prop] = set()
-                        keyErrored = True
-                    # Set found - check for potential duplicates
-                    if not keyErrored:
+                    if key_prop not in conflict_ids[areaNo]: continue
+                        # conflict_ids[areaNo][key_prop] = set()
+                    else:  # Set found - check for potential duplicates
                         # Check in duplicated list
-                        if cur_id in used_ids[areaNo][key_prop]:
+                        if cur_id in conflict_ids[areaNo][key_prop]:
                             # Generate another ID
                             new_id = generate_unique_id(used_ids[areaNo][key_prop], key_prop)
-                            # print(f"Duplicated {key_prop}, ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
+                            print(f"Duplicated {key_prop}, ID {cur_id}, Used IDs {used_ids[areaNo][key_prop]}. Assigned new ID {new_id}")
                             zone_item[id_position] = new_id
-                            # Check linked locations
-                            if key_prop=="location":
+
+                            if key_prop=="location":  # Check linked locations
                                 #input(f"==================Updated location {cur_id}->{new_id}==========================")
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Location ID")
-                            # Check linked entrance
-                            elif key_prop=="entrance":
+                            elif key_prop=="entrance":  # Check linked entrance
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Entrance ID")
                                 if re_zone["AreaSetting"][0][6]==cur_id and not area_setting_set:
                                     print(f"Area SETTING Changing {re_zone["AreaSetting"][0][6]} to {new_id}")
                                     re_zone["AreaSetting"][0][6] = new_id
                                     area_setting_set = True
-                            # Check linked path
-                            elif key_prop=="path":
+                            elif key_prop=="path":  # Check linked path
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Path ID")
 
                             if len(references)!=0:
@@ -384,29 +384,28 @@ def update_spr_value(re_zone_sprites, old_value, new_value, id_type):
                         changeNibbleAt(re_zone_sprites[i][3],ID_MATCH_TABLE[id_type][f"D{SPR_ID[1]}"],new_value)
     return re_zone_sprites
 
-
-# Alright but these are written by myself okay?
 # Add the IDs to the list of repeated IDs
 def addID(areaNo,key,cur_id):
-    try:
-        used_ids[areaNo][key].add(cur_id)
-    except KeyError:
+    # Check if set initalised
+    if key not in used_ids[areaNo]:
         used_ids[areaNo][key] = set()
+
+    # Check for conflict
+    if cur_id in used_ids[areaNo][key]:
+        try:
+            conflict_ids[areaNo][key].add(cur_id)
+        except KeyError:
+            conflict_ids[areaNo][key] = set()
+            conflict_ids[areaNo][key].add(cur_id)
+    else:
         used_ids[areaNo][key].add(cur_id)
 
-# THIS ISNT USED FOR ANYTHING
-def addIDsFromZone(areaNo,zone):
-    for key,value in zone.items():
-        try:
-            addID(areaNo,key,value)
-        except KeyError:
-            # No id needed to replace - skip
-            continue
-
-
+# Reset all the variables
+# Not ideal but works
 def reset_vars():
-    global used_ids_sprites, new_ids_sprites, used_ids
+    global used_ids_sprites, new_ids_sprites, used_ids, conflict_ids
     used_ids_sprites = [defaultdict(list),defaultdict(list),defaultdict(list),defaultdict(list)]
     new_ids_sprites = [defaultdict(int),defaultdict(int),defaultdict(int),defaultdict(int)]
 
     used_ids = [{},{},{},{}]
+    conflict_ids = [{},{},{},{}]

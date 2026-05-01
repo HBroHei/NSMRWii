@@ -38,7 +38,7 @@ u8_files_list = []
 
 STAGE_OUT_DIR = "./Stage_output/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage_output/"
 STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
-OUTJSON_PATH = "./out.json" if "out.json" in listdir(getcwd()) else "./Scripts/out.json"
+OUTJSON_PATH = "./stage.json" if "stage.json" in listdir(getcwd()) else "./Scripts/stage.json"
 XML_PATH = "nsmb_randomizer.xml" if "nsmb_randomizer.xml" in listdir(getcwd()) else "./Scripts/nsmb_randomizer.xml"
 
 #STAGE_DIR = "./Stage/" if "Stage" in listdir(getcwd()) else "./Scripts/Stage/"
@@ -487,7 +487,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             else:
                 stage_query.insert(0, "AND")
 
-        print(stage_query)
+        print(f"Stage requires: {stage_query}")
 
         # Generate the entrance zone
         generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query, zone_limit==1))
@@ -530,7 +530,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
             # Also please make use of addRandomZone, it is capable of this stuff
             print("Determine exit")
             # Need an exit zone, and a "main" zone
-            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(checks.simplify_query(("OR","full","exit","ambush","cannon"), stage_query))
+            generated_exit_zone, gen_exit_zone_tileset, gen_exit_zone_type = genZone(checks.simplify_query(("OR","exit","ambush","cannon"), stage_query))
         
             exit_zone = deepcopy(generated_exit_zone)
             print("[D] Exit zone from", exit_zone["orgLvl"] , "data =",exit_zone["zone"], gen_exit_zone_tileset, exit_zone["type"])
@@ -574,18 +574,18 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 print(f"After boss: {gen_exit_zone_tileset}")
                 cutscene_zone, _dummy, __dummy = genZone(["AND", "after_boss", ("TILE", gen_exit_zone_tileset)])
                 cutscene_zone["cutscene"] = ""
-                overlap_zone_no = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
-                if overlap_zone_no!=-1:
-                    overlap_zone = area_zone[added_zone_area_no][overlap_zone_no]["zone"]
-                    new_x = 512
-                    new_y = 512
-                    y_tot = overlap_zone[1]+overlap_zone[3]+64+cutscene_zone["zone"][3]
-                    x_tot = overlap_zone[0]+overlap_zone[2]+64+cutscene_zone["zone"][2]
-                    if x_tot > y_tot: # Horizontal zone
-                        new_y = overlap_zone[1]+overlap_zone[3]+480
-                    if x_tot < y_tot: # Vertical zone
-                        new_x = overlap_zone[0]+overlap_zone[2]+480
-                    cutscene_zone = corrections.alignToPos(cutscene_zone,new_x,new_y,False)
+                new_zone_pos = checks.checkPosInZone(area_zone[added_zone_area_no], cutscene_zone["zone"][1:3], *cutscene_zone["zone"][3:5])
+                # if overlap_zone_no!=-1:
+                #     overlap_zone = area_zone[added_zone_area_no][overlap_zone_no]["zone"]
+                #     new_x = 512
+                #     new_y = 512
+                #     y_tot = overlap_zone[1]+overlap_zone[3]+64+cutscene_zone["zone"][3]
+                #     x_tot = overlap_zone[0]+overlap_zone[2]+64+cutscene_zone["zone"][2]
+                #     if x_tot > y_tot: # Horizontal zone
+                #         new_y = overlap_zone[1]+overlap_zone[3]+480
+                #     if x_tot < y_tot: # Vertical zone
+                #         new_x = overlap_zone[0]+overlap_zone[2]+480
+                cutscene_zone = corrections.alignToPos(cutscene_zone,new_zone_pos[0],new_zone_pos[1],False)
                 # Surely this boss-dedicated scene would not have any other duplicates IDs
                 cutscene_zone = corrections.corrSprEntZone(cutscene_zone)
                 area_zone[added_zone_area_no].append(cutscene_zone)
@@ -680,7 +680,6 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                     break
                 if have_secret:
                     # Check if exit type is goal pole]
-                    #print(f"{added_area_no}  {area_zone[added_area_no]}")
                     exit_spr,exit_spr_pos = checks.checkExitSprite(area_zone[added_area_no][-1])
                     if exit_spr[0]==113:
                         area_zone[added_area_no][-1]["sprites"][exit_spr_pos][3] = b"\x00\x00\x10\x00\x00\x00"
@@ -707,6 +706,8 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                                 area_zone[added_area_no][-1]["bgdatL1"].remove(til)
                         # Add tiles to prevent falling
                         area_zone[added_area_no][-1]["bgdatL1"].append([53, zone_ent_x, zone_ent_y+2, 25,1])
+                        # Mark zone secret exit
+                        area_zone[added_area_no][-1]["type"].append("secret_generated")
 
                         print("ADDED New Flagpole")
                     # Randomise sprite
@@ -762,7 +763,9 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                     for exit_pos in entrance_list[area_id][zone_pos]["nonenterable"]:
                         # print(f"Area {area_id+1} Zone {zone_pos} Main Entrance: {processing_area[zone_pos]["AreaSetting"][0][6]} {processing_area[zone_pos]["entrance"][exit_pos][2]}")
                         # Check if nonent is the main entrance
-                        if (area_id!=0 or (area_id==0 and zone_pos!=0)) and processing_area[zone_pos]["AreaSetting"][0][6]==processing_area[zone_pos]["entrance"][exit_pos][2]:
+                        if (area_id!=0 or (area_id==0 and zone_pos!=0)) and\
+                            processing_area[zone_pos]["AreaSetting"][0][6]==processing_area[zone_pos]["entrance"][exit_pos][2] and\
+                            ("secret_generated" not in processing_area[zone_pos]["type"]):
                             zone_main_ent.append((zone_pos, exit_pos))
                         else:
                             nonent_list[area_id].append((zone_pos, exit_pos))
@@ -784,6 +787,8 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
                 for zone_pos in range(0,len(area_zone[area_id])):
                     if "cutscene" in area_zone[area_id][zone_pos]: continue # Skip cutscene zones
                     for entrance_pos in entrance_list[area_id][zone_pos]["enterable"]:
+                        # Manual secret exit generation should not be exited to other zones
+                        if "secret_generated" in area_zone[area_id][zone_pos]["type"]: continue
                         # Find suitable exit
                         exit_found = False
                         # Check assigned
@@ -864,7 +869,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="01-02.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
