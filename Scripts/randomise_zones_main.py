@@ -62,7 +62,10 @@ def addEntranceData(areaNo : int, zoneToFind:list):
     if zoneToFind==[]:
         allEnt = []
         allNonEnt = []
+        # Mainly used for Sprite corections
+        # checks.findExitEnt(zoneToFind)
     else:
+        print("FINDING ENTRANCES AND EXIT")
         allEnt, allNonEnt = checks.findExitEnt(zoneToFind)
     entrance_list[areaNo].append({
         "enterable" : allEnt,
@@ -161,7 +164,7 @@ def addRandomZone(types: list):
 def genZone(query:list):
     all_chosen_zones =  checks.filter_zone(all_stage_zones, query) # List of all suitable types
     if all_chosen_zones:
-        chosen_zone = choice(all_chosen_zones)
+        chosen_zone = deepcopy(choice(all_chosen_zones))
         return chosen_zone, set(ba.decode() for ba in chosen_zone["tileset"][1:]), chosen_zone["type"]
     raise NoSuitableZoneError(query)
 
@@ -491,7 +494,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
 
         # Generate the entrance zone
         generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query, zone_limit==1))
-        if have_secret and "full" in gen_ent_zone_type: # If have secret and type full, check whether spawn zone has 2 or more enterables
+        if have_secret: # If have secret and type full, check whether spawn zone has 2 or more enterables
             while len(checks.findExitEnt(generated_ent_zone)[0])<1:
                 generated_ent_zone, gen_ent_zone_tileset, gen_ent_zone_type = genZone(checks.simplify_query(("OR", "full", "entrance", "ambush"), stage_query, zone_limit==1))
 
@@ -869,7 +872,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="08-38.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
