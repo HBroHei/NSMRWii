@@ -1,4 +1,4 @@
-from math import ceil
+from math import ceil, floor
 
 def binToUtf(bytesSeq):
     return list(map(lambda l1:chr(l1),bytesSeq))
@@ -8,6 +8,9 @@ def convertNULL(char):
         return " "
     else:
         return char
+
+def objPosToTilePos(objPos):
+    return [ceil(objPos[0]/16),ceil(objPos[1]/16)]
 
 def tilePosToObjPos(tilePos):
     return [tilePos[0]*16,tilePos[1]*16]
@@ -47,10 +50,6 @@ def matches_pattern(hex_str, pattern):
         if p != 'x' and h != p:
             return False
     return True
-
-from math import ceil,floor
-def objPosToTilePos(objPos):
-    return [ceil(objPos[0]/16),ceil(objPos[1]/16)]
 
 import base64
 # Thanks OpenAI

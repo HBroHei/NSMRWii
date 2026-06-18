@@ -70,6 +70,8 @@ def alignToPos(zone,nx,ny,use_min = True):
     diffy = zone["zone"][1] - ny
 
     diffx_tiles, diffy_tiles = objPosToTilePos((diffx,diffy))
+    # \/ Looks unnecessary, but crucial since the obj to tile conversion will change the obj coordinates by 0-1
+    diffx, diffy = tilePosToObjPos((diffx_tiles, diffy_tiles))
 
     # Variables indicate if property passes check (*True if not passing*)
     check_spr = False
@@ -82,19 +84,25 @@ def alignToPos(zone,nx,ny,use_min = True):
     while passes==0 or (check_spr or check_loc or check_pat or check_ent or check_zone
         or check_tile!=[]):
         # We do not care if x + width / y + height exceeds limit as it does not overflow python
-        zone["zone"][0] = clamp(zone["zone"][0] - diffx)
-        zone["zone"][1] = clamp(zone["zone"][1] - diffy)
-
+        zone["zone"][0] = (zone["zone"][0] - diffx)
+        zone["zone"][1] = (zone["zone"][1] - diffy)
+        
+        # for i in range(len(zone["sprites"])):
+        #     spr = zone["sprites"][i]
+        #     spr = [spr[0],(spr[1] - diffx),(spr[2] - diffy),spr[3],spr[4],spr[5]]
+        #     # Aligh with line
+        #     if spr[0]==
+        #     zone["sprites"][i] = 
         zone["sprites"] =\
-            [[spr[0],clamp(spr[1] - diffx),clamp(spr[2] - diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
+            [[spr[0],(spr[1] - diffx),(spr[2] - diffy),spr[3],spr[4],spr[5]] for spr in zone["sprites"]]
         zone["location"] =\
-            [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
+            [[(loc[0] - diffx), (loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["location"]]
         zone["pathNode"] =\
-            [[clamp(loc[0] - diffx), clamp(loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
+            [[(loc[0] - diffx), (loc[1] - diffy),loc[2],loc[3],loc[4]] for loc in zone["pathNode"]]
         
         for i in range(len(zone["entrance"])):
-            zone["entrance"][i][0] = clamp(zone["entrance"][i][0] - diffx)
-            zone["entrance"][i][1] = clamp(zone["entrance"][i][1] - diffy)
+            zone["entrance"][i][0] = (zone["entrance"][i][0] - diffx)
+            zone["entrance"][i][1] = (zone["entrance"][i][1] - diffy)
             # Check entrance type:
             #  - Door - get door sprite behind,
             #    - Boss : door pos x + 8, door pos y + 32
@@ -113,7 +121,7 @@ def alignToPos(zone,nx,ny,use_min = True):
             curLayerStr = "bgdatL" + str(layerNo)
             if curLayerStr in zone:
                 zone[curLayerStr] =\
-                    [[til[0],clamp(til[1] - diffx_tiles),clamp(til[2] - diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
+                    [[til[0],(til[1] - diffx_tiles),(til[2] - diffy_tiles),til[3],til[4]] for til in zone[curLayerStr]]
         passes += 1
         if passes==100:
             print("Failed to align pos")

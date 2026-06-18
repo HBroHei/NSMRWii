@@ -872,7 +872,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
         globalVars.cp1 = True
-        if stg_name=="08-38.arc":input("PRESS ENTER TO CONTINUE...")
+        if stg_name=="05-21.arc":input("PRESS ENTER TO CONTINUE...")
         #exit() ######## TEMP ########
 
     
