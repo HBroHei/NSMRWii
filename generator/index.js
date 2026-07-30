@@ -84,7 +84,7 @@ function toJson(){
     }
 
     // Get skipping special levels
-    for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_03-05","map_06-24","map_08-03","map_08-24"]){
+    for(const lvl_skip_item of ["map_01-01","map_02-24","map_03-04","map_03-05","map_06-24","map_08-03","map_08-24","map_08-38"]){
         if(document.getElementById(lvl_skip_item).checked){
             const skipLvlName = lvl_skip_item.replace("map_","") + ".arc";
             lvList_skip.push(skipLvlName)
