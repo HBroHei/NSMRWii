@@ -122,10 +122,14 @@ def process(rulesDict, stage_path = "./Stage"):
                     elif ent[2]==1 and i==2 and filename=="02-05.arc":
                         print(f"Patching Pipes in {filename}")
                         ent[5] = 4
-            elif rulesDict["Patches"]["07-21 Door"] and filename=="07-21.arc" and i==3:
+            elif filename=="07-21.arc" and rulesDict["Patches"]["07-21 Door"] and i==3:
                 print("Patching 07-21.arc")
                 for ent in entrances:
                     if ent[2]==0: ent[9] = 0x80
+            elif filename=="03-21.arc" and rulesDict["Patches"]["03-21 Path"] and i==1:
+                print("Patching 03-21.arc")
+                for sp in spriteData:
+                    if sp[0]==159 and sp[1]==482 and sp[2]==993: sp[3] = b"\x00\x00\x00\x31\x00\x20"
             outJson[filename][i] = {}
             # add zone to the output json
             for zone in zoneData:
