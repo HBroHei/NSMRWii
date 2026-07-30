@@ -131,8 +131,6 @@ def findExitEnt(zone):
             if (spr[3][2] & 4)!=0:  # Remove "wrap back to map" function
                 spr_pos = zone["sprites"].index(spr)
                 tmp_bytearr = bytearray(zone["sprites"][spr_pos][3])
-                # print(f"BYTE ARRAY ===== {tmp_bytearr}")
-                # tmp_bytearr[0] = 0x00 # Event ID
                 tmp_bytearr[2] = 0x00 # Exit to Map
                 zone["sprites"][spr_pos][3] = bytes(tmp_bytearr)
         elif spr[0]==355 or spr[0]==360: # Rolling hill pipes
@@ -152,8 +150,6 @@ def findExitEnt(zone):
         else:
             ret_pos_noExit.append(i)
 
-    # Failsafe - if every entrance is enterable, copy ret_pos to ret_pos_noExt (to avoid zone have no exit)
-    #if len(ret_pos_noExit)==0: ret_pos_noExit = deepcopy(ret_pos)
     return ret_pos,ret_pos_noExit
 
 def checkPosInSpecificPos(hostPos, sprPos, width=0, height=0) -> int: # May also incoperate with the function above?
