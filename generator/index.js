@@ -63,6 +63,7 @@ function enableV2(){
     document.getElementById("exp_amb").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_patch").disabled = !document.getElementById("exp_v2enable").checked;
     document.getElementById("exp_patch7g").disabled = !document.getElementById("exp_v2enable").checked;
+    document.getElementById("exp_patch3g").disabled = !document.getElementById("exp_v2enable").checked;
     if(document.getElementById("exp_v2enable").checked){
         document.getElementById("exp_div_darkTypes").style.display = "block";
     }
