@@ -441,7 +441,7 @@ function toJson(){
             "Music" : [musicList],
             "Ambient" : [ambList],
             "Patches" : {
-                "09-05 Pipe" : document.getElementById("exp_patch").checked,
+                "Pipe Normal Correction" : document.getElementById("exp_patch").checked,
                 "07-21 Door" : document.getElementById("exp_patch7g").checked
             },
         }
