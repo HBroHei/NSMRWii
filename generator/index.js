@@ -442,7 +442,8 @@ function toJson(){
             "Ambient" : [ambList],
             "Patches" : {
                 "Pipe Normal Correction" : document.getElementById("exp_patch").checked,
-                "07-21 Door" : document.getElementById("exp_patch7g").checked
+                "07-21 Door" : document.getElementById("exp_patch7g").checked,
+                "03-21 Path" : document.getElementById("exp_patch3g").checked
             },
         }
     }
