@@ -291,7 +291,7 @@ def corrDupID(areaNo,re_zone):
                             elif key_prop=="entrance":  # Check linked entrance
                                 re_zone["sprites"] = update_spr_value(re_zone["sprites"], cur_id, new_id, "Entrance ID")
                                 if re_zone["AreaSetting"][0][6]==cur_id and not area_setting_set:
-                                    print(f"Area SETTING Changing {re_zone["AreaSetting"][0][6]} to {new_id}")
+                                    print(f"Area SETTING Changing {re_zone['AreaSetting'][0][6]} to {new_id}")
                                     re_zone["AreaSetting"][0][6] = new_id
                                     area_setting_set = True
                             elif key_prop=="path":  # Check linked path
