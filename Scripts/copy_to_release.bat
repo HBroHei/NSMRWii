@@ -12,10 +12,11 @@ copy ..\LATEST ..\..\release\
 copy ..\LICENSE ..\..\release\
 copy .\config_autoCopy.json ..\..\release\Scripts\
 copy main_v1.py ..\..\release\Scripts\
+copy gui.py ..\..\release\Scripts\
 copy nsmbw.py ..\..\release\Scripts\
 copy ..\navbar.css ..\..\release\
 copy ..\process.html ..\..\release\
-copy randomise_zones_.py ..\..\release\Scripts\
+copy randomise_zones_main.py ..\..\release\Scripts\
 copy read_zones.py ..\..\release\Scripts\
 copy ..\README.md ..\..\release\
 copy start_cli.bat ..\..\release\Scripts\
