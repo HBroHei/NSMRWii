@@ -205,7 +205,7 @@ def btn_start_onclick():
     # Function to start randomising, ran on a thread.
     def start_randomise(stage_json, config_json, stage_path, autocopy_config):
         try:
-            randomise_zones_main.main(stage_json, config_json, stage_path, autocopy_config)
+            randomise_zones_main.main(stage_json, config_json, stage_path, autocopy_config, "./Stage_output")
         except Exception as e:
             # An exception has occured - show error message
             no_exception = False
