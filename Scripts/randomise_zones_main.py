@@ -182,7 +182,7 @@ def checkDictListEmpty(d:dict):
         if len(i_lst)!=0: return False
     return True
 
-def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
+def writeToFile(lvlName:str, lvlData:list, outdir:str, areaNo = 1):
     no_of_areas = 0
     u8_files_list = []
     # List always starts with 0, so +1 needed
@@ -283,13 +283,13 @@ def writeToFile(lvlName:str, lvlData:list, areaNo = 1):
     u8_dict = u8_m.constructFromScratch(no_of_areas,[u8_files_dir] + u8_files_list)
 
     returnARC = u8_m.repackToBytes(u8_dict)
-    Path(STAGE_OUT_DIR).mkdir(exist_ok=True)
-    with open(STAGE_OUT_DIR + lvlName, 'wb') as f:
+    Path(outdir).mkdir(exist_ok=True)
+    with open(outdir + lvlName, 'wb') as f:
         f.write(returnARC)
     print("============= Processed",lvlName,"=================")
 
 # Code below are basically a copy of editArcFile()
-def vanilla_processLvl(istr, old_stg_path):
+def vanilla_processLvl(istr, old_stg_path, outdir = STAGE_OUT_DIR):
     newName = istr
     globalVars.tileData = [[],[],[]]
 
@@ -307,8 +307,8 @@ def vanilla_processLvl(istr, old_stg_path):
 
     # "Encode" and Save the modified file
     u8n = u8_m.repackToBytes(u8list)
-    Path(STAGE_OUT_DIR).mkdir(exist_ok=True)
-    with open(STAGE_OUT_DIR + istr, 'wb') as f:
+    Path(outdir).mkdir(exist_ok=True)
+    with open(outdir + istr, 'wb') as f:
         f.write(u8n)
             
 
@@ -351,14 +351,14 @@ def D_count_levelzone(org_lvl):
     except KeyError:
         count_distri[org_lvl] = 1
 
-def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_DIR, autocopy_config = {}):
+def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_DIR, autocopy_config = {}, outdir = STAGE_OUT_DIR):
     global inJson, zoneAddedNo, area_zone, area_tileset, entrance_list, area_enterable_count, area_nonenterable_count, rando_priority_lst
 
     read_config.read(config_f=config_f, stage_f=stage_f)
 
     # Delete previous run
     try:
-        rmtree(STAGE_OUT_DIR)
+        rmtree(outdir)
     except FileNotFoundError:
         pass
 
@@ -451,12 +451,12 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         print("============== Processing",stg_name,"=====================")
         if stg_name=="Texture" or stg_name in globalVars.skipLvl :
             #log += str("Processing [S]"+ "Stage_temp" + "/" + stg_name +"to" + "Stage_output/" + stg_name + "\n")
-            copyfile(stage_f + stg_name,STAGE_OUT_DIR + stg_name) if stg_name!="Texture" else copytree(stage_f + stg_name,STAGE_OUT_DIR + stg_name)
+            copyfile(stage_f + stg_name,outdir + stg_name) if stg_name!="Texture" else copytree(stage_f + stg_name,outdir + stg_name)
             stg_i += 1
             continue # Skip that folder
         elif stg_name in globalVars.skip_but_rando:
             # Randomise that level
-            vanilla_processLvl(stg_name, stage_f)
+            vanilla_processLvl(stg_name, stage_f, outdir)
             stg_i += 1
             continue # Skip zone rando nonsense
 
@@ -857,7 +857,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         # Why keeping track of area_len when I can just do this?
         area_len = len([area_add for area_add in area_zone if len(area_add)!=0])
         # Well, I wasted my time I guess
-        writeToFile(stg_name,area_zone,area_len)
+        writeToFile(stg_name,area_zone,outdir,area_len)
         # Reset correction variables
         corrections.reset_vars()
         print("=========",str(stg_i) + "/" + str(len(stg_lst)),"processed. =========")
@@ -875,7 +875,7 @@ def main(out_json_path = OUTJSON_PATH, config_f = CONFIG_PATH, stage_f = STAGE_D
         print("Auto Copying : Beginning transfer setting verification")
         if dolphinAutoTransfer.verify_transfer_settings():
             print("Auto Copying : Transfer settings are valid, beginning transfer...")
-            if dolphinAutoTransfer.start_transfer(STAGE_OUT_DIR, XML_PATH):
+            if dolphinAutoTransfer.start_transfer(outdir, XML_PATH):
                 print("Auto Copying : Randomized Files and related Riivolution XML has been correctly transfered to the riivolution folder")
             else:
                 print("Auto Copying : An error occurred during files transfer")
